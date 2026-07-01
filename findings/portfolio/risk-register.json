@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T09:59:46.370169Z",
+  "generated_at": "2026-07-01T10:20:50.021177Z",
   "risks": [
     {
       "risk_id": "RISK-001",
@@ -9,7 +9,7 @@
       "owner": "platform",
       "mitigation": "retry/backoff and quarantine replay",
       "status": "open",
-      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+      "last_reviewed_at": "2026-07-01T10:20:50.021177Z"
     },
     {
       "risk_id": "RISK-002",
@@ -19,7 +19,7 @@
       "owner": "platform",
       "mitigation": "event + reconcile + stale SLO alerts",
       "status": "open",
-      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+      "last_reviewed_at": "2026-07-01T10:20:50.021177Z"
     },
     {
       "risk_id": "RISK-003",
@@ -29,7 +29,7 @@
       "owner": "platform",
       "mitigation": "versioned schemas and CI validation",
       "status": "open",
-      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+      "last_reviewed_at": "2026-07-01T10:20:50.021177Z"
     },
     {
       "risk_id": "RISK-004",
@@ -39,7 +39,7 @@
       "owner": "security",
       "mitigation": "least-privilege tokens and scope checks",
       "status": "open",
-      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+      "last_reviewed_at": "2026-07-01T10:20:50.021177Z"
     },
     {
       "risk_id": "RISK-005",
@@ -49,7 +49,7 @@
       "owner": "security",
       "mitigation": "output filtering and log redaction",
       "status": "open",
-      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+      "last_reviewed_at": "2026-07-01T10:20:50.021177Z"
     }
   ]
 }

@@ -1,14 +1,14 @@
 {
   "schema_version": "2.0.0",
-  "generated_at": "2026-07-01T09:59:14.048222Z",
-  "source_sha_or_etag": "2026-07-01T09:29:12Z",
+  "generated_at": "2026-07-01T10:20:28.249397Z",
+  "source_sha_or_etag": "2026-07-01T10:00:15Z",
   "generator_version": "2.0.0",
-  "run_id": "20260701T095914.048222Z",
+  "run_id": "20260701T102028.249397Z",
   "scan_scope": "full",
   "name": "skiiforge",
   "visibility": "private",
   "default_branch": "main",
-  "pushed_at": "2026-07-01T09:29:12Z",
+  "pushed_at": "2026-07-01T10:00:15Z",
   "skills_detected": false,
   "integrations": {
     "vercel": false,
@@ -22,5 +22,5 @@
   "open_prs": 0,
   "open_issues": 0,
   "workflow_count": 3,
-  "failing_recent_runs": 3
+  "failing_recent_runs": 6
 }

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "max_snapshot_age_hours": 24,
   "max_stale_repos": 0,
   "max_failed_sources": 0,
@@ -15,5 +15,14 @@
     "caspahub",
     "addplus",
     "makao"
+  ],
+  "core_repo_must_be_verified": true,
+  "alert_on_core_vercel_statuses": [
+    "mismatch",
+    "fetch_failed",
+    "missing"
+  ],
+  "informational_vercel_statuses": [
+    "missing"
   ]
 }

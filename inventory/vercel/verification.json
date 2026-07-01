@@ -1,218 +1,287 @@
 [
   {
     "repo": "skiiforge",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "makao",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_i9jzf7kdSBMEyta8xmgu6AvexFQx",
+    "vercel_project_name": "makao",
+    "latestProductionUrl": "https://makaosite.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "churchcrm",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "solera",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_En6knbJqnmzx01rjsuSdzXA0YYQU",
+    "vercel_project_name": "solera",
+    "latestProductionUrl": "https://solerasite.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "addplus",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_1Av8il1jxnKJuz6iojLV8xIsXfau",
+    "vercel_project_name": "addplus",
+    "latestProductionUrl": "https://addplus.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "edifice",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_ARNNOIwARBivyY1V5Nv6xW7aLevW",
+    "vercel_project_name": "edifice",
+    "latestProductionUrl": "https://edificesite.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "caspahub",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_9eTKoaoptTkriA9ztlem8PTGu2N1",
+    "vercel_project_name": "caspahub",
+    "latestProductionUrl": "https://caspahub.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "aang",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_ZfMieE4CUk1AeyA9lyLzIvLz95bg",
+    "vercel_project_name": "aang",
+    "latestProductionUrl": "https://aangweb.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "luminary",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "itsdeno",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_laQfQLE30EnCKCtB61dpj5RjrpQL",
+    "vercel_project_name": "itsdeno",
+    "latestProductionUrl": "https://itsdeno.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "website",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "kilimax",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "rhema",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "breeze",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_hMCchE0SgXQcSerBB9hvqaVVDWNZ",
+    "vercel_project_name": "breeze",
+    "latestProductionUrl": "https://breeze-ken-muritus-projects.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "muritukennedy",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "rpwebsite",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_ZaosoPKMx34Afs9B3PSOu2E64JI5",
+    "vercel_project_name": "rpwebsite",
+    "latestProductionUrl": "https://rpchurch.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "rpos",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_ta7sXBh0v6DZf6NtMdTZVB4SvISw",
+    "vercel_project_name": "rpos",
+    "latestProductionUrl": "https://rpchurchos.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "rpacademy",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_ex9DK852RVM0RadiAJH4d1Hmfqn2",
+    "vercel_project_name": "rpacademy",
+    "latestProductionUrl": "https://rpacademy.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "deriviq",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_0TbbQVXFCv67rmCt5htEpqC7gvIm",
+    "vercel_project_name": "deriviq",
+    "latestProductionUrl": "https://deriviq.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "rewind",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_dTd1P9zZezi9PnRakLq8Zj3SBOBl",
+    "vercel_project_name": "rewind",
+    "latestProductionUrl": "https://rewindsite.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "CRM",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "varidi",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_1poqQTxoWoqwNxr2BGHbTK98QJm6",
+    "vercel_project_name": "varidi",
+    "latestProductionUrl": "https://varidi.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "bodalink",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_O3RxJFWCXbSHV3SWTAagQi0P9nxX",
+    "vercel_project_name": "bodalink",
+    "latestProductionUrl": "https://bodalinksite.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "farisbyjaza",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_iqBBfx4T3fM8hcihlgO2dsfoHkW8",
+    "vercel_project_name": "farisbyjaza",
+    "latestProductionUrl": "https://farisbyjaza.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "pesastudio",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_6ZIkItYujZTyDsc3g7mbvJjotqRO",
+    "vercel_project_name": "pesastudio",
+    "latestProductionUrl": "https://pesastudio.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "msingi",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "v0filum",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_VAuZ5tFPaKY7Ub7zNUnuxjnjBDYM",
+    "vercel_project_name": "v0filum",
+    "latestProductionUrl": "https://v0-filum-marketing-prd.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "v0framecore",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_jLeJopP2B8ukmjLu41JWhFJPRtkH",
+    "vercel_project_name": "v0framecore",
+    "latestProductionUrl": "https://v0-build-framecore-website.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "framecore",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_HZhAOvnw2ILIlDlEYG9CFRxn1cFH",
+    "vercel_project_name": "framecore",
+    "latestProductionUrl": "https://framecore-five.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "filum",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_uxj7FuO1qXQZA8e5oxN4p2B5RTfR",
+    "vercel_project_name": "filum",
+    "latestProductionUrl": "https://filumke.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "velanoah",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "vela",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_11cwU9PnK6av4gsFzaLWpinfDJMJ",
+    "vercel_project_name": "vela",
+    "latestProductionUrl": "https://velaxyz.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "frameflow",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "verified",
+    "reason_code": "vercel_api_name_match",
+    "vercel_project_id": "prj_KpW39wDT2ZsZC5ExVTbMN7aRNrje",
+    "vercel_project_name": "frameflow",
+    "latestProductionUrl": "https://frameflow-beta.vercel.app",
+    "evidence": ".vercel/repo.json not in remote repository (typically gitignored); verified via Vercel API project name match"
   },
   {
     "repo": "schedulepro",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "ma3app",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   },
   {
     "repo": "mat3",
-    "verification_status": "fetch_failed",
-    "reason_code": "repo_json_unavailable",
-    "evidence": ".vercel/repo.json missing or unreadable"
+    "verification_status": "missing",
+    "reason_code": "no_vercel_linkage",
+    "evidence": "No .vercel/repo.json in remote repository and no Vercel project with matching name"
   }
 ]
