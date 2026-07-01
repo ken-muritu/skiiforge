@@ -1,0 +1,30 @@
+name: Validate Integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+      uses: actions/checkout@v4
+
+      - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+      - name: Validate inventory integrity
+      run: |
+        python3 scripts/validate_inventory.py
+
+      - name: Verify freshness and drift report presence
+      run: |
+        test -f findings/portfolio/systemic-gaps.md
+        test -f findings/portfolio/remediation-roadmap.md
+        test -f inventory/repos/index.json
+        test -f inventory/vercel/verification.json

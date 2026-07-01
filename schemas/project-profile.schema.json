@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectProfile",
+  "type": "object",
+  "required": [
+    "name",
+    "visibility",
+    "default_branch",
+    "pushed_at",
+    "skills_detected",
+    "integrations"
+  ],
+  "properties": {
+    "name": { "type": "string" },
+    "visibility": { "type": "string" },
+    "default_branch": { "type": "string" },
+    "pushed_at": { "type": "string" },
+    "skills_detected": { "type": "boolean" },
+    "integrations": {
+      "type": "object",
+      "required": [
+        "vercel",
+        "turso",
+        "payhero",
+        "brevo",
+        "getstream",
+        "cloudinary",
+        "render"
+      ],
+      "properties": {
+        "vercel": { "type": "boolean" },
+        "turso": { "type": "boolean" },
+        "payhero": { "type": "boolean" },
+        "brevo": { "type": "boolean" },
+        "getstream": { "type": "boolean" },
+        "cloudinary": { "type": "boolean" },
+        "render": { "type": "boolean" }
+      }
+    },
+    "open_prs": { "type": "integer" },
+    "open_issues": { "type": "integer" },
+    "workflow_count": { "type": "integer" },
+    "failing_recent_runs": { "type": "integer" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "repo": "ma3app",
+  "integrations": {
+    "vercel": false,
+    "turso": false,
+    "payhero": false,
+    "brevo": false,
+    "getstream": false,
+    "cloudinary": false,
+    "render": false
+  },
+  "source": "remote path probes"
+}

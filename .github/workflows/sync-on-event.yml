@@ -1,0 +1,50 @@
+name: Sync On Event
+
+on:
+  push:
+    branches: [main, master]
+  repository_dispatch:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */6 * * *"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+      uses: actions/checkout@v4
+
+      - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+      - name: Setup jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Auth GH CLI
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh auth status
+
+      - name: Sync remote repositories
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: bash scripts/sync_remote.sh
+
+      - name: Build inventory
+      run: python3 scripts/build_inventory.py
+
+      - name: Validate inventory
+      run: python3 scripts/validate_inventory.py
+
+      - name: Commit updates
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add inventory findings frameworks
+        git diff --cached --quiet || git commit -m "chore(sync): refresh command-centre inventory"
+        git push

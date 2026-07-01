@@ -1,0 +1,13 @@
+{
+  "repo": "edifice",
+  "integrations": {
+    "vercel": false,
+    "turso": true,
+    "payhero": true,
+    "brevo": true,
+    "getstream": true,
+    "cloudinary": false,
+    "render": false
+  },
+  "source": "remote path probes"
+}

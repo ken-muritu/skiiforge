@@ -1,0 +1,20 @@
+{
+  "name": "varidi",
+  "visibility": "private",
+  "default_branch": "main",
+  "pushed_at": "2026-06-06T21:56:03Z",
+  "skills_detected": false,
+  "integrations": {
+    "vercel": false,
+    "turso": false,
+    "payhero": false,
+    "brevo": false,
+    "getstream": false,
+    "cloudinary": false,
+    "render": true
+  },
+  "open_prs": 0,
+  "open_issues": 0,
+  "workflow_count": 2,
+  "failing_recent_runs": 20
+}

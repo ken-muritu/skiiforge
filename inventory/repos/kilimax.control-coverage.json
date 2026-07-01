@@ -1,0 +1,13 @@
+{
+  "repo": "kilimax",
+  "known_controls": {
+    "ci_present": false,
+    "skills_present": false,
+    "recent_failures_present": false
+  },
+  "gaps_flagged": [
+    "requires_manual_security_review",
+    "requires_webhook_verification_review",
+    "requires_csrf_review"
+  ]
+}

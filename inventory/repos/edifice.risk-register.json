@@ -1,0 +1,18 @@
+{
+  "repo": "edifice",
+  "risk_count": 3,
+  "risks": [
+    {
+      "severity": "high",
+      "finding": "Service worker may cache sensitive same-origin API responses."
+    },
+    {
+      "severity": "high",
+      "finding": "Mutation surfaces show CSRF/origin-hardening gaps."
+    },
+    {
+      "severity": "high",
+      "finding": "CI workflow coverage is incomplete."
+    }
+  ]
+}

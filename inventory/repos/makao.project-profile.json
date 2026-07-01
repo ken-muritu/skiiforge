@@ -1,0 +1,20 @@
+{
+  "name": "makao",
+  "visibility": "private",
+  "default_branch": "main",
+  "pushed_at": "2026-07-01T07:31:35Z",
+  "skills_detected": true,
+  "integrations": {
+    "vercel": false,
+    "turso": false,
+    "payhero": true,
+    "brevo": true,
+    "getstream": false,
+    "cloudinary": false,
+    "render": false
+  },
+  "open_prs": 0,
+  "open_issues": 0,
+  "workflow_count": 0,
+  "failing_recent_runs": 0
+}

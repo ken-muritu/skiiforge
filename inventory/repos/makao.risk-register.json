@@ -1,0 +1,18 @@
+{
+  "repo": "makao",
+  "risk_count": 3,
+  "risks": [
+    {
+      "severity": "high",
+      "finding": "Critical server actions lack strict authz checks."
+    },
+    {
+      "severity": "high",
+      "finding": "Webhook verification can be bypassed via permissive logic."
+    },
+    {
+      "severity": "high",
+      "finding": "Sensitive settings exposure and public health signal concerns."
+    }
+  ]
+}

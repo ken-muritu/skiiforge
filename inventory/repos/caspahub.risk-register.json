@@ -1,0 +1,18 @@
+{
+  "repo": "caspahub",
+  "risk_count": 3,
+  "risks": [
+    {
+      "severity": "high",
+      "finding": "Public booking tracking path can expose customer details."
+    },
+    {
+      "severity": "high",
+      "finding": "Cookie-auth mutation routes need explicit CSRF controls."
+    },
+    {
+      "severity": "high",
+      "finding": "Payment/webhook trust model contains query-secret weakness."
+    }
+  ]
+}

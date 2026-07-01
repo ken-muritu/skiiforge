@@ -1,0 +1,20 @@
+{
+  "name": "velanoah",
+  "visibility": "private",
+  "default_branch": "main",
+  "pushed_at": "2026-05-08T18:10:42Z",
+  "skills_detected": false,
+  "integrations": {
+    "vercel": false,
+    "turso": false,
+    "payhero": false,
+    "brevo": false,
+    "getstream": false,
+    "cloudinary": false,
+    "render": false
+  },
+  "open_prs": 0,
+  "open_issues": 0,
+  "workflow_count": 0,
+  "failing_recent_runs": 0
+}

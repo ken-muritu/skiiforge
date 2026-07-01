@@ -1,0 +1,18 @@
+{
+  "repo": "solera",
+  "risk_count": 3,
+  "risks": [
+    {
+      "severity": "high",
+      "finding": "Webhook verification fallback can accept forged payload shape."
+    },
+    {
+      "severity": "high",
+      "finding": "Callback secret transport in URL query."
+    },
+    {
+      "severity": "high",
+      "finding": "Weak CSP directives increase XSS blast radius."
+    }
+  ]
+}

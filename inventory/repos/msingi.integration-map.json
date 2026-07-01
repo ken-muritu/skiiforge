@@ -1,0 +1,13 @@
+{
+  "repo": "msingi",
+  "integrations": {
+    "vercel": false,
+    "turso": false,
+    "payhero": false,
+    "brevo": false,
+    "getstream": false,
+    "cloudinary": false,
+    "render": true
+  },
+  "source": "remote path probes"
+}

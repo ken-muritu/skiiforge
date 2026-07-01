@@ -1,0 +1,18 @@
+{
+  "repo": "addplus",
+  "risk_count": 3,
+  "risks": [
+    {
+      "severity": "high",
+      "finding": "Password setup flow exposes account takeover risk."
+    },
+    {
+      "severity": "high",
+      "finding": "Webhook signature verification path contains weak/stubbed checks."
+    },
+    {
+      "severity": "high",
+      "finding": "Browser token storage patterns increase XSS impact."
+    }
+  ]
+}

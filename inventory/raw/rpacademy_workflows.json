@@ -1,0 +1,1 @@
+[{"name":"Build Android APK","path":".github/workflows/build-android.yml","state":"active"},{"name":"CI","path":".github/workflows/ci.yml","state":"active"},{"name":"Deploy Academy","path":".github/workflows/deploy-web.yml","state":"active"}]

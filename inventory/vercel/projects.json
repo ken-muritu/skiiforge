@@ -1,0 +1,252 @@
+{
+  "projects": [
+    {
+      "name": "solera",
+      "id": "prj_En6knbJqnmzx01rjsuSdzXA0YYQU",
+      "latestProductionUrl": "https://solerasite.vercel.app",
+      "updatedAt": 1782895034495,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "makao",
+      "id": "prj_i9jzf7kdSBMEyta8xmgu6AvexFQx",
+      "latestProductionUrl": "https://makaosite.vercel.app",
+      "updatedAt": 1782894954568,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "edifice",
+      "id": "prj_ARNNOIwARBivyY1V5Nv6xW7aLevW",
+      "latestProductionUrl": "https://edificesite.vercel.app",
+      "updatedAt": 1782894892964,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "caspahub",
+      "id": "prj_9eTKoaoptTkriA9ztlem8PTGu2N1",
+      "latestProductionUrl": "https://caspahub.vercel.app",
+      "updatedAt": 1782894777719,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "addplus",
+      "id": "prj_1Av8il1jxnKJuz6iojLV8xIsXfau",
+      "latestProductionUrl": "https://addplus.vercel.app",
+      "updatedAt": 1782894692032,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "aang",
+      "id": "prj_ZfMieE4CUk1AeyA9lyLzIvLz95bg",
+      "latestProductionUrl": "https://aangweb.vercel.app",
+      "updatedAt": 1782217367184,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "luminarysite",
+      "id": "prj_eXgNbcW3qy4ospoXrUXMtLyDQYSd",
+      "latestProductionUrl": "https://luminarysite.vercel.app",
+      "updatedAt": 1781791739634,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "luminary-app",
+      "id": "prj_IiCuDGHm8S6gj0mTmQqcKlDgxrAd",
+      "latestProductionUrl": "https://luminary-app-ken-muritus-projects.vercel.app",
+      "updatedAt": 1781791724852,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "itsdeno",
+      "id": "prj_laQfQLE30EnCKCtB61dpj5RjrpQL",
+      "latestProductionUrl": "https://itsdeno.vercel.app",
+      "updatedAt": 1781731715492,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "kilimax-website",
+      "id": "prj_aUWjeCA9lAGROQrqCfPzYWHVnrAX",
+      "latestProductionUrl": "https://kilimax-website.vercel.app",
+      "updatedAt": 1781611745473,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "breezeairconsltd",
+      "id": "prj_Pim5OlF1c8LYNMv1plvd68PH8wiY",
+      "latestProductionUrl": "https://breezeairconsltd.vercel.app",
+      "updatedAt": 1781459688086,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "breeze",
+      "id": "prj_hMCchE0SgXQcSerBB9hvqaVVDWNZ",
+      "latestProductionUrl": "https://breeze-ken-muritus-projects.vercel.app",
+      "updatedAt": 1781459562275,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "kennedymuritu",
+      "id": "prj_U8EPpUqES5RXrp7WIANiLDEr9evi",
+      "latestProductionUrl": "https://kennedymuritu.vercel.app",
+      "updatedAt": 1781453928534,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "rpwebsite",
+      "id": "prj_ZaosoPKMx34Afs9B3PSOu2E64JI5",
+      "latestProductionUrl": "https://rpchurch.vercel.app",
+      "updatedAt": 1781365842731,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "rpos",
+      "id": "prj_ta7sXBh0v6DZf6NtMdTZVB4SvISw",
+      "latestProductionUrl": "https://rpchurchos.vercel.app",
+      "updatedAt": 1781359020863,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "rpacademy",
+      "id": "prj_ex9DK852RVM0RadiAJH4d1Hmfqn2",
+      "latestProductionUrl": "https://rpacademy.vercel.app",
+      "updatedAt": 1781358638204,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "deriviq",
+      "id": "prj_0TbbQVXFCv67rmCt5htEpqC7gvIm",
+      "latestProductionUrl": "https://deriviq.vercel.app",
+      "updatedAt": 1781156740178,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "rewind",
+      "id": "prj_dTd1P9zZezi9PnRakLq8Zj3SBOBl",
+      "latestProductionUrl": "https://rewindsite.vercel.app",
+      "updatedAt": 1781098178976,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "farisbyjaza",
+      "id": "prj_iqBBfx4T3fM8hcihlgO2dsfoHkW8",
+      "latestProductionUrl": "https://farisbyjaza.vercel.app",
+      "updatedAt": 1779780517751,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "69fe1788b4e278b246abad37",
+      "id": "prj_7czOrhfo9Lxdq0xBbUL2vsLlSY88",
+      "latestProductionUrl": "https://velanoah.vercel.app",
+      "updatedAt": 1779744200466,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "pesastudio",
+      "id": "prj_6ZIkItYujZTyDsc3g7mbvJjotqRO",
+      "latestProductionUrl": "https://pesastudio.vercel.app",
+      "updatedAt": 1779707978321,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "bodalink",
+      "id": "prj_O3RxJFWCXbSHV3SWTAagQi0P9nxX",
+      "latestProductionUrl": "https://bodalinksite.vercel.app",
+      "updatedAt": 1779704792572,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "vela",
+      "id": "prj_11cwU9PnK6av4gsFzaLWpinfDJMJ",
+      "latestProductionUrl": "https://velaxyz.vercel.app",
+      "updatedAt": 1779609429080,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "msingistore",
+      "id": "prj_fG95yvRZmDhLOG9LQiIwRVwPRn2z",
+      "latestProductionUrl": "https://msingistore.vercel.app",
+      "updatedAt": 1779530994379,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "msingios",
+      "id": "prj_9SvozfSUXWGsxISzppwNcDmU0EBo",
+      "latestProductionUrl": "https://msingios.vercel.app",
+      "updatedAt": 1779530944349,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "varidi",
+      "id": "prj_1poqQTxoWoqwNxr2BGHbTK98QJm6",
+      "latestProductionUrl": "https://varidi.vercel.app",
+      "updatedAt": 1779302146121,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "v0filum",
+      "id": "prj_VAuZ5tFPaKY7Ub7zNUnuxjnjBDYM",
+      "latestProductionUrl": "https://v0-filum-marketing-prd.vercel.app",
+      "updatedAt": 1779183394659,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "v0framecore",
+      "id": "prj_jLeJopP2B8ukmjLu41JWhFJPRtkH",
+      "latestProductionUrl": "https://v0-build-framecore-website.vercel.app",
+      "updatedAt": 1779183247904,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "framecore",
+      "id": "prj_HZhAOvnw2ILIlDlEYG9CFRxn1cFH",
+      "latestProductionUrl": "https://framecore-five.vercel.app",
+      "updatedAt": 1779099227883,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "filum",
+      "id": "prj_uxj7FuO1qXQZA8e5oxN4p2B5RTfR",
+      "latestProductionUrl": "https://filumke.vercel.app",
+      "updatedAt": 1778964705460,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    },
+    {
+      "name": "frameflow",
+      "id": "prj_KpW39wDT2ZsZC5ExVTbMN7aRNrje",
+      "latestProductionUrl": "https://frameflow-beta.vercel.app",
+      "updatedAt": 1778829980372,
+      "nodeVersion": "24.x",
+      "deprecated": false
+    }
+  ]
+}

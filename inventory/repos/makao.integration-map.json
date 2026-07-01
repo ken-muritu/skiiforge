@@ -1,0 +1,13 @@
+{
+  "repo": "makao",
+  "integrations": {
+    "vercel": false,
+    "turso": false,
+    "payhero": true,
+    "brevo": true,
+    "getstream": false,
+    "cloudinary": false,
+    "render": false
+  },
+  "source": "remote path probes"
+}

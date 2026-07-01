@@ -1,0 +1,725 @@
+{
+  "generated_repo_count": 36,
+  "profiles": [
+    {
+      "name": "skiiforge",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-07-01T09:08:00Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "makao",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-07-01T07:31:35Z",
+      "skills_detected": true,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": true,
+        "brevo": true,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "churchcrm",
+      "visibility": "private",
+      "default_branch": "master",
+      "pushed_at": "2026-07-01T06:48:00Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 7,
+      "open_issues": 0,
+      "workflow_count": 6,
+      "failing_recent_runs": 11
+    },
+    {
+      "name": "solera",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-07-01T03:51:43Z",
+      "skills_detected": true,
+      "integrations": {
+        "vercel": false,
+        "turso": true,
+        "payhero": true,
+        "brevo": true,
+        "getstream": true,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 20
+    },
+    {
+      "name": "addplus",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-30T21:59:21Z",
+      "skills_detected": true,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": true
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 2
+    },
+    {
+      "name": "edifice",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-30T21:44:58Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": true,
+        "payhero": true,
+        "brevo": true,
+        "getstream": true,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 1,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "caspahub",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-30T21:44:56Z",
+      "skills_detected": true,
+      "integrations": {
+        "vercel": false,
+        "turso": true,
+        "payhero": true,
+        "brevo": true,
+        "getstream": true,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 20
+    },
+    {
+      "name": "aang",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-23T12:21:56Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "luminary",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-18T14:08:40Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 2,
+      "failing_recent_runs": 18
+    },
+    {
+      "name": "itsdeno",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-17T21:28:10Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "website",
+      "visibility": "private",
+      "default_branch": "master",
+      "pushed_at": "2026-06-16T12:15:02Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "kilimax",
+      "visibility": "private",
+      "default_branch": "master",
+      "pushed_at": "2026-06-16T12:08:00Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "rhema",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-15T09:26:50Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 1
+    },
+    {
+      "name": "breeze",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-14T17:52:38Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 1
+    },
+    {
+      "name": "muritukennedy",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-14T16:17:45Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 1,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "rpwebsite",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-13T15:49:22Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "rpos",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-13T13:55:20Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 6
+    },
+    {
+      "name": "rpacademy",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-13T13:48:49Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 3,
+      "failing_recent_runs": 15
+    },
+    {
+      "name": "deriviq",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-11T05:44:58Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "rewind",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-10T13:29:06Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "CRM",
+      "visibility": "public",
+      "default_branch": "docs/forensic-readme-update",
+      "pushed_at": "2026-06-08T16:30:30Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "varidi",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-06T21:56:03Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": true
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 2,
+      "failing_recent_runs": 20
+    },
+    {
+      "name": "bodalink",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-06-06T21:45:52Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 8
+    },
+    {
+      "name": "farisbyjaza",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-26T07:27:36Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 2,
+      "failing_recent_runs": 20
+    },
+    {
+      "name": "pesastudio",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-25T11:19:10Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "msingi",
+      "visibility": "public",
+      "default_branch": "main",
+      "pushed_at": "2026-05-23T10:08:11Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": true
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 2,
+      "failing_recent_runs": 20
+    },
+    {
+      "name": "v0filum",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-19T01:37:17Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "v0framecore",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-19T01:26:32Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "framecore",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-18T10:13:23Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "filum",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-16T20:50:49Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "velanoah",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-08T18:10:42Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "vela",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-05-05T15:00:53Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 1,
+      "failing_recent_runs": 3
+    },
+    {
+      "name": "frameflow",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-04-13T14:27:27Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "schedulepro",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-03-15T13:21:21Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "ma3app",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-03-08T22:05:38Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 0,
+      "failing_recent_runs": 0
+    },
+    {
+      "name": "mat3",
+      "visibility": "private",
+      "default_branch": "main",
+      "pushed_at": "2026-02-03T00:47:24Z",
+      "skills_detected": false,
+      "integrations": {
+        "vercel": false,
+        "turso": false,
+        "payhero": false,
+        "brevo": false,
+        "getstream": false,
+        "cloudinary": false,
+        "render": false
+      },
+      "open_prs": 0,
+      "open_issues": 0,
+      "workflow_count": 3,
+      "failing_recent_runs": 10
+    }
+  ]
+}
