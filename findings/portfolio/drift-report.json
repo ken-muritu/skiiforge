@@ -1,3 +1,9 @@
 {
-  "generated_repo_count": 36
+  "generated_at": "2026-07-01T09:59:46.370169Z",
+  "repo_count": 36,
+  "stale_count": 0,
+  "missing_vercel_mapping_count": 0,
+  "mismatch_vercel_mapping_count": 0,
+  "fetch_failed_vercel_mapping_count": 36,
+  "quarantined_sources_count": 0
 }

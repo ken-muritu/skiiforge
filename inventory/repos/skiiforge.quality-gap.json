@@ -1,7 +1,11 @@
 {
+  "schema_version": "2.0.0",
+  "generated_at": "2026-07-01T09:59:14.048222Z",
+  "generator_version": "2.0.0",
+  "run_id": "20260701T095914.048222Z",
   "repo": "skiiforge",
-  "workflow_count": 0,
-  "failing_recent_runs": 0,
+  "workflow_count": 3,
+  "failing_recent_runs": 3,
   "open_prs": 0,
   "open_issues": 0,
   "notes": "Generated from remote metadata; deep code quality checks require targeted review."

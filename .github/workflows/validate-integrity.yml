@@ -21,10 +21,16 @@ jobs:
       - name: Validate inventory integrity
       run: |
         python3 scripts/validate_inventory.py
+        python3 scripts/generate_portfolio_reports.py
+        python3 scripts/emit_alerts.py
 
       - name: Verify freshness and drift report presence
       run: |
         test -f findings/portfolio/systemic-gaps.md
         test -f findings/portfolio/remediation-roadmap.md
+        test -f findings/portfolio/metrics.json
+        test -f findings/portfolio/metrics-dashboard.md
+        test -f findings/portfolio/risk-register.json
+        test -f findings/portfolio/alerts.json
         test -f inventory/repos/index.json
         test -f inventory/vercel/verification.json

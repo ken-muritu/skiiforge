@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-07-01T09:59:46.370169Z",
+  "risks": [
+    {
+      "risk_id": "RISK-001",
+      "category": "availability",
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "platform",
+      "mitigation": "retry/backoff and quarantine replay",
+      "status": "open",
+      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+    },
+    {
+      "risk_id": "RISK-002",
+      "category": "data-freshness",
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "platform",
+      "mitigation": "event + reconcile + stale SLO alerts",
+      "status": "open",
+      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+    },
+    {
+      "risk_id": "RISK-003",
+      "category": "schema-drift",
+      "likelihood": "medium",
+      "impact": "medium",
+      "owner": "platform",
+      "mitigation": "versioned schemas and CI validation",
+      "status": "open",
+      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+    },
+    {
+      "risk_id": "RISK-004",
+      "category": "permissions",
+      "likelihood": "medium",
+      "impact": "high",
+      "owner": "security",
+      "mitigation": "least-privilege tokens and scope checks",
+      "status": "open",
+      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+    },
+    {
+      "risk_id": "RISK-005",
+      "category": "sensitive-data",
+      "likelihood": "low",
+      "impact": "high",
+      "owner": "security",
+      "mitigation": "output filtering and log redaction",
+      "status": "open",
+      "last_reviewed_at": "2026-07-01T09:59:46.370169Z"
+    }
+  ]
+}

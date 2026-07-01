@@ -1,11 +1,22 @@
 {
+  "schema_version": "2.0.0",
+  "generated_at": "2026-07-01T09:59:14.048222Z",
+  "generator_version": "2.0.0",
+  "run_id": "20260701T095914.048222Z",
+  "scan_scope": "full",
   "generated_repo_count": 36,
   "profiles": [
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-07-01T09:29:12Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "skiiforge",
       "visibility": "private",
       "default_branch": "main",
-      "pushed_at": "2026-07-01T09:08:00Z",
+      "pushed_at": "2026-07-01T09:29:12Z",
       "skills_detected": false,
       "integrations": {
         "vercel": false,
@@ -18,10 +29,16 @@
       },
       "open_prs": 0,
       "open_issues": 0,
-      "workflow_count": 0,
-      "failing_recent_runs": 0
+      "workflow_count": 3,
+      "failing_recent_runs": 3
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-07-01T07:31:35Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "makao",
       "visibility": "private",
       "default_branch": "main",
@@ -42,6 +59,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-07-01T06:48:00Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "churchcrm",
       "visibility": "private",
       "default_branch": "master",
@@ -62,6 +85,12 @@
       "failing_recent_runs": 11
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-07-01T03:51:43Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "solera",
       "visibility": "private",
       "default_branch": "main",
@@ -82,6 +111,12 @@
       "failing_recent_runs": 20
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-30T21:59:21Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "addplus",
       "visibility": "private",
       "default_branch": "main",
@@ -102,6 +137,12 @@
       "failing_recent_runs": 2
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-30T21:44:58Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "edifice",
       "visibility": "private",
       "default_branch": "main",
@@ -122,6 +163,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-30T21:44:56Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "caspahub",
       "visibility": "private",
       "default_branch": "main",
@@ -142,6 +189,12 @@
       "failing_recent_runs": 20
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-23T12:21:56Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "aang",
       "visibility": "private",
       "default_branch": "main",
@@ -162,6 +215,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-18T14:08:40Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "luminary",
       "visibility": "private",
       "default_branch": "main",
@@ -182,6 +241,12 @@
       "failing_recent_runs": 18
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-17T21:28:10Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "itsdeno",
       "visibility": "private",
       "default_branch": "main",
@@ -202,6 +267,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-16T12:15:02Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "website",
       "visibility": "private",
       "default_branch": "master",
@@ -222,6 +293,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-16T12:08:00Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "kilimax",
       "visibility": "private",
       "default_branch": "master",
@@ -242,6 +319,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-15T09:26:50Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "rhema",
       "visibility": "private",
       "default_branch": "main",
@@ -262,6 +345,12 @@
       "failing_recent_runs": 1
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-14T17:52:38Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "breeze",
       "visibility": "private",
       "default_branch": "main",
@@ -282,6 +371,12 @@
       "failing_recent_runs": 1
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-14T16:17:45Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "muritukennedy",
       "visibility": "private",
       "default_branch": "main",
@@ -302,6 +397,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-13T15:49:22Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "rpwebsite",
       "visibility": "private",
       "default_branch": "main",
@@ -322,6 +423,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-13T13:55:20Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "rpos",
       "visibility": "private",
       "default_branch": "main",
@@ -342,6 +449,12 @@
       "failing_recent_runs": 6
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-13T13:48:49Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "rpacademy",
       "visibility": "private",
       "default_branch": "main",
@@ -362,6 +475,12 @@
       "failing_recent_runs": 15
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-11T05:44:58Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "deriviq",
       "visibility": "private",
       "default_branch": "main",
@@ -382,6 +501,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-10T13:29:06Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "rewind",
       "visibility": "private",
       "default_branch": "main",
@@ -402,6 +527,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-08T16:30:30Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "CRM",
       "visibility": "public",
       "default_branch": "docs/forensic-readme-update",
@@ -422,6 +553,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-06T21:56:03Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "varidi",
       "visibility": "private",
       "default_branch": "main",
@@ -442,6 +579,12 @@
       "failing_recent_runs": 20
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-06-06T21:45:52Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "bodalink",
       "visibility": "private",
       "default_branch": "main",
@@ -462,6 +605,12 @@
       "failing_recent_runs": 8
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-26T07:27:36Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "farisbyjaza",
       "visibility": "private",
       "default_branch": "main",
@@ -482,6 +631,12 @@
       "failing_recent_runs": 20
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-25T11:19:10Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "pesastudio",
       "visibility": "private",
       "default_branch": "main",
@@ -502,6 +657,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-23T10:08:11Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "msingi",
       "visibility": "public",
       "default_branch": "main",
@@ -522,6 +683,12 @@
       "failing_recent_runs": 20
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-19T01:37:17Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "v0filum",
       "visibility": "private",
       "default_branch": "main",
@@ -542,6 +709,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-19T01:26:32Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "v0framecore",
       "visibility": "private",
       "default_branch": "main",
@@ -562,6 +735,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-18T10:13:23Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "framecore",
       "visibility": "private",
       "default_branch": "main",
@@ -582,6 +761,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-16T20:50:49Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "filum",
       "visibility": "private",
       "default_branch": "main",
@@ -602,6 +787,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-08T18:10:42Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "velanoah",
       "visibility": "private",
       "default_branch": "main",
@@ -622,6 +813,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-05-05T15:00:53Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "vela",
       "visibility": "private",
       "default_branch": "main",
@@ -642,6 +839,12 @@
       "failing_recent_runs": 3
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-04-13T14:27:27Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "frameflow",
       "visibility": "private",
       "default_branch": "main",
@@ -662,6 +865,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-03-15T13:21:21Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "schedulepro",
       "visibility": "private",
       "default_branch": "main",
@@ -682,6 +891,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-03-08T22:05:38Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "ma3app",
       "visibility": "private",
       "default_branch": "main",
@@ -702,6 +917,12 @@
       "failing_recent_runs": 0
     },
     {
+      "schema_version": "2.0.0",
+      "generated_at": "2026-07-01T09:59:14.048222Z",
+      "source_sha_or_etag": "2026-02-03T00:47:24Z",
+      "generator_version": "2.0.0",
+      "run_id": "20260701T095914.048222Z",
+      "scan_scope": "full",
       "name": "mat3",
       "visibility": "private",
       "default_branch": "main",

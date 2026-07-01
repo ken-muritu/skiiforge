@@ -39,12 +39,20 @@ FIVE_PROJECT_RISKS = {
 def main():
     index = json.loads((REPOS_DIR / "index.json").read_text(encoding="utf-8"))
     profiles = index["profiles"]
+    generated_at = index.get("generated_at")
+    run_id = index.get("run_id")
+    generator_version = "2.0.0"
+    schema_version = "2.0.0"
 
     for profile in profiles:
         name = profile["name"]
         integrations = profile["integrations"]
 
         integration_map = {
+            "schema_version": schema_version,
+            "generated_at": generated_at,
+            "generator_version": generator_version,
+            "run_id": run_id,
             "repo": name,
             "integrations": integrations,
             "source": "remote path probes"
@@ -52,6 +60,10 @@ def main():
         (REPOS_DIR / f"{name}.integration-map.json").write_text(json.dumps(integration_map, indent=2), encoding="utf-8")
 
         risk_register = {
+            "schema_version": schema_version,
+            "generated_at": generated_at,
+            "generator_version": generator_version,
+            "run_id": run_id,
             "repo": name,
             "risk_count": len(FIVE_PROJECT_RISKS.get(name, [])),
             "risks": [
@@ -62,6 +74,10 @@ def main():
         (REPOS_DIR / f"{name}.risk-register.json").write_text(json.dumps(risk_register, indent=2), encoding="utf-8")
 
         control_coverage = {
+            "schema_version": schema_version,
+            "generated_at": generated_at,
+            "generator_version": generator_version,
+            "run_id": run_id,
             "repo": name,
             "known_controls": {
                 "ci_present": profile["workflow_count"] > 0,
@@ -77,6 +93,10 @@ def main():
         (REPOS_DIR / f"{name}.control-coverage.json").write_text(json.dumps(control_coverage, indent=2), encoding="utf-8")
 
         quality_gap = {
+            "schema_version": schema_version,
+            "generated_at": generated_at,
+            "generator_version": generator_version,
+            "run_id": run_id,
             "repo": name,
             "workflow_count": profile["workflow_count"],
             "failing_recent_runs": profile["failing_recent_runs"],
@@ -87,6 +107,10 @@ def main():
         (REPOS_DIR / f"{name}.quality-gap.json").write_text(json.dumps(quality_gap, indent=2), encoding="utf-8")
 
         skill_index = {
+            "schema_version": schema_version,
+            "generated_at": generated_at,
+            "generator_version": generator_version,
+            "run_id": run_id,
             "repo": name,
             "skills_detected": profile["skills_detected"],
             "frameworks_detected": [],

@@ -1,1 +1,218 @@
-[]
+[
+  {
+    "repo": "skiiforge",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "makao",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "churchcrm",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "solera",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "addplus",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "edifice",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "caspahub",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "aang",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "luminary",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "itsdeno",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "website",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "kilimax",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "rhema",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "breeze",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "muritukennedy",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "rpwebsite",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "rpos",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "rpacademy",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "deriviq",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "rewind",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "CRM",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "varidi",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "bodalink",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "farisbyjaza",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "pesastudio",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "msingi",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "v0filum",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "v0framecore",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "framecore",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "filum",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "velanoah",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "vela",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "frameflow",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "schedulepro",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "ma3app",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  },
+  {
+    "repo": "mat3",
+    "verification_status": "fetch_failed",
+    "reason_code": "repo_json_unavailable",
+    "evidence": ".vercel/repo.json missing or unreadable"
+  }
+]

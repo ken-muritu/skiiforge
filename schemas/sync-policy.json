@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "max_snapshot_age_hours": 24,
+  "max_stale_repos": 0,
+  "max_failed_sources": 0,
+  "required_verification_statuses": [
+    "verified",
+    "mismatch",
+    "missing",
+    "fetch_failed"
+  ],
+  "expected_core_repos": [
+    "solera",
+    "edifice",
+    "caspahub",
+    "addplus",
+    "makao"
+  ]
+}

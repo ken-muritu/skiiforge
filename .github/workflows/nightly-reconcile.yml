@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
     steps:
       - name: Checkout
       uses: actions/checkout@v4
@@ -25,31 +26,54 @@ jobs:
       - name: Run full remote sync
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SKIIFORGE_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        SKIIFORGE_SCAN_SCOPE: reconcile
       run: |
         bash scripts/sync_remote.sh
+        python3 scripts/collect_vercel_projects.py
         python3 scripts/build_inventory.py
+        python3 scripts/verify_vercel_mappings.py
+        python3 scripts/build_findings.py
+        python3 scripts/generate_portfolio_reports.py
         python3 scripts/validate_inventory.py
+        python3 scripts/emit_alerts.py
+
+      - name: Create issue on alert
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ALERT_COUNT=$(python3 - <<'PY'
+        import json
+        with open("findings/portfolio/alerts.json","r",encoding="utf-8") as f:
+            print(json.load(f).get("alert_count",0))
+        PY
+        )
+        if [ "$ALERT_COUNT" -gt 0 ]; then
+          gh issue create --title "Skiiforge reconcile alerts ($ALERT_COUNT)" --body-file findings/portfolio/alerts.md || true
+        fi
 
       - name: Freshness report
       run: |
         python3 - <<'PY'
-        import json, pathlib, datetime
-        idx = pathlib.Path("inventory/repos/index.json")
-        data = json.loads(idx.read_text())
-        now = datetime.datetime.utcnow().isoformat() + "Z"
-        report = {
-          "generated_at": now,
-          "repo_count": data.get("generated_repo_count", 0),
-          "failing_recent_runs_total": sum(p.get("failing_recent_runs", 0) for p in data.get("profiles", []))
-        }
-        pathlib.Path("findings/portfolio/drift-report.json").write_text(json.dumps(report, indent=2))
-        print(json.dumps(report, indent=2))
+        import json, pathlib
+        report = pathlib.Path("findings/portfolio/drift-report.json")
+        data = json.loads(report.read_text())
+        print(json.dumps(data, indent=2))
         PY
 
       - name: Commit reconcile outputs
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add inventory findings
-        git diff --cached --quiet || git commit -m "chore(reconcile): nightly drift and inventory refresh"
+        git add inventory findings frameworks schemas
+        if git diff --cached --quiet; then
+          exit 0
+        fi
+        RISK_CLASS=$(python3 scripts/classify_changes.py)
+        echo "Change class: $RISK_CLASS"
+        if [ "$RISK_CLASS" = "risk-impacting" ]; then
+          echo "Risk-impacting change detected; manual approval required."
+          exit 1
+        fi
+        git commit -m "chore(reconcile): nightly drift and inventory refresh"
         git push

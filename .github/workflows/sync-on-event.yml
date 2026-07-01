@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
     steps:
       - name: Checkout
       uses: actions/checkout@v4
@@ -33,18 +34,58 @@ jobs:
       - name: Sync remote repositories
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SKIIFORGE_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        SKIIFORGE_SCAN_SCOPE: event
       run: bash scripts/sync_remote.sh
+
+      - name: Collect Vercel projects
+      run: python3 scripts/collect_vercel_projects.py
 
       - name: Build inventory
       run: python3 scripts/build_inventory.py
 
+      - name: Verify Vercel mappings
+      run: python3 scripts/verify_vercel_mappings.py
+
+      - name: Build findings
+      run: python3 scripts/build_findings.py
+
+      - name: Generate portfolio reports
+      run: python3 scripts/generate_portfolio_reports.py
+
       - name: Validate inventory
       run: python3 scripts/validate_inventory.py
+
+      - name: Emit alerts
+      run: python3 scripts/emit_alerts.py
+
+      - name: Create issue on alert
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ALERT_COUNT=$(python3 - <<'PY'
+        import json
+        with open("findings/portfolio/alerts.json","r",encoding="utf-8") as f:
+            print(json.load(f).get("alert_count",0))
+        PY
+        )
+        if [ "$ALERT_COUNT" -gt 0 ]; then
+          gh issue create --title "Skiiforge sync alerts ($ALERT_COUNT)" --body-file findings/portfolio/alerts.md || true
+        fi
 
       - name: Commit updates
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add inventory findings frameworks
-        git diff --cached --quiet || git commit -m "chore(sync): refresh command-centre inventory"
+        git add inventory findings frameworks schemas
+        if git diff --cached --quiet; then
+          exit 0
+        fi
+        RISK_CLASS=$(python3 scripts/classify_changes.py)
+        echo "Change class: $RISK_CLASS"
+        if [ "$RISK_CLASS" = "risk-impacting" ]; then
+          echo "Risk-impacting change detected; manual approval required."
+          exit 1
+        fi
+        git commit -m "chore(sync): refresh command-centre inventory"
         git push

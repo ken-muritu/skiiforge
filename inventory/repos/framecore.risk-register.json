@@ -1,4 +1,8 @@
 {
+  "schema_version": "2.0.0",
+  "generated_at": "2026-07-01T09:59:14.048222Z",
+  "generator_version": "2.0.0",
+  "run_id": "20260701T095914.048222Z",
   "repo": "framecore",
   "risk_count": 0,
   "risks": []

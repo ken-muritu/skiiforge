@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import csv
 import json
+import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -58,9 +60,14 @@ def main():
     REPOS_OUT.mkdir(parents=True, exist_ok=True)
     VERCEL_OUT.mkdir(parents=True, exist_ok=True)
 
+    generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    run_id = os.getenv("SKIIFORGE_RUN_ID", generated_at.replace(":", "").replace("-", ""))
+    scan_scope = os.getenv("SKIIFORGE_SCAN_SCOPE", "full")
+    generator_version = "2.0.0"
+    schema_version = "2.0.0"
+
     repos = load_json(RAW / "repos_full.json", [])
     profiles = []
-    vercel_index = []
 
     for repo in repos:
         name = repo["name"]
@@ -74,6 +81,12 @@ def main():
 
         failing_runs = sum(1 for r in runs if r.get("conclusion") == "failure")
         profile = {
+            "schema_version": schema_version,
+            "generated_at": generated_at,
+            "source_sha_or_etag": meta.get("pushed_at", "unknown"),
+            "generator_version": generator_version,
+            "run_id": run_id,
+            "scan_scope": scan_scope,
             "name": name,
             "visibility": meta.get("visibility", "unknown"),
             "default_branch": meta.get("default_branch", repo.get("defaultBranchRef", {}).get("name", "main")),
@@ -88,21 +101,16 @@ def main():
         profiles.append(profile)
         (REPOS_OUT / f"{name}.project-profile.json").write_text(json.dumps(profile, indent=2), encoding="utf-8")
 
-        if integrations["vercel"]:
-            vercel_index.append(
-                {
-                    "repo": name,
-                    "verification_status": "detected",
-                    "evidence": ".vercel/repo.json path probe succeeded"
-                }
-            )
-
     summary = {
+        "schema_version": schema_version,
+        "generated_at": generated_at,
+        "generator_version": generator_version,
+        "run_id": run_id,
+        "scan_scope": scan_scope,
         "generated_repo_count": len(profiles),
         "profiles": profiles
     }
     (REPOS_OUT / "index.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    (VERCEL_OUT / "verification.json").write_text(json.dumps(vercel_index, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -11,3 +11,8 @@ src/lib/payhero-webhook.ts,0
 src/lib/payhero.ts,0
 src/lib/email.ts,0
 src/lib/stream/server.ts,0
+apps/web/src/lib/turso-api.ts,1
+apps/web/src/lib/payhero-webhook.ts,1
+apps/web/src/lib/stream/server.ts,1
+apps/api/src/services/emailService.ts,1
+apps/api/src/lib/imageUpload.ts,1

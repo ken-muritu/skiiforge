@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-07-01T09:59:46.370169Z",
+  "repo_count_total": 36,
+  "repo_count_fresh": 36,
+  "repo_count_stale": 0,
+  "validation_failures": 0,
+  "vercel_verified_count": 0,
+  "quarantined_sources_count": 0,
+  "vercel_mismatch_count": 0,
+  "vercel_missing_count": 0,
+  "vercel_fetch_failed_count": 36
+}
