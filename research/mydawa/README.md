@@ -1,94 +1,154 @@
-# MYDAWA — Complete Site Content Archive (README)
+# MYDAWA — Visual & Content Research Archive
 
-Research archive of **https://mydawa.com/** — Kenya's online pharmacy & health platform.
-Produced by an automated documentation pass (Hermes Agent), 2026-07-25.
+Automated documentation pass over **https://mydawa.com/** (Kenya's online pharmacy & health platform),
+produced by Hermes Agent on **2026-07-25**. This README is the master index: it captures everything
+we have collected, explains *how we got here*, and lists what is still pending.
 
-> STATUS: This master document consolidates all content captured this session.
-> Live full-site crawl is **PENDING browser-backend recovery** (managed browser was in
-> a sustained 502 outage at time of writing). Sections already verified from the live
-> site are marked [VERIFIED]; sections pending live fetch are marked [PENDING].
-> No real purchase was placed; auth was crossed only with the account owner's consent
-> (SMS OTP) and only up to the cart/checkout boundary.
+> **Honesty notes**
+> - No real purchase was ever placed. Authentication was crossed only with the account owner's
+>   consent (SMS OTP) and only up to the cart/checkout boundary.
+> - The managed browser backend was unstable (repeated 502 outages). Some intended captures were
+>   lost to resets — see "How we got here" and the `screenshots-all/MANIFEST.md`.
+> - Mobile/tablet (390/768 px) screenshots are **not** possible through the managed browser tool
+>   (fixed ~1512 px viewport, no device emulation). They require `scripts/cap.py` on a host with
+>   egress + Playwright (see "How to finish").
 
-## 0. Site Identity
-- Name: MYDAWA. Tagline: "for your health". Positioning: "Kenya's Most Trusted Online Pharmacy".
-- Regulated: PPB (Pharmacy and Poisons Board of Kenya) "Authorized Pharmacy", Health Safety Code **P0940**.
-- Delivery: Kenya-wide; standard delivery window "4-6 hours" cited on product pages. Campaign observed: "FREE DELIVERY ALL WEEKEND WITHIN NAIROBI AND MOMBASA" (MYDAWA "Back in Bloom", 1st–31st July).
-- Auth model: **phone + SMS OTP only** (no password, no CAPTCHA). Cart/checkout/account are auth-gated.
+---
 
-## 1. Top Navigation (icon + label)
-Shop by Category · Shop by Condition · Shop by Brand · Services · My Health Center.
-Persistent CTAs: "Speak to a Doctor" (telehealth), "Upload Prescription".
-Utility bar: logo, global search, delivery-location chip, Deals, Sign In/Account, cart.
+## 1. What we have (current inventory)
 
-## 2. Homepage [VERIFIED]
-- Promo banner: "MYDAWA is Back in Bloom — your favourite health & wellness essentials… at lower everyday prices."
-- Search module ("What Are You Looking For?") + trending chips: La Roche-Posay Anthelios UVMune 400 SPF50, PEP Tablets 90's, Mariprist, La Roche Lipikar Baume AP+M, CeraVe Foam Cleanser, Postinor 2, CeraVe Moisturizing Lotion, Zelaton 15 Gel, NOW Magnesium Glycinate, La Roche-Posay Anthelios Shaka Spray.
-- "Get Started" tiles (15): Femvive, Reproductive Health & Sexual, Supplements & Nutrition, Medical Devices, New on MYDAWA, Snacks & Drinks, Mum & Baby, Offers, Pata Tiba Na Thao, Health Conditions, Family Planning, IV Therapy, Beauty & Skin Care, Personal Care, Dermatological Skincare.
-- BLOOM FLASH SALES: live countdown + "View All". Sample items (name · was · now KES): Dewpoint's Activated Charcoal Soap 150g 470/414; Dr Organic Pro Collagen Dragons Blood Moisturiser 3,990/3,591; Yves Rocher Repair Lotion 390ml 2,798/2,519; Aunt Jackie's Grapeseed Hair Shine Boss 118ml 1,879/1,654; Nascita Make-Up Angled Powder Brush 896/789; Dermol Emollient Cream 500ml 2,320/2,042; Nascita Cleaning Sponge 202; Revlon Super Lustrous Lipstick Black Cherry 1,678/1,477; Rexona Invisible Black&White Deo 741/653; Dr Organic Ageless Cleansing Balm 2,610/2,297.
-- "Get 400 KES OFF Your Next Order" — Share Your Shopping List (Skincare, Baby Care, Mothercare, Haircare, Wellness, Personal Care; JPG/PNG/PDF ≤20MB; min spend KSh 2,000; voucher 15 days).
-- Supplement Finder ("Not sure which supplements are right for you?") — goals: Energy, Immunity, Sleep, Gut Health, Skin & Hair, Bone & Joint → /vitamin-quiz.
-- Product grids: Recommended For You, Offers For You, New on MYDAWA, Popular Sun Care.
-- My Health Center tabs: Chronic Conditions, Sexual & Reproductive Health, IV Therapy, Pata Tiba Model, Telehealth.
+```
+research/mydawa/
+├── README.md                 ← this master index
+├── routes.json               ← exhaustive crawl map (96 routes, 7 groups)
+├── screenshots-all/          ← ALL screenshots in one folder (deduped)
+│   ├── MANIFEST.md           ← traces every original file; documents the dup bug
+│   └── 11 unique PNGs        (homepage, PLP, PDP, diabetes/Mzima, brands, offers,
+│                              telehealth, authed-home, empty-cart, nav-panel, login)
+├── markdown-all/             ← ALL markdown in one folder
+│   ├── MASTER.md             ← every per-page .md combined into one 44 KB doc
+│   └── 19 per-page .md files (homepage, navigation, catalogue, offers, search,
+│                              auth, telehealth, components, branding, UX, sitemap…)
+└── scripts/
+    └── cap.py                ← parametric Playwright capture (desktop/tablet/mobile,
+                               gated areas) — the durable "complete the archive" tool
+```
 
-## 3. Catalogue [VERIFIED]
-- /products: "Showing 20 of **13,213 products**". Filter sidebar: Category (150+ checkboxes), Brand, Price, Discounts. SORT: Recommended, Popularity, Price Low→High, Price High→Low, Offers, New Products. SHOW per page: 20/40/80/100. Grid/list toggle. 4-col grid.
-- Shop by Category & Shop by Condition open a filtered listing (NOT a hover menu).
-- /brands: A–Z brand index (6,500+ brands), live "Search brands…" filter, 5-col grid. Brand pages: /brand/<slug>.
+Totals committed: **11 unique PNGs**, **20 markdown docs** (19 per-page + MASTER), **1 route map**,
+**1 capture script**. **Zero zero-byte files.**
 
-### Shop by Category roots (15) [VERIFIED]
-beauty-and-skin-care · dermatological-skincare · family-planning · femvive · health-conditions · iv-therapy · medical-devices · mum-and-baby · new-on-mydawa · offers · pata-tiba-na-thao · personal-care · reproductive-health-and-sexual · snacks-and-drinks · supplements-and-nutrition
+### Verified screenshots (11 distinct)
+| File | What it shows |
+|---|---|
+| `homepage-desktop-1512px.png` | Homepage (logged-out) |
+| `products-catalogue-root.png` | /products PLP — "13,213 products" |
+| `product-detail-laroche-anthelios.png` | PDP example |
+| `diabetes-mzima-landing.png` | Mzima chronic-care landing |
+| `brands-index.png` | /brands A–Z index |
+| `offers-page.png` | /offer |
+| `telehealth.png` | /telehealth |
+| `authenticated-homepage.png` | Homepage as logged-in "Kennedy" |
+| `cart-empty.png` | /mycart empty + 3-step checkout indicator |
+| `category-listing-skincare.png` | Shop-by-Category panel / skincare listing |
+| `login-page.png` | /login (logged-out OTP screen) |
 
-### Shop by Condition roots (40+) [VERIFIED]
-allergies-allergic-reactions · anti-inflammatory-conditions · bladder-and-urinary-health · blood-and-circulation-health · bone-joint-and-muscle-health · brain-and-nerve-conditions · cancer-care · cold-and-flu · dependence · diabetes · diagnostic-tests · emergency-care · eye-and-ear-conditions · foot-conditons · gastrointestinal-conditions · heart-conditions · hemorrhoidsvaricose-veins · hypertension · immunosuppressants · infections · insomnia · liver-and-kidney-conditions · malaria · mens-health · mental-health · motion-sickness · oral-conditions · pain-and-inflammation · pregnancy · respiratory-conditions · sickle-cell-disease · skin-conditions · thyroid-conditions · vaccines · weight-management · wellness-check-ups · wound-and-burn-care
+### Verified content (markdown) — all in `markdown-all/`
+homepage · navigation-hierarchy · products-catalogue · catalogue-and-filtering ·
+product-detail-example · brands-index · offers-page · search-experience · auth-pages ·
+authenticated-state · pharmacy-services · telehealth · components-inventory ·
+branding-notes · color-palette · ux-observations · sitemap · url-inventory ·
+capture-status · **MASTER.md** (all of the above combined).
 
-### Product Detail [VERIFIED] (example: La Roche-Posay Anthelios Fluid UVMune 400 SPF50 50ml, KES 3,200)
-Image gallery (1/3) + thumbnails · brand link · rating 4.7 (14 Ratings · 14 Reviews) · "In Stock" · "Standard Delivery: 4-6 hours" · "49/50 sold in the last 7 days" · Add To Cart + Wish List · OVERVIEW · accordions (How to use, Precautions & Disclaimer) · Customer Reviews (star distribution, sort Latest/Oldest/High/Low Rated, Helpful/Report, Load More) · Similar Products carousel.
+---
 
-## 4. Offers [VERIFIED] (/offer)
-"Best Value Offers For You" grid (discount badges 5%–20%, "Add To Cart" or "Notify Me" for out-of-stock). "Sale Is Live" + "Shop Now" banner strip. "Offers By Categories" (10 tiles). "Smart Savings On Popular Brands" (Garnier, Nice & Lovely, MEGA, Holland & Barrett, Nivea, Eucerin, Dove, La Roche-Posay, Molfix, Bio-Oil).
-- /flash-sale [PENDING live fetch].
+## 2. How we got here (the journey)
 
-## 5. Search [VERIFIED]
-Header + homepage search. Query via /products?search=<term> (reuses PLP shell). paracetamol → results grid; nonexistent term → empty grid (no dedicated no-results template observed). Autocomplete/type-ahead [PENDING].
+1. **Kickoff.** Goal: a complete visual + content archive of mydawa.com pushed to this repo.
+   Sandbox egress is allow-listed (github/npm/Cloudflare only); mydawa.com is **TLS-blocked**
+   from the terminal (`curl` → 000). The *only* path to the live site is the managed browser tool
+   (Browserbase infra), which renders a **fixed ~1512 px desktop viewport with no device emulation**.
 
-## 6. Authentication [VERIFIED]
-- /login & /register: phone + SMS OTP only. Country +254, mobile field, "Send code". No password, no CAPTCHA. /mycart → redirects to /login?ReturnUrl=%2Fmycart (auth gate).
-- Authenticated (as account "Kennedy", with owner consent): header shows "Hello, Kennedy" + saved "Delivery to Kennedy Muritu". 
+2. **First pass + disaster.** Initial captures were written with `write_file`, which in this
+   sandbox **silently produced 0-byte files** — the first push (`5979c4f`) shipped 12 empty `.md`
+   files. Caught via an audit, rebuilt with in-process Python writes, re-pushed (`f5530a0`).
 
-## 7. Shopping Journey [PARTIAL]
-- Cart (/mycart): "My Cart", 3-step checkout indicator: (1) Cart Summary → (2) Delivery Details → (3) Payment. Empty state captured. Populated cart + Delivery + Payment steps [PENDING — backend outage + cart-not-persisting quirk]. No real order placed.
-- Account dashboard / orders / prescriptions [PENDING].
+3. **Content capture.** Logged the public site: homepage, PLP (13,213 products), category/condition
+   trees (15 categories, 40+ conditions), 6,500+ brands, offers, search, telehealth, Mzima/diabetes,
+   branding (PIL colour extraction → PPB code **P0940**), components, UX notes, sitemap/URL inventory.
 
-## 8. Healthcare Services [PARTIAL]
-- Telehealth (/telehealth) [VERIFIED]: "Talk to a Doctor on Phone for Free". Services: Prescription (validate/renew + delivery), Lab Tests from Home, Family Planning (incl. injectables at home), IV Therapy at Home, Chronic Care (Mzima: diabetes, hypertension, asthma). How It Works: Book free consult → call from provider → care plan → delivery. FAQ accordion. Booking CTAs gate to login.
-- Mzima Chronic Care (/diabetes, /hypertension, /sicklecell, /lupus, /arthritis) [VERIFIED for /diabetes]: hero "Diabetes Care Made Simpler with Mzima" + Book a Consultation; condition explainer; "Why It Matters" complications; signs & symptoms; management; "How the Mzima Program Supports You" (care plan, free monthly follow-up calls, nutrition reviews, specialist check); FAQ; CTA.
-- IV Therapy (/ivtherapy), Pata Tiba Na Thao (/patatiba), PrEP (/prep), PEP (/pep), Sexual & Reproductive (/sexualwellness), Family Planning (/familyplanning), Health Center (/health-center), Mzima Program (/mzimaprogram), Vitamin Quiz (/vitamin-quiz), Upload Prescription (/submit-a-prescription) [PENDING live fetch].
+4. **Auth + cart/checkout (with consent).** Logged in as the account owner ("Kennedy") via SMS OTP
+   (no password, no order). Captured authenticated homepage + empty cart (3-step indicator:
+   Cart Summary → Delivery Details → Payment). The *populated* cart + Delivery/Payment steps could
+   not be captured: the browser kept 502-ing, and MYDAWA's cart did not persist across a hard
+   navigation in this tool.
 
-## 9. Branding [VERIFIED]
-- Logo: "MYDAWA Logo" (alt), tagline "for your health".
-- Color: primary brand MAGENTA ~#e01070 (gradient to #500040); neutral base light grey #f0f0f0, near-black #101020 text; teal/green healthcare identity (Mzima, delivery, In Stock). See markdown-all/color-palette.md (PIL pixel extraction).
-- Icons: line icons (nav, search, location, cart, wishlist). Marketing imagery + app QR.
+5. **The duplicate-image bug.** During the flaky session the browser repeatedly reset to the
+   logged-out `/login` screen; my "copy latest screenshot" step then saved that *same* login page
+   over several intended captures (offers/register/search/cart-gate). Result: of 26 PNGs, only
+   **11 were unique** — 11 were identical login pages. Consolidation (below) collapsed these and
+   `screenshots-all/MANIFEST.md` documents exactly which intended pages were lost.
 
-## 10. Footer (all pages) [VERIFIED]
-App QR + "Scan QR to Download the MYDAWA Mobile App". Newsletter signup. Link columns:
-- SHOP BY CATEGORY (15 roots)
-- ABOUT US: Who We Are, Quality Statement, Careers, Terms & Conditions, Privacy Cookies, Disclaimer, Copyright
-- HELP CENTER: FAQs, Contact Us, Shipping Policy, Return Policy, Pharmacovigilance
-- READ & LEARN: My Health Center
-- Authorized Pharmacy (PPB P0940) · App Store + Google Play badges.
+6. **Consolidation (your request).** Collapsed all screenshots into `screenshots-all/` (deduped,
+   with manifest) and all markdown into `markdown-all/`. Added `MASTER.md` combining all 19 per-page
+   docs into one file. Commit `fac42bf`.
 
-## 11. Information / Legal routes [PENDING live fetch]
-/who-we-are · /quality-statement · /careers · /terms-conditions · /privacy-cookies · /disclaimer · /copyright · /help-center/faq · /contact-us · /return-policy · /pharmacovigilance · /upload-shopping-list
+7. **Current state.** The managed browser backend is in a sustained 502 outage, so the remaining
+   live captures (full category/condition/brand crawl, populated checkout, mobile/tablet) are blocked
+   until it recovers or `scripts/cap.py` runs on a capable host.
 
-## 12. Full Route Inventory (crawl map)
-See markdown-all/url-inventory.md (926-link homepage graph + category/condition/brand trees)
-and scripts/cap.py (parametric capture matrix: areas × desktop/tablet/mobile).
-PENDING live crawl will extend README §3–§11 with every condition/category/brand/health
-page's extracted text.
+---
 
-## 13. How to reproduce / complete
-- Browser-tool passes: re-establish the managed browser; resume PENDING sections; commit incrementally.
-- Full device matrix + gated cart/checkout/account: `python3 scripts/cap.py all` on a host
-  with egress + Playwright (and MYDAWA_STATE for gated areas). Idempotent (skip-existing).
-- Safety: no real purchase; auth only with owner consent; public content only.
+## 3. What's pending / remaining
+
+### A. Live content not yet fetched (browser was down / reset-bug losses)
+- **Re-capture the clobbered pages** (highest priority): `offers`, `register`, `search-results`,
+  `search-no-results`, `cart-login-gate`, `auth-gate` were overwritten by the login-page duplicate.
+- **Full category crawl** (15 category roots) — text + screenshots per category.
+- **Full condition crawl** (40+ condition roots).
+- **Brand pages** (6,500+ — sample a representative set).
+- **Healthcare pages**: /ivtherapy, /patatiba, /prep, /pep, /sexualwellness, /familyplanning,
+  /health-center, /mzimaprogram, /vitamin-quiz, /submit-a-prescription.
+- **Info/legal**: /who-we-are, /quality-statement, /careers, /terms-conditions, /privacy-cookies,
+  /disclaimer, /copyright, /help-center/faq, /contact-us, /return-policy, /pharmacovigilance,
+  /upload-shopping-list.
+- **/flash-sale** dedicated page.
+
+### B. Shopping journey (auth-gated, owner-consented)
+- Populated cart, **Delivery Details** step, **Payment** step (stop before placing any order).
+- Account dashboard / orders / prescriptions pages.
+
+### C. Device matrix (cannot be done via managed browser tool)
+- **Tablet (768 px) and Mobile (390 px)** screenshots for every key page — only `scripts/cap.py`
+  on a host with egress + Playwright can produce these.
+
+### D. README "entire site" crawl
+- Fold the full live crawl (A) into this README so it becomes the single complete content document.
+
+---
+
+## 4. How to finish (reproducibility)
+
+- **Managed-browser passes** (when backend is healthy): resume section A/B above; commit incrementally.
+- **Complete device matrix + gated areas**: `python3 scripts/cap.py all` on a host with egress +
+  Playwright. Gated routes use a logged-in `MYDAWA_STATE` (storage_state JSON). Idempotent
+  (skip-existing), full-page shots, 1920/834/390 viewports. No real order is placed by the script.
+- **Safety constraints**: no real purchase; auth only with owner consent; public content only;
+  do not access non-public data.
+
+---
+
+## 5. Site content (verified extracts) — quick reference
+
+- **Identity**: MYDAWA, "for your health", PPB-authorized (code **P0940**), Kenya-wide delivery
+  (standard "4–6 hours"). Campaign: "Back in Bloom" / "FREE DELIVERY ALL WEEKEND… NAIROBI AND MOMBASA".
+- **Auth**: phone + SMS OTP only (no password, no CAPTCHA). /mycart → `/login?ReturnUrl=%2Fmycart`.
+- **Catalogue**: 13,213 products; filters by Category (150+), Brand, Price, Discount; sort + 20/40/80/100.
+- **Navigation**: Shop by Category · Shop by Condition · Shop by Brand · Services · My Health Center;
+  CTAs "Speak to a Doctor", "Upload Prescription".
+- **Healthcare**: Telehealth (free phone consult), Mzima chronic care (diabetes/hypertension/etc.),
+  IV therapy at home, Pata Tiba Na Thao, PrEP/PEP, family planning.
+- **Branding**: primary magenta ~#e01070; neutral grey #f0f0f0; near-black #101020; teal/green
+  healthcare accent. See `markdown-all/color-palette.md`.
+
+> For the full per-section write-ups, see `markdown-all/` (or the combined `markdown-all/MASTER.md`).
+> For the complete route map, see `routes.json`.
