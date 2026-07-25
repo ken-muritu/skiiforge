@@ -172,3 +172,15 @@ capture-status · **MASTER.md** (all of the above combined).
 | 8 | in the md folder, add a master md for all the mds (combine all their md files to one) | Created markdown-all/MASTER.md — all 19 per-page docs combined verbatim under headings, with table of contents (44 KB). |
 | 9 | in this github.com/ken-muritu/skiiforge/tree/main/research/mydawa can you update the readme to include and capture all we have as of now to the core and how we got there, and what's pending/remaining | Rewrote README as master index: inventory + journey (egress block, 0-byte disaster, auth w/ consent, dup bug, consolidation) + structured pending list + reproducibility. |
 | 10 | maybe something to add, is right from the prompt I gave you (basically the chat log, coupled with what was done in the readme) | Appending this Conversation Log section mapping each user prompt to the action it triggered. |
+
+---
+
+## 11. Companion Documents
+
+- **`MYDAWA-EXECUTIVE-REPORT.md`** — comprehensive executive platform handbook (this archive's
+  content, structured for stakeholders).
+- **`MYDAWA-DUE-DILIGENCE.md`** — separate due-diligence assessment: regulatory/compliance posture
+  (PPB P0940), security (OTP-only auth, auth-gating), privacy/health-data exposure, operational
+  resilience, a confirmed data-quality defect (11/26 screenshots were duplicate login pages), a
+  findings register, and evidence-gathering recommendations. **Read it alongside this README:**
+  it is explicitly provisional because the archive is front-end-only.
