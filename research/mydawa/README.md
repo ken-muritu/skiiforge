@@ -67,7 +67,7 @@ Header + homepage search. Query via /products?search=<term> (reuses PLP shell). 
 
 ## 9. Branding [VERIFIED]
 - Logo: "MYDAWA Logo" (alt), tagline "for your health".
-- Color: primary brand MAGENTA ~#e01070 (gradient to #500040); neutral base light grey #f0f0f0, near-black #101020 text; teal/green healthcare identity (Mzima, delivery, In Stock). See branding/color-palette.md (PIL pixel extraction).
+- Color: primary brand MAGENTA ~#e01070 (gradient to #500040); neutral base light grey #f0f0f0, near-black #101020 text; teal/green healthcare identity (Mzima, delivery, In Stock). See markdown-all/color-palette.md (PIL pixel extraction).
 - Icons: line icons (nav, search, location, cart, wishlist). Marketing imagery + app QR.
 
 ## 10. Footer (all pages) [VERIFIED]
@@ -82,7 +82,7 @@ App QR + "Scan QR to Download the MYDAWA Mobile App". Newsletter signup. Link co
 /who-we-are · /quality-statement · /careers · /terms-conditions · /privacy-cookies · /disclaimer · /copyright · /help-center/faq · /contact-us · /return-policy · /pharmacovigilance · /upload-shopping-list
 
 ## 12. Full Route Inventory (crawl map)
-See sitemap/url-inventory.md (926-link homepage graph + category/condition/brand trees)
+See markdown-all/url-inventory.md (926-link homepage graph + category/condition/brand trees)
 and scripts/cap.py (parametric capture matrix: areas × desktop/tablet/mobile).
 PENDING live crawl will extend README §3–§11 with every condition/category/brand/health
 page's extracted text.
