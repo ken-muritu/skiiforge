@@ -152,3 +152,23 @@ capture-status · **MASTER.md** (all of the above combined).
 
 > For the full per-section write-ups, see `markdown-all/` (or the combined `markdown-all/MASTER.md`).
 > For the complete route map, see `routes.json`.
+
+---
+
+## 6. Conversation Log (prompt → action)
+
+> Verbatim user prompts from this session, each paired with what was actually done.
+> This is the audit trail of how the archive was built turn by turn.
+
+| # | User prompt (paraphrased/verbatim) | What was done |
+|---|---|---|
+| 1 | can't we find a way around mydawa just as we did with the above such that we have screenshots that capture the entire mydawa website? | Explained the prior 'way around' was cloning local git repos (github egress) — does not apply to a live TLS-blocked site. Managed browser tool is the only path (fixed 1512px, no device emulation). Proposed Options A/B/C. |
+| 2 | 3 to completion | Chose Option 3: finish desktop capture via browser tool (A) AND build the Playwright cap.py + full route matrix (C). Captured offers, login, register, search-results, search-no-results, cart-gate, telehealth; wrote 19 content docs; committed cap.py. |
+| 3 | let's proceed with what's remaining, ask me for the OTP I'll send you | Logged in as Kennedy via SMS OTP (with consent). Captured authenticated homepage + empty cart (3-step checkout indicator). Browser 502 outages blocked populated cart/checkout. |
+| 4 | +254 115594826  /  562661  /  878752  /  300186  /  167433 | Supplied mobile number + OTPs across multiple login attempts. Browser blank-frame + 502 quirks required re-sending codes; final successful login used 167433. No order placed. |
+| 5 | let's retry... ensure we complete to the end/successfully | Re-attempted gated capture; session had logged out (cookie lost in outage). Re-logged in, added item, but cart did not persist across navigation. Paused; committed progress. |
+| 6 | another thing, let's crawl the entire site (entire!) and put all the contents in the readme file but for now let's finish up | Built master README consolidating all captured content with [VERIFIED]/[PENDING] markers; added exhaustive route map (routes.json, 96 routes) for the full crawl. |
+| 7 | can we place all screenshots in one folder (all!) then all md files in another (all!) | Consolidated: screenshots-all/ (11 unique PNGs deduped + MANIFEST.md) and markdown-all/ (19 per-page .md). Discovered 26 PNGs -> only 11 unique (11 identical login-page dupes from resets). Removed old subfolders. |
+| 8 | in the md folder, add a master md for all the mds (combine all their md files to one) | Created markdown-all/MASTER.md — all 19 per-page docs combined verbatim under headings, with table of contents (44 KB). |
+| 9 | in this github.com/ken-muritu/skiiforge/tree/main/research/mydawa can you update the readme to include and capture all we have as of now to the core and how we got there, and what's pending/remaining | Rewrote README as master index: inventory + journey (egress block, 0-byte disaster, auth w/ consent, dup bug, consolidation) + structured pending list + reproducibility. |
+| 10 | maybe something to add, is right from the prompt I gave you (basically the chat log, coupled with what was done in the readme) | Appending this Conversation Log section mapping each user prompt to the action it triggered. |
