@@ -59,3 +59,17 @@ No real purchase. No auth bypass. Public content only; gated areas need user con
   persist into /mycart), Delivery Details step, Payment step, account dashboard/
   orders/prescriptions. Resume when browser backend recovers; still authed (cookie
   session should persist). NO real order will be placed.
+
+
+## FINAL STATE 2026-07-25 (end of authed session attempt)
+- Logged in as Kennedy twice (OTPs 878752, 167433) — no order placed, no password.
+- Captured & pushed: authenticated homepage, empty cart (3-step checkout indicator).
+- BLOCKED: populated cart + Delivery Details + Payment steps. Two causes:
+  (1) managed browser backend 502 outages throughout; (2) the site's cart did not
+  persist into a fresh /mycart navigation in this tool (cart preview dialog holds the
+  in-memory item; a hard nav to /mycart shows the server cart which stayed empty).
+- RECOMMENDED FINISH: run scripts/cap.py on a host with stable egress + a logged-in
+  MYDAWA_STATE (storage_state JSON). It captures the gated cart/checkout/account
+  matrix idempotently, including a populated cart if the add-to-cart is scripted
+  before the screenshot. No real order is placed by the script.
+- The README crawl (full-site content) is a SEPARATE follow-up task.
