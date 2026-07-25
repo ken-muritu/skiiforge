@@ -208,3 +208,55 @@ reliance (investment, partnership, or integration) is placed on this assessment.
 *Prepared 2026-07-25 from research/mydawa/ captured sources. Companion document:
 `MYDAWA-EXECUTIVE-REPORT.md`. All findings are grounded in the archive; "[Cannot assess]" denotes
 evidence gaps, not presumed deficiencies.*
+
+
+---
+
+## 10. LIVE Due-Diligence Pass (navigated mydawa.com, 2026-07-25)
+
+> Added after a live black-box pass through the managed browser. Scope: front-end only, desktop
+> viewport, no devtools/network inspector, no source access, no backend testing. The browser backend
+> was unstable (intermittent 502/timeouts), so the live pass was partial; remaining probes are listed
+> as PENDING. No login was performed in this pass (the earlier authed session from the capture effort
+> is separate and documented in capture-status.md).
+
+### 10.1 Confirmed live observations
+- **Account route correction (finding F13):** `/account` returns a **404 ("Page Not Found")**, NOT an
+  auth-gate redirect. The real account surfaces are enumerated in robots.txt: `/my-account`,
+  `/My-Account`, `/my-orders`, `/my-profile`, `/order-issue`. *DD implication:* the earlier `routes.json`
+  guess of `/account` was wrong; the production route namespace uses `my-account`/`my-orders` etc.
+- **robots.txt discloses the internal API/route taxonomy (finding F14):** the file reveals (by name)
+  the backend endpoint surface, including:
+  - Transactional/gated: `/checkout`, `/mycart`, `/login`, `/home/login`, `/register`, `/My-Account`,
+    `/my-account`, `/my-orders`, `/my-profile`, `/order-issue`, `/payment`, `/payment-status`,
+    `/order-confirmation`, `/wishlist`.
+  - **Internal API endpoints (named, "Disallow"):** `/linkeditem`, `/productsearch`, `/categorysearch`,
+    `/brandsearch`, `/addcart`, `/notifyme`, `/addwishlistproduct`, `/getpickuporders`, `/regions`.
+  - Search: `Disallow: /search?`.
+  - Sitemap declared: `https://mydawa.com/sitemap.xml`.
+  *DD implication:* this is **standard robots.txt practice** (not a vulnerability per se), but it does
+  confirm a server-side API layer exists behind those paths and names its functions. The endpoints are
+  not directly exercised here; whether they enforce auth/rate-limiting/object-level authorization is
+  **[Cannot assess — not tested]**.
+- **Homepage (live) confirmation:** "Get the App" dropdown, "Deals" nav link, and a **dynamic BLOOM
+  FLASH SALES countdown** (observed ticking, e.g. "01h 15m 33s") — confirms time-sensitive promo logic
+  is server/client-driven and live.
+
+### 10.2 Probes attempted but BLOCKED by backend outage (PENDING)
+- Fetch + parse `/sitemap.xml` (to enumerate real public URL scale and confirm the 13,213-product /
+  6,500-brand figures against the declared sitemap).
+- Read `/privacy-cookies` and `/terms-conditions` full text (compliance DD — lawful basis, cookies,
+  health-data handling).
+- Probe a named API endpoint (e.g., `/productsearch?...` or `/regions`) logged-out to observe auth/
+  rate-limit behaviour (passive, non-destructive).
+- Re-confirm auth-gate redirect on `/my-account` and `/mycart` while logged out.
+- Re-capture the clobbered pages (offers/register/search/cart-gate) lost to the earlier duplicate-
+  login defect.
+
+### 10.3 Updated risk read (live)
+- The live pass **raises no new confirmed vulnerability**, but it (a) corrects the account-route
+  assumption, and (b) confirms a named internal API surface via robots.txt. The central DD conclusion
+  is unchanged: **provisional**, because backend/authz/infra/API behaviour remains untested.
+- Recommendation upgrade: a future pass should, with owner consent and a logged-in session, exercise
+  `/my-account`, `/my-orders`, `/payment-status` for **broken-access-control / IDOR** checks (object-
+  level authorization across orders), and should test the named API endpoints' auth requirements.
