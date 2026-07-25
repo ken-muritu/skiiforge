@@ -175,12 +175,12 @@ capture-status · **MASTER.md** (all of the above combined).
 
 ---
 
-## 11. Companion Documents
+## 11. Companion Document
 
-- **`MYDAWA-EXECUTIVE-REPORT.md`** — comprehensive executive platform handbook (this archive's
-  content, structured for stakeholders).
-- **`MYDAWA-DUE-DILIGENCE.md`** — separate due-diligence assessment: regulatory/compliance posture
-  (PPB P0940), security (OTP-only auth, auth-gating), privacy/health-data exposure, operational
-  resilience, a confirmed data-quality defect (11/26 screenshots were duplicate login pages), a
-  findings register, and evidence-gathering recommendations. **Read it alongside this README:**
-  it is explicitly provisional because the archive is front-end-only.
+- **`DueDiligenceMyDawa.md`** — the single consolidated deliverable merging the **Comprehensive
+  Executive Platform Report** (Part A) and the **Due Diligence Assessment** (Part B, including the
+  live black-box pass). 43 KB. Covers platform overview, architecture/features, UX, security &
+  compliance (PPB P0940), privacy/health-data, operational resilience, a confirmed data-quality
+  defect (11/26 screenshots were duplicate login pages), a findings register, and evidence-gathering
+  recommendations. Explicitly provisional because the archive is front-end-only.
+- The 20 per-page capture docs live in `markdown-all/` (with `MASTER.md` combining them).
