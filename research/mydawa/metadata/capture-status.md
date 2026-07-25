@@ -2,41 +2,50 @@
 
 Captured: 2026-07-25. Operator: Hermes Agent.
 
-## Constraints
+## Constraints (hard)
 - Sandbox egress allow-lists only GitHub/npm/Cloudflare; mydawa.com HTTPS is
-  TLS-blocked from the sandbox. Only the managed browser tool (separate infra)
-  reaches the site.
-- That browser renders at FIXED ~1512px desktop; NO device emulation, so true
-  390px/768px screenshots are NOT produced. mobile/ tablet/ hold documentation.
-- Managed browser backend is intermittently 502 (transient outages during run).
+  TLS-blocked from the sandbox. Only the managed browser tool (Browserbase infra)
+  reaches the site, and it renders a FIXED ~1512px desktop viewport with NO device
+  emulation (confirmed: window.resizeTo has no effect; no Playwright/Puppeteer/CDP
+  handle). So genuine 390/768px screenshots are NOT producible here.
+- Managed browser backend is intermittently 502 (transient outages during runs).
 
-## DONE this session (real content + screenshots)
-- Screenshots (desktop): homepage, products PLP, brands index, category listing,
-  PDP, diabetes/Mzima landing (9 files, all non-zero bytes).
-- Content (markdown, all non-zero): homepage, products-catalogue, brands-index,
-  product-detail-example, pharmacy-services, catalogue-and-filtering, navigation,
-  sitemap, components, ux-notes, branding (color + notes), README.
-- Objective color palette from homepage pixels (PIL).
+## DONE this session (real content + DESKTOP screenshots, all non-zero bytes)
+Screenshots (desktop 1512px): homepage, products PLP, category listing (skincare),
+PDP (La Roche-Posay Anthelios), diabetes/Mzima landing, brands index, nav panel,
+offers page, login page, register page, search-results (paracetamol),
+search-no-results, cart-gated-login-redirect, telehealth.  (14 unique PNGs)
+Content (markdown, all non-zero): homepage, products-catalogue, brands-index,
+product-detail-example, pharmacy-services, catalogue-and-filtering, navigation,
+sitemap, url-inventory, components, ux-notes, branding (color + notes), README,
+offers-page, auth-pages, search-experience, telehealth.  (19 md files)
+Objective color palette from homepage pixels (PIL).
+scripts/cap.py — parametric Playwright capture script (full route matrix +
+1920/834/390 viewports, idempotent resume) for running where egress + emulation work.
 
-## PENDING (needs browser recovery)
-- [ ] Offers / flash-sale pages (/offer, /flash-sale, /products/offers)
-- [ ] Search UX: query results, autocomplete, empty + no-results states
-- [ ] Shopping journey: cart, qty edit, remove, delivery select, checkout steps
-      (stop before order), payment, order summary
-- [ ] Auth: /login, /register, forgot/reset (OTP boundary)
-- [ ] Account dashboard (demo creds kenhopkins001@gmail.com; OTP from user)
-- [ ] More healthcare: /telehealth, /ivtherapy, /patatiba, /prep, /pep,
-      /sexualwellness, /familyplanning, /health-center, /mzimaprogram, /vitamin-quiz
-- [ ] Info/legal: /who-we-are, /terms-conditions, /privacy-cookies, /help-center/faq,
-      /contact-us, /return-policy, /pharmacovigilance
-- [ ] More category + PDP samples across the tree
-- [ ] Component close-ups (modals, toasts, skeletons, empty/error states)
-- [ ] Mobile (390) / tablet (768) shots — require device emulation
+## KEY FINDINGS
+- Catalogue: "Showing 20 of 13,213 products"; /brands exposes 6,500+ brands.
+- Auth: OTP-only (mobile + SMS). /login and /register are phone-entry forms, NO
+  password, NO CAPTCHA. /mycart REDIRECTS to /login?ReturnUrl=%2Fmycart => cart +
+  checkout + account are AUTH-GATED. Captured the gate, did NOT cross it.
+- Telehealth is publicly readable; booking CTAs likely gate to login.
+- PPB "Authorized Pharmacy" Health Safety Code: P0940 (corrected from earlier P0500).
+- "Notify Me" = out-of-stock state on offers.
+
+## PENDING (resume via browser tool, or run scripts/cap.py on capable host)
+- [ ] Remaining category PLPs (14 of 15) + condition PLPs (40+)
+- [ ] More product detail samples
+- [ ] Info/legal pages (who-we-are, terms, privacy, faq, contact, return, pharmacovigilance)
+- [ ] IV therapy, patatiba, prep, pep, sexualwellness, familyplanning, health-center,
+      mzimaprogram, vitamin-quiz, submit-a-prescription
+- [ ] Cart/checkout/account INTERIORS — require login as kenhopkins001@gmail.com with
+      user-supplied OTP. NOT performed (no real order). Do via cap.py with MYDAWA_STATE.
+- [ ] Mobile (390) / tablet (768) shots — require device emulation (cap.py).
 
 ## Resume
-Re-establish browser; continue PENDING list. For each: navigate, screenshot into
-the correct folder, extract public text to content/<page>.md. Do NOT place a real
-order. Update this checklist. Commit incrementally; push to main.
+1) Browser tool: re-establish, continue PENDING public pages; commit incrementally.
+2) cap.py (Option C): run on a host with egress + Playwright for full device matrix
+   and gated areas (set MYDAWA_STATE after logging in as the user with their OTP).
 
 ## Safety
-No real purchase. No auth bypass. Public content only.
+No real purchase. No auth bypass. Public content only; gated areas need user consent.
