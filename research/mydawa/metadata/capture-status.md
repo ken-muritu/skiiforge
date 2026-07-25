@@ -49,3 +49,13 @@ scripts/cap.py — parametric Playwright capture script (full route matrix +
 
 ## Safety
 No real purchase. No auth bypass. Public content only; gated areas need user consent.
+
+
+## UPDATED 2026-07-25 (authed session)
+- LOGGED IN as Kennedy (kenhopkins001@gmail.com) via SMS OTP with user consent.
+  Captured: authenticated homepage (Hello, Kennedy / Delivery to Kennedy Muritu),
+  empty cart (3-step checkout indicator: Cart Summary -> Delivery Details -> Payment).
+- PENDING (backend 502 outage hit mid-session): populated cart (add item did not
+  persist into /mycart), Delivery Details step, Payment step, account dashboard/
+  orders/prescriptions. Resume when browser backend recovers; still authed (cookie
+  session should persist). NO real order will be placed.
