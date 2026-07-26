@@ -1,57 +1,46 @@
 # Aurum UI Research
 
 > Comprehensive UX/UI teardown + design-system analysis for rebuilding
-> Aurum's frontend, benchmarked against **heyclicky.com** and **wisprflow.ai**
-> (the two sites you admire).
+> Aurum's frontend, benchmarked against **heyclicky.com** and **wisprflow.ai**.
 
-## What this is
-A complete product teardown: every route, every component, verbatim copy,
-computed design tokens, screenshots, and a prioritized rebuild plan. Built to
-be the definitive reference for redesigning `aurum/frontend`.
+## The deliverable (consolidated, single-file per finding)
+This repo was consolidated so you don't dig through 50+ scattered files.
+Each report is ONE self-contained markdown:
 
-## Structure
-```
-research/aurum-ui-research/
-  heyclicky/        site-map, components, brand-voice, typography, colors,
-                    spacing, motion, accessibility, content/, screenshots/
-  wisprflow/       (same structure) — THE model reference (production-complete)
-  aurum/           same structure — the product being audited
-  comparison/       UX_COMPARISON, DESIGN_GAPS, VISUAL_ANALYSIS,
-                    BRAND_ANALYSIS, SCORECARD
-  recommendations/   QUICK_WINS, REDESIGN_PLAN, DESIGN_SYSTEM_PLAN,
-                    IMPLEMENTATION_ROADMAP
-  AURUM_UI_GUIDE.md  canonical rebuild spec (tokens + component before/after)
-  CAPTURE_MANIFEST.md  honest per-(site×page×viewport×state) log
-```
+- **AURUM_AUDIT.md** - THE master file (68KB). Guide + all findings + all three
+  project reports appended. Read this one cover-to-cover.
+- **AURUM_REPORT.md** - Aurum's full audit (site-map, components, brand-voice,
+  typography, colors, spacing, motion, accessibility, verbatim content, shots).
+- **WISPRFLOW_REPORT.md** - reference north star (production-complete).
+- **HEYCLICKY_REPORT.md** - reference (WIP; flagged, not a model).
+- **FINDINGS_COMPARISON.md** - UX / visual / brand / gaps / scorecard.
+- **FINDINGS_RECOMMENDATIONS.md** - quick wins / redesign / design-system / roadmap.
+- **AURUM_UI_GUIDE.md** - canonical rebuild spec (token :root, component before/after).
+- **CAPTURE_MANIFEST.md** - honest per-(site x page x viewport x state) log.
 
-## How to read it
-1. Start with `AURUM_UI_GUIDE.md` — the rebuild spec.
-2. `comparison/SCORECARD.md` — where Aurum scores vs refs (1–5).
-3. `comparison/DESIGN_GAPS.md` — the 8 prioritized gaps + fixes.
-4. `recommendations/QUICK_WINS.md` — do these first (~5–6 hrs, big lift).
-5. `CAPTURE_MANIFEST.md` — exactly what was/wasn't captured (honest).
+## Raw evidence (not consolidated)
+- `aurum/content/`, `heyclicky/content/`, `wisprflow/content/` - verbatim DOM extracts.
+- `aurum/screenshots/`, `heyclicky/screenshots/`, `wisprflow/screenshots/` - 49 PNGs.
 
 ## Key findings (TL;DR)
-- **heyclicky is a WIP** (red wireframe placeholders). Do NOT model Aurum on it.
-- **Wispr Flow is the model**: EB Garamond + Figtree, cream #FFFFEB,
-  lavender #F0D7FF, carousels, motion-blur. Production-complete.
-- **Aurum's weakest**: emoji icons (1/5), no motion (1/5), no sticky nav
-  (1/5), Times New Roman logo / no loaded type (2/5).
-- **Aurum's strongest**: dark gold/mint color (4/5), layout/IA (4/5).
-- Top 3 fixes (low effort, high lift): Lucide icons, load Fraunces+Satoshi,
+- **heyclicky is a WIP** (red wireframe placeholders) - NOT a model.
+- **Wispr Flow is the model**: EB Garamond + Figtree, cream #FFFFEB, lavender
+  #F0D7FF, carousels, motion-blur. Production-complete.
+- **Aurum's weakest**: emoji icons (1/5), no motion (1/5), no sticky nav (1/5),
+  Times New Roman logo / no loaded type (2/5).
+- **Aurum's strongest**: dark gold/mint identity (4/5), layout/IA (4/5).
+- Top 3 quick wins (low effort, high lift): Lucide icons, load Fraunces+Satoshi,
   sticky header + card elevation.
 
-## Method & honesty notes
-- Aurum captured via **Playwright** (Vercel is allow-listed here).
-- heyclicky + wisprflow captured via **managed browser** (their hosts are
-  TLS-blocked from this sandbox's curl/Playwright; the proxy is desktop-only,
-  so tablet/mobile reference shots are UNCONFIRMED — documented in the manifest).
-- Aurum **tablet/mobile** are partial (sandbox caps foreground at 60s +
-  reaps background processes); desktop is 100% captured. Manifest is honest.
-- Aurum **gated app UI** (dashboard/builder/generate WITH data) is NOT
-  captured — needs a logged-in session. Login-redirect state IS captured.
+## Method / honesty
+- Aurum captured via **Playwright** (Vercel allow-listed). Desktop 100%, tablet
+  partial, mobile 0 (sandbox caps 60s + reaps bg processes).
+- heyclicky + wisprflow via **managed browser** (their hosts TLS-blocked from
+  this sandbox; proxy is desktop-only -> no tablet/mobile ref shots; documented).
+- Aurum **gated app UI** (dashboard/builder/generate WITH data) NOT captured -
+  needs a logged-in session. Login-redirect state IS captured.
 
-## Next step
-Run `recommendations/IMPLEMENTATION_ROADMAP.md`. Foundations + quick wins
-first (~week 1), then the authenticated app + motion (~week 2). The audit
-is purely frontend — no backend changes required.
+## Due-diligence note
+Every per-site file was checked for cross-contamination before consolidation:
+aurum/* = dark gold identity; heyclicky/* = light + blue + WIP wireframe;
+wisprflow/* = cream + lavender + serif. No leakage. Screenshots in correct folders.
