@@ -1,0 +1,290 @@
+[
+  {
+    "site": "aurum",
+    "page": "home",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/home_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "home",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/home_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "home",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/home_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "login",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/login_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "login",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/login_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "login",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/login_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "signup",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/signup_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "signup",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/signup_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "signup",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/signup_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "forgot",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/forgot_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "forgot",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/forgot_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "forgot",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/forgot_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "reset",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/reset_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "reset",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/reset_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "reset",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/reset_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "discover",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/discover_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "discover",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/discover_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "discover",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/discover_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "dashboard",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/dashboard_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "dashboard",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/dashboard_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "dashboard",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/dashboard_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "masteries",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/masteries_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "masteries",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/masteries_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "masteries",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/masteries_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "masteries-new",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/masteries-new_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "masteries-new",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/masteries-new_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "masteries-new",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/masteries-new_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "generate",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/generate_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "generate",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/generate_full_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "generate",
+    "viewport": "desktop",
+    "state": "sticky-header-on-scroll",
+    "captured": true,
+    "filename": "screenshots/desktop/generate_scroll-1000_desktop.png",
+    "notes": "header-at-1000px vs 0"
+  },
+  {
+    "site": "aurum",
+    "page": "notfound",
+    "viewport": "desktop",
+    "state": "initial-load",
+    "captured": true,
+    "filename": "screenshots/desktop/notfound_initial_desktop.png",
+    "notes": ""
+  },
+  {
+    "site": "aurum",
+    "page": "notfound",
+    "viewport": "desktop",
+    "state": "full-page",
+    "captured": true,
+    "filename": "screenshots/desktop/notfound_full_desktop.png",
+    "notes": ""
+  }
+]
