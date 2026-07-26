@@ -1,0 +1,41 @@
+{
+  "background": "rgb(11, 13, 18)",
+  "color": "rgb(232, 235, 240)",
+  "fontFamily": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+  "fontSize": "16px",
+  "lineHeight": "24.8px",
+  "letterSpacing": "normal",
+  "buttons": [
+    null,
+    {
+      "sel": "a",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "border": "0px rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "font": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+      "weight": "800",
+      "shadow": "none"
+    },
+    null
+  ],
+  "allColors": [
+    "rgb(0, 0, 0)",
+    "rgb(232, 235, 240)",
+    "rgb(11, 13, 18)",
+    "rgba(11, 13, 18, 0.85)",
+    "rgb(154, 163, 178)",
+    "rgb(233, 196, 106)",
+    "rgba(233, 196, 106, 0.1)",
+    "rgba(233, 196, 106, 0.25)",
+    "rgb(16, 19, 26)",
+    "rgb(47, 54, 68)",
+    "rgb(22, 26, 34)",
+    "rgb(35, 40, 51)"
+  ],
+  "allFonts": [
+    "\"Times New Roman\"",
+    "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"
+  ]
+}
