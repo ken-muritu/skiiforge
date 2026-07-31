@@ -8,24 +8,69 @@ import { BRAND } from "../tokens";
 
 const APPLY_URL = "https://tally.so/r/2Er8jD";
 
+// Responsive padding scale matched to the original (px):
+// mobile 16/24 -> sm 40 -> md 80 -> lg 120
+const PAD_X = { xs: "16px", sm: "40px", md: "80px", lg: "120px" } as const;
+const SECTION_PY = { xs: "56px", sm: "72px", md: "75px" } as const;
+
+const eyebrow = {
+  fontSize: 14,
+  fontWeight: 600,
+  color: BRAND.green,
+  letterSpacing: "0.24em",
+  textTransform: "uppercase" as const,
+};
+const h2Title = {
+  fontFamily: "var(--font-plus-jakarta), sans-serif",
+  fontSize: { xs: 24, md: 48 },
+  fontWeight: 700,
+  color: BRAND.ink,
+  lineHeight: { md: "60px" },
+  letterSpacing: "-0.01em",
+};
+const bodyText = {
+  fontSize: { xs: 16, md: 18 },
+  lineHeight: "26px",
+  color: BRAND.slate,
+};
+
 /* ---------------- HERO ---------------- */
 export function Hero() {
   return (
     <Box
-      className="relative flex md:min-h-screen md:items-center justify-center overflow-hidden pt-[95px] md:pt-0 pb-[75px] px-4 sm:px-6 md:px-[80px] lg:px-[120px]"
-      sx={{ position: "relative" }}
+      sx={{
+        position: "relative",
+        overflow: "hidden",
+        minHeight: { md: "100vh" },
+        display: "flex",
+        alignItems: { md: "center" },
+        justifyContent: "center",
+        pt: { xs: "95px", md: 0 },
+        pb: { xs: "56px", md: "75px" },
+        px: PAD_X,
+      }}
     >
+      {/* Faint 75px blueprint lattice, masked top & bottom (from manifest) */}
       <Box
-        className="hero-grid pointer-events-none absolute inset-0"
-        sx={{ position: "absolute", inset: 0 }}
         aria-hidden
+        sx={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `repeating-linear-gradient(0deg, ${BRAND.gridLine} 0, ${BRAND.gridLine} 1px, transparent 1px, transparent 75px), repeating-linear-gradient(90deg, ${BRAND.gridLine} 0, ${BRAND.gridLine} 1px, transparent 1px, transparent 75px)`,
+          opacity: 0.5,
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent)",
+          maskImage:
+            "linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent)",
+          pointerEvents: "none",
+        }}
       />
-      <Box className="relative z-10" sx={{ position: "relative", zIndex: 10 }}>
-        <Box className="w-full text-center">
+      <Box sx={{ position: "relative", zIndex: 1, width: "100%" }}>
+        <Box sx={{ textAlign: "center" }}>
           <Typography
-            variant="h1"
-            className="text-balance"
+            component="h1"
             sx={{
+              fontFamily: "var(--font-plus-jakarta), sans-serif",
               fontSize: { xs: 36, sm: 48, md: 96 },
               lineHeight: { md: "96px" },
               letterSpacing: "0%",
@@ -33,10 +78,7 @@ export function Hero() {
               color: BRAND.ink,
             }}
           >
-            <Box component="span" sx={{ color: BRAND.ink }}>
-              For the ones who
-            </Box>
-            <br />
+            <Box component="span">For the ones who </Box>
             <Box component="span" sx={{ color: BRAND.green }}>
               refuse average
             </Box>
@@ -45,12 +87,9 @@ export function Hero() {
             </Box>
           </Typography>
           <Typography
-            className="text-balance"
             sx={{
+              ...bodyText,
               mt: "18px",
-              fontSize: { xs: 16, md: 18 },
-              lineHeight: "26px",
-              color: BRAND.slate,
               maxWidth: 620,
               mx: "auto",
             }}
@@ -60,8 +99,13 @@ export function Hero() {
             placement support.
           </Typography>
           <Box
-            className="flex flex-col gap-4 pt-6 sm:flex-row sm:justify-center sm:gap-6"
-            sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3, pt: 6, justifyContent: "center" }}
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 2,
+              justifyContent: "center",
+              pt: "24px",
+            }}
           >
             <Button
               component="a"
@@ -74,8 +118,10 @@ export function Hero() {
                 color: "#fff",
                 borderRadius: "5px",
                 fontSize: 16,
-                px: 4,
-                py: 1,
+                px: "32px",
+                py: "10px",
+                textTransform: "none",
+                fontFamily: "var(--font-inter), sans-serif",
                 "&:hover": { backgroundColor: "#2c3f2f" },
               }}
             >
@@ -89,8 +135,10 @@ export function Hero() {
                 color: BRAND.ink,
                 borderRadius: "5px",
                 fontSize: 16,
-                px: 4,
-                py: 1,
+                px: "32px",
+                py: "10px",
+                textTransform: "none",
+                fontFamily: "var(--font-inter), sans-serif",
                 "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
               }}
             >
@@ -112,50 +160,45 @@ export function Reality() {
   ];
   return (
     <Reveal>
-      <Box className="flex px-4 sm:px-16 md:px-[120px] py-[75px] flex-col">
-        <Box className="w-full">
-          <Typography
-            sx={{ fontSize: 14, fontWeight: 600, color: BRAND.green, letterSpacing: "0.05em" }}
-          >
-            THE REALITY
-          </Typography>
-          <Typography
-            className="text-balance"
-            sx={{
-              fontFamily: "var(--font-plus-jakarta), sans-serif",
-              fontSize: { xs: 22, md: 28 },
-              fontWeight: 600,
-              color: BRAND.ink,
-              mt: "24px",
-              lineHeight: "42px",
-              letterSpacing: "-1.1%",
-              maxWidth: 820,
-            }}
-          >
-            You didn’t study STEM to earn $250 a month. For most university
-            graduates in Africa, this is the starting point.
-          </Typography>
-          <Box
-            className="mt-[90px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[60px]"
-            sx={{ display: "grid", gap: 6, mt: "90px", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(3,1fr)" } }}
-          >
-            {stats.map((s) => (
-              <Box key={s.n} className="flex items-center flex-col gap-3" sx={{ textAlign: "center" }}>
-                <Typography
-                  sx={{
-                    fontSize: 44,
-                    lineHeight: "48px",
-                    fontWeight: 500,
-                    color: BRAND.ink,
-                    letterSpacing: "-1.1%",
-                  }}
-                >
-                  {s.n}
-                </Typography>
-                <Typography sx={{ fontSize: 16, color: BRAND.slate }}>{s.l}</Typography>
-              </Box>
-            ))}
-          </Box>
+      <Box sx={{ px: PAD_X, py: SECTION_PY }}>
+        <Typography sx={eyebrow}>THE REALITY</Typography>
+        <Typography
+          sx={{
+            ...h2Title,
+            fontSize: { xs: 22, md: 28 },
+            lineHeight: { md: "42px" },
+            mt: "24px",
+            maxWidth: 820,
+          }}
+        >
+          You didn’t study STEM to earn $250 a month. For most university
+          graduates in Africa, this is the starting point.
+        </Typography>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(3,1fr)" },
+            gap: { xs: "32px", md: "60px" },
+            mt: "60px",
+            textAlign: "center",
+          }}
+        >
+          {stats.map((s) => (
+            <Box key={s.n}>
+              <Typography
+                sx={{
+                  fontSize: { xs: 36, md: 44 },
+                  lineHeight: "48px",
+                  fontWeight: 600,
+                  color: BRAND.ink,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {s.n}
+              </Typography>
+              <Typography sx={{ ...bodyText, mt: "12px" }}>{s.l}</Typography>
+            </Box>
+          ))}
         </Box>
       </Box>
     </Reveal>
@@ -172,40 +215,42 @@ export function Opportunity() {
   ];
   return (
     <Reveal>
-      <Box className="flex px-4 sm:px-16 md:px-[120px] py-[75px] flex-col">
-        <Typography sx={{ fontSize: 14, fontWeight: 600, color: BRAND.green, letterSpacing: "0.05em" }}>
-          THE OPPORTUNITY
-        </Typography>
-        <Box className="flex gap-[31px] mt-[34px]" sx={{ display: "flex", gap: "31px", mt: "34px" }}>
+      <Box sx={{ px: PAD_X, py: SECTION_PY }}>
+        <Typography sx={eyebrow}>THE OPPORTUNITY</Typography>
+        <Box sx={{ display: "flex", gap: "31px", mt: "34px" }}>
           <Divider orientation="vertical" flexItem />
-          <Typography
-            sx={{
-              fontFamily: "var(--font-plus-jakarta), sans-serif",
-              fontSize: 28,
-              fontWeight: 600,
-              color: BRAND.ink,
-              maxWidth: 720,
-            }}
-          >
+          <Typography sx={{ ...h2Title, fontSize: { xs: 22, md: 28 }, lineHeight: "36px", maxWidth: 720 }}>
             Remote roles offer up to 5x more for honed skills. We prepare
             high-potential talent for the global market.
           </Typography>
         </Box>
         <Box
-          className="mt-[90px] grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-[16px]"
-          sx={{ display: "grid", gap: "16px", mt: "90px", gridTemplateColumns: { xs: "1fr", sm: "repeat(3,1fr)", md: "repeat(4,1fr)" } }}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(3,1fr)", md: "repeat(4,1fr)" },
+            gap: "16px",
+            mt: "60px",
+          }}
         >
           {cards.map((c) => (
             <Box
               key={c.title}
-              className="flex items-center flex-col px-[20px] pt-[19px] pb-[24px] border rounded-[8px]"
-              sx={{ border: `1px solid ${BRAND.cardBorder}`, borderRadius: "8px", textAlign: "center" }}
+              sx={{
+                border: `1px solid ${BRAND.cardBorder}`,
+                borderRadius: "8px",
+                textAlign: "center",
+                px: "20px",
+                pt: "19px",
+                pb: "24px",
+              }}
             >
-              <Image src={c.icon} alt="icon" width={44} height={44} />
+              <Image src={c.icon} alt={c.title} width={44} height={44} />
               <Typography sx={{ color: BRAND.greenDeep, fontWeight: 600, fontSize: 18, mt: "12px" }}>
                 {c.title}
               </Typography>
-              <Typography sx={{ fontSize: 16, color: BRAND.slateBlue, mt: "12px" }}>{c.desc}</Typography>
+              <Typography sx={{ fontSize: 16, color: BRAND.slateBlue, mt: "12px" }}>
+                {c.desc}
+              </Typography>
             </Box>
           ))}
         </Box>
@@ -252,19 +297,15 @@ export function Alternative() {
   );
   return (
     <Reveal>
-      <Box className="px-4 sm:px-6 py-[75px] md:px-[120px]">
-        <Box className="w-full md:w-[75%]">
-          <Typography sx={{ fontSize: 14, fontWeight: 600, color: BRAND.green, letterSpacing: "0.05em" }}>
-            THE ALTERNATIVE
-          </Typography>
+      <Box sx={{ px: PAD_X, py: SECTION_PY }}>
+        <Box sx={{ maxWidth: { md: "75%" } }}>
+          <Typography sx={eyebrow}>THE ALTERNATIVE</Typography>
           <Typography
-            className="sm:text-balance"
             sx={{
-              mt: "24px",
+              ...h2Title,
               fontSize: { xs: 24, md: 48 },
-              fontWeight: 700,
-              color: BRAND.ink,
               lineHeight: { md: "60px" },
+              mt: "24px",
             }}
           >
             We give you an <Box component="span" sx={{ color: BRAND.slate }}>unfair advantage</Box> for a
@@ -272,18 +313,22 @@ export function Alternative() {
           </Typography>
         </Box>
         <Box
-          className="mt-[30px] md:mt-[60px] grid gap-6 md:grid-cols-2"
-          sx={{ display: "grid", gap: 4, mt: { md: "60px" }, gridTemplateColumns: { md: "1fr 1fr" } }}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { md: "1fr 1fr" },
+            gap: 3,
+            mt: { xs: "30px", md: "60px" },
+          }}
         >
           <Box sx={{ bgcolor: BRAND.neutralBg, border: `1px solid ${BRAND.borderGrey}`, borderRadius: "16px", p: "32px 33px" }}>
-            <Typography sx={{ textTransform: "capitalize", fontSize: 14, fontWeight: 600, letterSpacing: "0.24em", color: BRAND.slate }}>
+            <Typography sx={{ textTransform: "uppercase", fontSize: 14, fontWeight: 600, letterSpacing: "0.24em", color: BRAND.slate }}>
               REGULAR UNIVERSITY ROUTE
             </Typography>
             <Box component="ul" sx={{ mt: 2, pl: 0, listStyle: "none" }}>
               {regular.map((t) => (
                 <Box component="li" key={t} sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 1 }}>
                   <Dot />
-                  <Typography sx={{ fontSize: 16, color: BRAND.slate }}>{t}</Typography>
+                  <Typography sx={{ ...bodyText }}>{t}</Typography>
                 </Box>
               ))}
             </Box>
@@ -318,8 +363,14 @@ export function Stats() {
   return (
     <Reveal variant="fade" duration={0.8}>
       <Box
-        className="mt-[55px] bg-[#F1F2F0] grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 md:gap-4 px-8 md:px-[60px] lg:px-[100px] py-[40px] md:py-[57px]"
-        sx={{ bgcolor: BRAND.greenTint, display: "grid", gap: { xs: 6, md: 4 }, gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(3,1fr)", md: "repeat(4,1fr)" }, py: { xs: "40px", md: "57px" }, px: { xs: 4, md: "60px", lg: "100px" } }}
+        sx={{
+          bgcolor: BRAND.greenTint,
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(3,1fr)", md: "repeat(4,1fr)" },
+          gap: { xs: "32px", md: "24px" },
+          py: { xs: "40px", md: "57px" },
+          px: { xs: "32px", md: "60px", lg: "100px" },
+        }}
       >
         {items.map((s, i) => (
           <Box key={s.l} sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -332,7 +383,11 @@ export function Stats() {
               </Typography>
             </Box>
             {i < items.length - 1 && (
-              <Divider orientation="vertical" flexItem sx={{ borderColor: BRAND.divider, display: { xs: "none", sm: "none", md: "block" } }} />
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ borderColor: BRAND.divider, display: { xs: "none", md: "block" } }}
+              />
             )}
           </Box>
         ))}
@@ -357,11 +412,11 @@ function StepCard({ step, title, desc }: { step: string; title: string; desc: st
 export function HowItWorks() {
   return (
     <Reveal>
-      <Box component="section" id="how-it-works" className="py-[75px] px-4 md:px-[60px] lg:px-[120px]">
-        <Typography sx={{ fontSize: { xs: 32, md: 48 }, fontWeight: 700, color: BRAND.ink, lineHeight: { md: "64px" } }}>
+      <Box component="section" id="how-it-works" sx={{ py: SECTION_PY, px: PAD_X }}>
+        <Typography sx={{ ...h2Title, fontSize: { xs: 32, md: 48 } }}>
           Is it hard to join?
         </Typography>
-        <Typography sx={{ mt: "10px", fontSize: 16, color: BRAND.slate, maxWidth: 720 }}>
+        <Typography sx={{ ...bodyText, mt: "10px", maxWidth: 720 }}>
           From ambitious beginners to rising experts, we build{" "}
           <Box component="span" sx={{ fontWeight: 600, color: BRAND.greenDeep }}>
             Africa&apos;s top 0.1%
@@ -370,8 +425,22 @@ export function HowItWorks() {
         <Typography sx={{ mt: "10px", fontSize: 18, fontWeight: 600, color: BRAND.ink }}>
           Just prove you can commit.
         </Typography>
-        <Box className="mt-[61px] grid grid-cols-1 gap-4 lg:grid-cols-12" sx={{ display: "grid", gap: 3, mt: "61px", gridTemplateColumns: { lg: "repeat(12,1fr)" } }}>
-          <Box className="lg:col-span-9 flex flex-col gap-4" sx={{ gridColumn: { lg: "span 9" }, display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { lg: "repeat(12,1fr)" },
+            gap: 3,
+            mt: "61px",
+          }}
+        >
+          <Box
+            sx={{
+              gridColumn: { lg: "span 9" },
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+            }}
+          >
             <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 2, alignItems: "stretch" }}>
               <Box sx={{ width: { lg: 160 }, flexShrink: 0, display: "flex", alignItems: "center" }}>
                 <Typography sx={{ textTransform: "uppercase", fontSize: 20, fontWeight: 600, color: BRAND.greenDeep, letterSpacing: "0.15em" }}>
@@ -425,11 +494,18 @@ export function Recognized() {
   ];
   return (
     <Reveal>
-      <Box className="px-4 md:px-[60px] lg:px-[120px] py-[72px] md:py-[98px]">
-        <Typography sx={{ fontSize: { xs: 32, md: 48 }, fontWeight: 700, color: BRAND.ink }}>
+      <Box sx={{ px: PAD_X, py: SECTION_PY }}>
+        <Typography sx={{ ...h2Title, fontSize: { xs: 32, md: 48 } }}>
           We are <Box component="span" sx={{ color: BRAND.slate }}>recognized.</Box>
         </Typography>
-        <Box className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mt-[40px]" sx={{ display: "grid", gap: { md: 10 }, mt: "40px", gridTemplateColumns: { md: "repeat(3,1fr)" } }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { md: "repeat(3,1fr)" },
+            gap: { xs: "32px", md: "40px" },
+            mt: "40px",
+          }}
+        >
           {cards.map((c) => (
             <Box key={c.t} sx={{ display: "flex", flexDirection: "column", gap: "12px", minHeight: 123, py: "15px", borderTop: `1px solid ${BRAND.greenDeep}` }}>
               <Typography sx={{ fontSize: 18, fontWeight: 500, color: BRAND.ink }}>{c.t}</Typography>
@@ -456,13 +532,19 @@ export function Collaborators() {
   ];
   return (
     <Reveal>
-      <Box className="py-[60px] md:py-[75px] px-4 md:px-[60px] lg:px-[120px]">
+      <Box sx={{ py: SECTION_PY, px: PAD_X }}>
         <Typography sx={{ textAlign: "center", textTransform: "uppercase", color: BRAND.slate, fontWeight: 600, letterSpacing: "0.24em", fontSize: 14 }}>
           collaborators and mentors from
         </Typography>
         <Box
-          className="mt-[61px] grid grid-cols-2 md:grid-cols-4 gap-0 rounded-lg overflow-hidden border-l"
-          sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4,1fr)" }, mt: "61px", borderLeft: `1px solid ${BRAND.borderGrey}`, borderRadius: "8px", overflow: "hidden" }}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4,1fr)" },
+            mt: "61px",
+            borderLeft: `1px solid ${BRAND.borderGrey}`,
+            borderRadius: "8px",
+            overflow: "hidden",
+          }}
         >
           {logos.map((l) => (
             <Box
@@ -490,8 +572,8 @@ export function Collaborators() {
 export function Testimonial() {
   return (
     <Reveal>
-      <Box component="section" className="py-[75px] md:px-[120px]">
-        <Typography sx={{ fontSize: { xs: 32, md: 48 }, fontWeight: 700, color: BRAND.ink }}>
+      <Box component="section" sx={{ py: SECTION_PY, px: PAD_X }}>
+        <Typography sx={{ ...h2Title, fontSize: { xs: 32, md: 48 } }}>
           What our students say
         </Typography>
         <Box sx={{ display: "flex", gap: "24px", alignItems: "center", mt: "40px", maxWidth: 900 }}>
@@ -512,9 +594,9 @@ export function Testimonial() {
 export function FinalCTA() {
   return (
     <Reveal>
-      <Box component="section" className="py-[75px] md:px-[120px]">
+      <Box component="section" sx={{ py: SECTION_PY, px: PAD_X }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-          <Typography sx={{ fontSize: { xs: 28, md: 48 }, fontWeight: 700, color: BRAND.ink, textAlign: "center", lineHeight: { md: "60px" } }}>
+          <Typography sx={{ ...h2Title, fontSize: { xs: 28, md: 48 }, textAlign: "center" }}>
             Ready to Rise to the top?
           </Typography>
           <Button
@@ -526,7 +608,7 @@ export function FinalCTA() {
               backgroundColor: BRAND.greenDeep,
               color: "#fff",
               borderRadius: "5px",
-              px: 4,
+              px: "32px",
               py: "12px",
               textTransform: "none",
               fontFamily: "var(--font-dm-sans), sans-serif",
@@ -550,7 +632,7 @@ export function Footer() {
     { src: "/telegram-logo.svg", alt: "Telegram" },
   ];
   return (
-    <Box component="footer" sx={{ bgcolor: "#fff", borderTop: `1px solid ${BRAND.borderGrey}`, px: { xs: 4, md: "120px" }, py: "40px" }}>
+    <Box component="footer" sx={{ bgcolor: "#fff", borderTop: `1px solid ${BRAND.borderGrey}`, px: PAD_X, py: "40px" }}>
       <Typography sx={{ fontWeight: 600, color: BRAND.ink }}>Directed Development Ltd</Typography>
       <Typography sx={{ fontSize: 14, color: BRAND.slate, mt: 1 }}>
         Address: 167-169 Great Portland Street, 5th Floor, London, W1W 5PF
