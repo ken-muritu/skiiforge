@@ -24,14 +24,44 @@ export function Header() {
         </Link>
         <Box className="flex gap-[28px]" alignItems="center">
           <Link href="/about-us">
-            <Button color="inherit">About Us</Button>
+            <Button
+              variant="outlined"
+              color="inherit"
+              sx={{
+                borderColor: "#1e1e1e",
+                color: "#1e1e1e",
+                borderRadius: "5px",
+                fontSize: 14,
+                fontWeight: 500,
+                textTransform: "none",
+                fontFamily: "var(--font-inter), sans-serif",
+                px: 1.5,
+                py: 0.5,
+                "&:hover": { borderColor: "#1e1e1e", backgroundColor: "rgba(0,0,0,0.04)" },
+              }}
+            >
+              About Us
+            </Button>
           </Link>
           <Button
             component="a"
             href={APPLY_URL}
             target="_blank"
             rel="noopener noreferrer"
+            variant="outlined"
             color="inherit"
+            sx={{
+              borderColor: "#1e1e1e",
+              color: "#1e1e1e",
+              borderRadius: "5px",
+              fontSize: 14,
+              fontWeight: 500,
+              textTransform: "none",
+              fontFamily: "var(--font-inter), sans-serif",
+              px: 1.5,
+              py: 0.5,
+              "&:hover": { borderColor: "#1e1e1e", backgroundColor: "rgba(0,0,0,0.04)" },
+            }}
           >
             Apply Now
           </Button>
