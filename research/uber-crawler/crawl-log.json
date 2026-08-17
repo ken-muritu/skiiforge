@@ -1,0 +1,82 @@
+{
+  "startedAt": "2026-08-17T07:06:20.675Z",
+  "pages": [
+    {
+      "url": "https://www.uber.com",
+      "section": "home",
+      "depth": 0,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/drive/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/business/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/about/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/about/uber-offerings/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/about/how-does-uber-work/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/about/sustainability/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/global/en/r/cities/nairobi-nairobi-ke/",
+      "section": "global",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/global/en/r/cities/mombasa-coast-ke/",
+      "section": "global",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/global/en/r/cities/uasin-gishu-rift-valley-ke/",
+      "section": "global",
+      "depth": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.uber.com/ke/en/newsroom/",
+      "section": "ke",
+      "depth": 1,
+      "status": 200
+    }
+  ],
+  "blockedAt": null,
+  "errors": [],
+  "finishedAt": "2026-08-17T07:30:30.748Z",
+  "pagesVisited": 12,
+  "screenshotsCaptured": 48
+}
