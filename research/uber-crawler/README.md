@@ -24,13 +24,17 @@ custom Playwright crawler (`crawl.js` in this folder) on **2026-08-17**.
 
 ```
 research/uber-crawler/
-├── README.md          ← this file
-├── crawl.js            ← the crawler (Node.js + Playwright)
+├── README.md               ← this file
+├── crawl.js                 ← the crawler (Node.js + Playwright)
+├── capture_gaps.js          ← targeted follow-up script for states the first pass missed
 ├── package.json
-├── crawl-log.json      ← machine-readable summary: pages visited, statuses, any block event
-└── screenshots/
-    └── <section>/       ← one folder per top-level path segment (home, ride, drive, ...),
-                           plus login-modal/, signup-modal/, popup-cookie/, popup-promo/
+├── crawl-log.json           ← first-pass machine-readable summary
+├── capture-gaps-log.json    ← follow-up-pass machine-readable summary
+├── screenshots/
+│   └── <section>/            ← one folder per top-level path segment (home, ride, drive, ...),
+│                                plus login-modal/, signup-modal/, popup-cookie/, popup-promo/
+└── allscreenshots/           ← every screenshot from this project, flat, one folder,
+                                 same pattern as research/mydawa/screenshots-all/
 ```
 
 ## How to run it yourself
@@ -105,3 +109,79 @@ Run on 2026-08-17, `MAX_PAGES=12`, `MAX_DEPTH=3`, viewport 1440×900, headless.
   because real per-page cost with full interaction simulation ran ~1–2 minutes/page against
   live uber.com. Raise `MAX_PAGES` in `CONFIG` for a more exhaustive run — the script itself
   has no hard ceiling beyond that constant.
+
+## Gap-fill pass (2026-08-17, same day, later) — `capture_gaps.js`
+
+The first pass left several requirement gaps admitted above. Rather than guess at
+fixes, this pass inspected the **real live DOM** of uber.com first, then captured
+what was actually missing. Uber's site is built on their own
+[Base Web](https://baseweb.design) design system, which explains most of the
+original gaps: there's no semantic `<header>`/`[role=navigation]`/generic
+`[aria-expanded]` markup for the crawler's original generic selectors to find —
+everything routes through `data-baseweb="..."` component markers instead.
+`crawl.js`'s selectors were updated accordingly (see inline comments at each
+`explore*` function) so a future full re-run benefits, not just this one-off pass.
+
+**Findings, gap by gap:**
+
+- **Cookie banner — root cause confirmed, not fixable from here.** Fetched the raw
+  page HTML on a completely fresh browser context (no prior cookies/localStorage)
+  in both `en-US`/`America/Los_Angeles` and `en-GB`/`Europe/London` locale+timezone
+  combinations. **No CMP script (OneTrust/Cookiebot/TrustArc/Osano) is injected into
+  the page at all**, in either case — this isn't a client-side toggle we failed to
+  click, the consent banner is gated server-side, almost certainly by real geo-IP
+  region detection that locale/timezone spoofing can't fake without an actual
+  regional proxy/IP. What *does* exist, confirmed present in the page text, is a
+  CCPA-style privacy/cookie link in the footer — captured that as the honest,
+  real substitute: `popup-cookie/101-footer-privacy-cookie-links.png`.
+- **Nav dropdown — selector fixed, partial result.** Real nav lives in
+  `[data-baseweb="header-navigation"]`; `crawl.js` now tries that when the semantic
+  selector finds nothing. On this run, the container was located and its first 6
+  items were hovered, but none revealed a `[data-baseweb="menu"]` panel — captured
+  the static container state (`home/102-header-navigation-static.png`) rather than
+  claim a dropdown that didn't visibly open. Uber's primary nav here (Ride/Drive/
+  Rent) appears to be plain top-level links rather than hover/click submenus; a
+  real mega-menu may only exist behind an item this run didn't reach, or may need
+  `click` instead of `hover` — worth another pass if a specific dropdown is known
+  to exist.
+- **Accordion — selector fixed, but flaky/inconsistent.** `[data-baseweb="accordion"]`
+  is real (confirmed once via direct DOM inspection: a "trip details" demo card,
+  rendered **already expanded**, `aria-expanded="true"`, by default — not a
+  collapsed FAQ list). On a second, separate page load it wasn't present at all.
+  This reads as content that's conditionally rendered (A/B test, session-based, or
+  scroll-triggered) rather than a stable, always-present element — flagged honestly
+  rather than forced. `exploreAccordions()` now scopes to
+  `[data-baseweb="accordion"]` first when present (falling back to the old generic
+  selector for non-Base-Web sites), so it'll capture it correctly whenever it does
+  render.
+- **Sign In — real gap, now closed.** DOM inspection showed `www.uber.com`'s
+  "Log in" is a plain `<a href="https://auth.uber.com/login-redirect?...">` —  a
+  real page on a *different subdomain*, not a same-page modal. The original run's
+  text/role-based click matching likely landed on a hidden duplicate (mobile-nav
+  copies of the same link exist in the DOM), which is why it only ever produced
+  validation-state screenshots with no visible login form behind them.
+  `exploreAuthEntryPoints()` now tries a direct `href`-pattern match first (more
+  reliable than role/text matching when duplicates exist) before falling back to
+  the old click-based approach. Captured the real sign-in page
+  (`login-modal/103-signin-real-page.png` — phone/email + Google/Apple continue
+  options) and its validation state after typing an invalid value
+  (`login-modal/104-signin-real-validation-state.png`), never submitted.
+- **Carousel — real gap, now closed.** Checked the homepage plus 3 content pages
+  for `data-baseweb="carousel"` and common slider-library markers (swiper/slick/
+  keen-slider/embla). Found a real ride-options carousel (labeled "1/2" with
+  prev/next arrows) on `/ke/en/about/uber-offerings/` and captured both its
+  initial state and after clicking "next"
+  (`uber-offerings/105-carousel-found.png`, `106-carousel-advanced.png`).
+  Not found on the homepage or the other 2 pages checked — genuinely appears
+  page-specific rather than a selector miss.
+- **Promo popup** — still not observed on any page visited across either pass.
+  No evidence one exists on this crawled surface area (marketing pages, no
+  active session); not chased further since there's nothing concrete pointing
+  at where one would trigger.
+
+**Environment note:** this pass hit repeated Chromium-binary evictions from
+`~/.cache/ms-playwright/` between separate script invocations (installed fine,
+then gone a few minutes later, several times) — an environment/cache-eviction
+issue unrelated to the crawl logic itself, not a uber.com blocking response.
+Worth knowing if you re-run this and see the same "Executable doesn't exist"
+error: just re-run `npx playwright install chromium chromium-headless-shell`.

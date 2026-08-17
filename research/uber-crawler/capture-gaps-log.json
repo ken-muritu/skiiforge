@@ -1,0 +1,41 @@
+{
+  "finishedAt": "2026-08-17T08:31:17.498Z",
+  "captured": [
+    {
+      "section": "popup-cookie",
+      "label": "footer-privacy-cookie-links",
+      "file": "/tmp/claude-1000/-home-pop-os/4dece44f-9555-4736-b905-21f7bd95aa77/scratchpad/uber-crawler/screenshots/popup-cookie/101-footer-privacy-cookie-links.png",
+      "note": "no CMP banner exists for this vantage point; footer cookie/CCPA links are the real, honest substitute"
+    },
+    {
+      "section": "home",
+      "label": "header-navigation-static",
+      "file": "/tmp/claude-1000/-home-pop-os/4dece44f-9555-4736-b905-21f7bd95aa77/scratchpad/uber-crawler/screenshots/home/102-header-navigation-static.png",
+      "note": "header-navigation container located but hover did not reveal a [data-baseweb=menu] on any of the first 6 items"
+    },
+    {
+      "section": "login-modal",
+      "label": "signin-real-page",
+      "file": "/tmp/claude-1000/-home-pop-os/4dece44f-9555-4736-b905-21f7bd95aa77/scratchpad/uber-crawler/screenshots/login-modal/103-signin-real-page.png",
+      "note": "www.uber.com \"Log in\" is a plain <a href> to https://auth.uber.com/login-redirect?next_url=https://www.uber.com — a real page on the auth.uber.com subdomain, not a same-page modal. This is the actual sign-in surface."
+    },
+    {
+      "section": "login-modal",
+      "label": "signin-real-validation-state",
+      "file": "/tmp/claude-1000/-home-pop-os/4dece44f-9555-4736-b905-21f7bd95aa77/scratchpad/uber-crawler/screenshots/login-modal/104-signin-real-validation-state.png",
+      "note": "invalid placeholder value typed to trigger validation UI; never submitted"
+    },
+    {
+      "section": "uber-offerings",
+      "label": "carousel-found",
+      "file": "/tmp/claude-1000/-home-pop-os/4dece44f-9555-4736-b905-21f7bd95aa77/scratchpad/uber-crawler/screenshots/uber-offerings/105-carousel-found.png",
+      "note": "real carousel/slider component found on https://www.uber.com/ke/en/about/uber-offerings/"
+    },
+    {
+      "section": "uber-offerings",
+      "label": "carousel-advanced",
+      "file": "/tmp/claude-1000/-home-pop-os/4dece44f-9555-4736-b905-21f7bd95aa77/scratchpad/uber-crawler/screenshots/uber-offerings/106-carousel-advanced.png",
+      "note": "advanced the carousel on https://www.uber.com/ke/en/about/uber-offerings/"
+    }
+  ]
+}

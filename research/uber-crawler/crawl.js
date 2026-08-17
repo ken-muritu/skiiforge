@@ -192,10 +192,18 @@ const COOKIE_BANNER_SELECTORS = [
   'div[role="dialog"][aria-label*="cookie" i]',
 ];
 
-/** Generic modal/dialog selectors — most component libraries use one of these. */
+/**
+ * Generic modal/dialog selectors — most component libraries use one of these.
+ * `[data-baseweb="menu"]` was added after inspecting live uber.com: it's built
+ * on Uber's own Base Web design system, which renders nav dropdowns and menus
+ * via `data-baseweb="menu"` rather than a semantic <header>/role=navigation
+ * (uber.com has neither — that's why a first pass with only generic
+ * role/class selectors found no nav dropdowns at all).
+ */
 const MODAL_SELECTORS = [
   '[role="dialog"]',
   '[aria-modal="true"]',
+  '[data-baseweb="menu"]',
   '[class*="modal" i]:visible',
   '[class*="popup" i]:visible',
 ];
@@ -243,9 +251,20 @@ async function captureAnyModal(page, section, label) {
 // Interaction simulators
 // ============================================================================
 
-/** Clicks each top-level nav item, screenshots any dropdown/submenu that opens, then closes it. */
+/**
+ * Clicks each top-level nav item, screenshots any dropdown/submenu that opens,
+ * then closes it. Tries the semantic selector first, then falls back to Base
+ * Web's `data-baseweb="header-navigation"` container — uber.com (built on its
+ * own Base Web design system) has no <header> or [role=navigation] element at
+ * all, so on that site only the fallback ever matches. Keep both: the
+ * semantic selector is still the right first choice for other sites this
+ * script gets pointed at.
+ */
 async function exploreNav(page, section) {
-  const navItems = page.locator('header nav a, [role="navigation"] a, nav [role="menuitem"]');
+  let navItems = page.locator('header nav a, [role="navigation"] a, nav [role="menuitem"]');
+  if ((await navItems.count().catch(() => 0)) === 0) {
+    navItems = page.locator('[data-baseweb="header-navigation"] a, [data-baseweb="header-navigation"] button');
+  }
   const count = Math.min(await navItems.count().catch(() => 0), 5); // cap — nav bars can be huge on mega-menus
   for (let i = 0; i < count; i++) {
     const item = navItems.nth(i);
@@ -267,18 +286,54 @@ async function exploreNav(page, section) {
   }
 }
 
-/** Finds and clicks Sign In / Sign Up / Log In entry points, captures whatever modal/page appears. */
+/**
+ * Finds and clicks Sign In / Sign Up / Log In entry points, captures whatever
+ * modal/page appears.
+ *
+ * `hrefPattern` is tried first when present: sites with several duplicate nav
+ * items in the DOM (mobile + desktop variants, footer repeats — common on
+ * uber.com) can make role/text matching land `.first()` on a hidden
+ * duplicate, silently skipping the whole entry point. Matching a real `href`
+ * substring instead (e.g. an auth subdomain's login path) is far more
+ * reliable when the trigger is a plain link to a known destination rather
+ * than a same-page modal — go there with `page.goto` directly instead of
+ * clicking, since that's deterministic regardless of which DOM duplicate is
+ * "visible" first.
+ */
 async function exploreAuthEntryPoints(page, section) {
   const authLabels = [
-    { pattern: /sign in|log in/i, folder: "login-modal" },
-    { pattern: /sign up|create account|register/i, folder: "signup-modal" },
+    { pattern: /sign in|log in/i, folder: "login-modal", hrefPattern: /login|signin|auth\./i },
+    { pattern: /sign up|create account|register/i, folder: "signup-modal", hrefPattern: /signup|register/i },
   ];
 
-  for (const { pattern, folder } of authLabels) {
+  for (const { pattern, folder, hrefPattern } of authLabels) {
+    const urlBefore = page.url();
+    const directHref = await page
+      .locator("a[href]")
+      .evaluateAll(
+        (els, re) => els.map((e) => e.getAttribute("href")).find((h) => h && new RegExp(re, "i").test(h)),
+        hrefPattern.source
+      )
+      .catch(() => null);
+
+    if (directHref) {
+      try {
+        const absoluteHref = new URL(directHref, urlBefore).toString();
+        await page.goto(absoluteHref, { waitUntil: "domcontentloaded", timeout: CONFIG.NAV_TIMEOUT_MS });
+        await page.waitForLoadState("networkidle", { timeout: CONFIG.NAV_TIMEOUT_MS }).catch(() => {});
+        await screenshot(page, folder, `${section}-${folder}-fullpage`);
+        await triggerFormValidation(page, folder, section);
+        await page.goto(urlBefore, { waitUntil: "domcontentloaded", timeout: CONFIG.NAV_TIMEOUT_MS }).catch(() => {});
+        continue; // got a real capture via direct href — skip the fragile click-based fallback below
+      } catch {
+        await page.goto(urlBefore, { waitUntil: "domcontentloaded", timeout: CONFIG.NAV_TIMEOUT_MS }).catch(() => {});
+        // fall through to click-based detection below
+      }
+    }
+
     const trigger = page.getByRole("button", { name: pattern }).or(page.getByRole("link", { name: pattern }));
     try {
       if (!(await trigger.first().isVisible({ timeout: 2000 }))) continue;
-      const urlBefore = page.url();
       await trigger.first().click({ timeout: CONFIG.ACTION_TIMEOUT_MS });
       await page.waitForTimeout(800);
 
@@ -336,9 +391,19 @@ async function triggerFormValidation(page, section, context) {
   }
 }
 
-/** Expands the first few accordion-style elements found. */
+/**
+ * Expands the first few accordion-style elements found. A bare
+ * `[aria-expanded="false"]` selector is too broad on component-library-built
+ * sites — on uber.com it matched an unrelated reused header widget instead of
+ * the real accordion, producing byte-identical "accordion" screenshots across
+ * totally different pages (caught by hash-comparing output; see README).
+ * Scope to `[data-baseweb="accordion"]` first when present, and only fall
+ * back to the generic selector for sites that don't use Base Web.
+ */
 async function exploreAccordions(page, section) {
-  const accordionTriggers = page.locator('[aria-expanded="false"]');
+  const basewebAccordion = page.locator('[data-baseweb="accordion"]').first();
+  const scope = (await basewebAccordion.count()) > 0 ? basewebAccordion : page;
+  const accordionTriggers = scope.locator('[aria-expanded="false"]');
   const count = Math.min(await accordionTriggers.count().catch(() => 0), 5);
   for (let i = 0; i < count; i++) {
     try {
@@ -351,10 +416,20 @@ async function exploreAccordions(page, section) {
   if (count > 0) await screenshot(page, section, "accordions-expanded");
 }
 
-/** Clicks "next" on the first couple of carousel-like components found. */
+/**
+ * Clicks "next" on the first couple of carousel-like components found.
+ * Includes `data-baseweb="carousel"` plus the common slider-library class
+ * markers (swiper/slick/keen-slider/embla) alongside the original
+ * class-name-contains-"carousel" heuristic, since real-world carousels rarely
+ * literally use the word "carousel" in their markup.
+ */
 async function exploreCarousels(page, section) {
   const nextButtons = page.locator(
-    '[class*="carousel" i] button[aria-label*="next" i], [class*="carousel" i] [class*="next" i], button[aria-label*="next slide" i]'
+    '[data-baseweb="carousel"] button[aria-label*="next" i], ' +
+    '[class*="carousel" i] button[aria-label*="next" i], [class*="carousel" i] [class*="next" i], ' +
+    '[class*="swiper" i] [class*="next" i], [class*="slick" i] [class*="next" i], ' +
+    '[class*="keen-slider" i] ~ button[aria-label*="next" i], [class*="embla" i] button[aria-label*="next" i], ' +
+    'button[aria-label*="next slide" i]'
   );
   const count = Math.min(await nextButtons.count().catch(() => 0), 3);
   for (let i = 0; i < count; i++) {
