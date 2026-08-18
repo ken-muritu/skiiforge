@@ -1,0 +1,11 @@
+[Unit]
+Description=Battery guard - escalating alarm if battery drains below 30% while unplugged
+
+[Service]
+Type=simple
+ExecStart=%h/bin/battery-guard.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

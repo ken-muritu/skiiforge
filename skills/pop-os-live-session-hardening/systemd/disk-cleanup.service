@@ -1,0 +1,6 @@
+[Unit]
+Description=Safe disk cleanup + usage notification
+
+[Service]
+Type=oneshot
+ExecStart=%h/bin/disk-cleanup.sh
