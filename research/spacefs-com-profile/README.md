@@ -1,28 +1,38 @@
-# SpaceFS.com - Visual + Design Profile
+# SpaceFS.com — Visual + Design Profile (Revised)
 
-Complete replica-ready design profile of https://spacefs.com/, generated 2026-08-18.
+Replaces the guessed/inferred version committed by Hermes on 2026-08-18 (commit `dfe06f7`) with
+one built from real, verified data — pulled directly from spacefs.com's own shipped HTML, CSS,
+and JS from a network origin Cloudflare's WAF did not block.
 
 ## Contents
 
-- spacefs-profile.md - 525-line exhaustive design & technical profile covering:
-  - Brand identity, color system, typography, layout & spacing
-  - Full component inventory (navbar, hero, CTAs, file browser mockups, Finder UI, pricing, FAQ, footer)
-  - Visual aesthetic & motion analysis
-  - Technical architecture
-  - Content structure with exact section hierarchy
-  - Assets manifest (posters, icons, brand assets)
-  - Step-by-step recreation guide with design tokens and build order
+- `spacefs-profile.md` — the full profile. Every color/font/spacing/breakpoint value is copied
+  verbatim from the site's real CSS, not estimated. Includes a side-by-side correction table
+  against Hermes' original guesses.
+- `assets/screenshots/` — 2 real, verified renders (hero, overview)
+- `assets/posters/` — 12 real downloaded JPGs (Hermes' cloud sandbox was blocked from this
+  subdomain entirely)
+- `assets/icons/` — real favicon set + the actual Open Graph share image
+
+## Why This Exists
+
+Hermes' agent hit Cloudflare's bot-blocking on its cloud sandbox's datacenter IP for every real
+fetch method it tried, and fell back to guessing design tokens from "industry-standard patterns"
+— clearly labeled as inferred, to its credit, but not what a pixel-accurate replica needs. It
+also fabricated three contact emails that don't exist anywhere in the site. This machine's
+network origin wasn't blocked, so this revision replaces every guessed value with the real one
+and corrects the fabricated contact info.
+
+## What's Still Missing
+
+Full section-by-section screenshots (`#product`, `#pricing`, `#faq`, `#sign-up`) and
+mobile/tablet viewports were not completed — automated browser-window focus proved unreliable in
+this desktop session. See §10 of `spacefs-profile.md` ("Honest Limitations of This Pass") for
+exactly what's missing and how to finish it. Everything else (colors, fonts, spacing, real copy,
+real downloaded assets) is complete and verified.
 
 ## How to Use
 
-Read spacefs-profile.md top to bottom for the full picture. The Recreation Guide (Section 10) contains the prioritized build sequence and CSS token definitions to start from.
-
-## Notes
-
-- Direct browser screenshot capture was blocked by Cloudflare WAF (datacenter IP). The profile is built from web_extract crawling + content analysis.
-- Poster image URLs are documented but not downloadable from this environment (Cloudflare blocks asset subdomain too).
-- Design inferences are based on page structure, content patterns, and industry-standard patterns for dark-themed Next.js product sites.
-
-## Generated For
-
-ken-muritu/skiiforge - research/spacefs-com-profile/
+Read `spacefs-profile.md` top to bottom. §2–4 (Color/Typography/Layout) can be dropped directly
+into a Tailwind config as-is — they're the site's real values. §5 has verbatim copy for every
+section. §9 is the build-order recreation guide.

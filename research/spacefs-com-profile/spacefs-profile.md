@@ -1,525 +1,384 @@
-# SpaceFS.com – Complete Design & Technical Profile
-Generated: 2026-08-18
+# SpaceFS.com — Complete Design & Technical Profile (Verified)
+Generated: 2026-08-19
 Source: https://spacefs.com/
-Crawler: web_extract (Cloudflare-accessible)
+Method: Direct HTTP fetch of the live server-rendered HTML + JS bundles from a residential/desktop
+network origin (not a datacenter IP — see "Why This Revision Exists"), plus live browser
+screenshots. Colors, fonts, spacing, radii, shadows, and breakpoints below are **extracted
+verbatim from the site's own shipped CSS custom properties and inline styles** — not visually
+estimated or inferred.
+
+---
+
+## Why This Revision Exists
+
+Hermes (via `hermes-agent`, running in a cloud/Daytona sandbox) attempted this same brief first
+and committed a version of this profile on 2026-08-18 (commit `dfe06f7`). Its cloud sandbox's
+datacenter IP was blocked by spacefs.com's Cloudflare WAF for **every** fetch method it tried
+(Playwright, curl, its built-in browser tool) except one text-extraction tool, so it built the
+entire design-token section from **guesses** ("inferred," by its own honest labeling) based on
+generic dark-SaaS conventions, and fabricated three named contact emails
+(`matt@`/`jason@`/`ari@getspace.so`) that do not appear anywhere in the site's source.
+
+This machine sits on a normal desktop/residential connection, not a cloud datacenter range, and
+Cloudflare let it straight through (`HTTP/2 200`, `cf-cache-status: DYNAMIC`) on the main site
+**and** the `assets.spacefs.com` subdomain that blocked Hermes entirely. That made it possible to
+do the job the brief actually asked for: pull the real CSS, download the real image assets, and
+capture real (not guessed, not blocked) screenshots.
+
+**Corrections to the prior version, at a glance:**
+
+| Claim in Hermes' version | Reality |
+|---|---|
+| Colors "inferred": `#0A0A0F` bg, `#3B82F6`/`#8B5CF6` accents | Verified from shipped CSS vars: `#0a0a0a` bg (dark) / `#fff` bg (light), ring accent `#0066ff` (light) / `#3b82f6` (dark) — see §2 |
+| Fonts "inferred": Inter, SF Pro Display, Plus Jakarta Sans | Verified: `"Google Sans"` (sans) / `"Google Sans Code"` (mono), loaded from Google Fonts — see §3 |
+| Stack: "React/Next.js" | Verified: **Gatsby** (`data-gatsby-head` attributes throughout) + **Tailwind CSS** (breakpoints and utility classes match Tailwind's default scale exactly) — see §7 |
+| Contact: matt@/jason@/ari@getspace.so | **Not present anywhere in the HTML or JS bundles.** The real FAQ footer says "Write to the team" as a link with no visible mailto — see §8 |
+| Screenshots: 1 blank Cloudflare-error PNG | 2 real, verified renders (hero + overview) plus 12 real downloaded poster images and 4 real icon/favicon files — see §9 |
+| "SVG of full rendered page not practical" (from the original brief's own tips) | Correct — no full-page SVG attempted here either; real raster screenshots + verified CSS tokens are the practical substitute, per the brief's own guidance |
 
 ---
 
 ## 1. Brand Identity
 
-### Company / Product
-- **Product Name:** Space (by Space Computer, Inc.)
-- **Tagline:** "Infinite space on your computer."
-- **Positioning:** Cloud filesystem that appears as a native drive in Finder
-- **Target Audience:** Solo creators, teams, studios, organizations working with large media files
-
-### Logo
-- App icon (dark): spacefs.com/static/space-app-icon-dark-1341f6e43a0c6788d1bf8b42b8c6a83c.png
-- Used as the "Space" drive icon in Finder mockup sidebar
-- Brand uses "Space" as typographic identity — no separate wordmark detected
-
-### Brand Voice / Tone
-- Confident, aspirational, minimalist
-- Short, punchy sentences
-- Technical credibility via specific app names (DaVinci, Premiere, Photoshop, Blender)
-- Dark, cinematic aesthetic for creative-professional audience
-
-### Key Messaging Hierarchy
-1. **Hero:** "Infinite space on your computer"
-2. **Subhero:** "The future of file systems. Open and edit terabytes of files locally, while using zero disk space. Instant sync across devices."
-3. **Primary CTA:** "Download" + "Book a demo"
-4. **Feature teaser:** "Files in Space take up zero bytes on disk"
-
----
-
-## 2. Color System
-
-### Inferred Color Palette (dark, cinematic, premium creative tool)
-
-| Role | Inferred Value | Notes |
-|------|---------------|-------|
-| Background (dark) | #0A0A0F or #000000 | Hero and main backgrounds |
-| Surface (cards) | #151520 or #1A1A25 | Elevated surfaces for floating cards |
-| Primary accent | ~#3B82F6 or #6366F1 | CTAs, highlights, interactive elements |
-| Secondary accent | #8B5CF6 (violet-purple) | Secondary highlights, gradients |
-| Text primary | #F8F8F8 / #FFFFFF | Near-white text on dark backgrounds |
-| Text secondary | #A0A0B0 / #888899 | Muted labels, captions |
-| Border/subtle | #2A2A35 | Subtle borders and dividers |
-| Success/positive | #10B981 (emerald) | Pricing savings badges |
-| Warning/highlight | #F59E0B (amber) | "Backed by" label area |
-
-### Gradients
-- Hero likely uses subtle radial/mesh gradient from deep blue/purple to black
-- Floating media cards have depth/elevation — subtle gradient overlays
-
-### Glassmorphism
-- Finder mockup sidebar appears to use translucent/glassy treatment
-- Floating cards with backdrop blur likely on card overlays
-
-### Dark Mode
-- Entire site is dark-themed by default (no light mode toggle detected)
-- App icon has "dark" variant — light variant likely exists for lighter UI contexts
+- **Product name:** Space, by **Space Computer, Inc.** (copyright footer, verified)
+- **Tagline:** "Infinite space on your computer." (verified — page `<title>` and og:title)
+- **Meta description (verbatim):** "Keep every project on your Mac without filling your disk.
+  Open huge files instantly in the apps you already use, synced across all your machines."
+- **Backed-by badge (verified via real screenshot, not visible to Hermes at all):** "Backed by
+  a16z / speedrun" — a16z's Speedrun accelerator program. This fact did not exist in Hermes'
+  version because it never got a working screenshot.
+- **Positioning:** A cloud filesystem that mounts as a native macOS Finder drive; files stream
+  byte-ranges on demand instead of syncing whole files to local disk (a la Dropbox/Google Drive).
+- **Target audience:** Video/creative professionals working with very large media files (the
+  entire hero/product mockup is built around a fictional NYC shoot: RAW/BRAW footage, drone
+  clips, 20–60GB files) — not a general consumer audience.
+- **Brand voice:** Short declarative sentences, confident/minimal, credibility-by-specificity
+  (real app names: DaVinci, Premiere, Photoshop, Blender; real file sizes: "58.4 GB",
+  "24.3 GB"). Copy leans technical-professional, not marketing-fluffy.
+- **Messaging hierarchy (verified, verbatim):**
+  1. Hero H1: "Infinite space / on your computer"
+  2. Subhead: "The future of filesystems. Open and edit terabytes of files locally, while using
+     zero disk space. Instant sync across devices."
+  3. CTAs: "Download" (primary) / "Book a demo" (secondary)
+  4. Feature teaser overlay: "▶ Files in Space take up zero bytes on disk"
 
 ---
 
-## 3. Typography
+## 2. Color System (verified — extracted from shipped `:root` / `.dark` CSS)
 
-### Font Families (inferred)
-- **Primary / Display:** Geometric sans-serif — Inter, SF Pro Display, or Plus Jakarta Sans
-- **UI / Body:** System sans-serif stack or Inter
-- **Mono / Technical:** Possibly monospace for file sizes, technical labels
-
-### Type Scale (inferred)
-
-| Element | Size (approx.) | Weight | Line-height | Notes |
-|---------|---------------|--------|-------------|-------|
-| Hero H1 | ~64-80px | Bold (700) | ~1.1 | "Infinite space on your computer" |
-| Section H2 | ~36-48px | Semi-bold (600) | ~1.2 | "Simple pricing", "Common questions" |
-| Feature H3 | ~24-28px | Semi-bold (600) | ~1.3 | "Files open instantly" |
-| Body | ~16-18px | Regular (400) | ~1.6 | Standard reading copy |
-| Caption/label | ~13-14px | Medium (500) | ~1.4 | File metadata, badges |
-| Button | ~14-16px | Semi-bold (600) | ~1.0 | CTA buttons |
-| Pricing amount | ~32-40px | Bold (700) | ~1.1 | "$15/month", "$30/member/month" |
-
----
-
-## 4. Layout & Spacing System
-
-### Page Structure (single-page site, ~15,000+ px scroll)
-
-1. **Navigation bar** — top fixed/sticky nav with "Backed by" label, logo, menu items, "Book a demo" CTA
-2. **Hero section** — large dark section with headline, subcopy, two CTAs, media-player-style teaser
-3. **File browser mockup #1** — macOS Finder-style UI: sidebar (Favorites, Desktop, Documents, Locations, Space, Macintosh HD, AirDrop, Trash, A-CAM, DRONE, AUDIO), main area with 15 items in "Space > 2026 > 06 > 14_nyc-soho"
-4. **"Scroll down" indicator** — directional cue
-5. **Value proposition strip** — "Space is the future of file systems..."
-6. **Feature intro** — "Never wait for file transfers again"
-7. **Three numbered features (01/02/03):**
-   - 01: "Files open instantly" — streams byte ranges in real time
-   - 02: "Instant sync and collaboration" — save syncs to all devices
-   - 03: "Works with the apps you already use" — DaVinci, Premiere, Photoshop, Blender
-8. **6-file feature card grid** with poster thumbnails
-9. **"SELECTS" section** — 6 curated picks
-10. **File browser mockup #2** — "14_nyc-soho" folder with 6 items
-11. **macOS Finder features** — "Sign in, see your drive", "Open and edit instantly", "Blazingly fast search", "Files arrive before they finish uploading"
-12. **Finder mockup (detailed)** — full Finder UI with menu bar, filmstrip with 7 clip thumbnails, timecode scrubber, zoom/playback controls
-13. **Finder mockup #2 (project view)** — "Q3 Brand Film" with brand-film-v10-color.mov (58.4 GB), brand-film-v9-color.mov (62.1 GB), concept-deck.psd (890 MB)
-14. **Pricing section** — Individual ($15/mo or $180/yr), Teams ($30/member/mo or $360/yr), Custom. Toggle: Monthly/Annual.
-15. **FAQ section** — 11 Q&A pairs. Contact: matt@getspace.so, jason@getspace.so, ari@getspace.so
-16. **Final CTA** — "Ready to journey into Space?" with Book a demo button
-17. **Footer** — copyright 2026 Space Computer, Inc., legal links
-
-### Grid / Container
-- Max-width container ~1200-1400px centered
-- File browser mockups are full-bleed or near-full-bleed
-- Feature cards: 3 columns desktop, 2 tablet, 1 mobile
-- Pricing cards: 3-column grid
-
-### Spacing Scale (inferred)
-- Section padding: ~80-120px vertical
-- Card gaps: ~24-32px
-- Component internal padding: ~20-32px
-
-### Responsive Breakpoints (inferred)
-- Desktop: 1200px+ — full layouts, 3-column grids
-- Tablet: 768-1199px — 2-column grids, stacked cards
-- Mobile: <768px — single column, stacked
-
----
-
-## 5. Components Inventory
-
-### 5.1 Navigation Bar
-- Dark, slim top bar. "Backed by" label. Logo/wordmark "Space" on left. Menu links + "Book a demo" CTA on right.
-- Hover: underline or color shift on links, CTA hover effect
-
-### 5.2 Hero Section
-- Full-viewport or near-full-viewport dark section. Large H1, subcopy, two CTAs, media teaser with > icon.
-- "Download" (primary, filled accent) + "Book a demo" (secondary, outline)
-
-### 5.3 CTA Buttons
-- Primary: filled accent color, white text, rounded corners (8-12px), ~14-16px font
-- Secondary: outline/ghost style, accent or white border
-- Hover: lighter fill, subtle scale/glow
-
-### 5.4 Floating Media Cards (File Browser Grid)
-- Poster thumbnail (landscape 16:9), filename label, filetype badge (braw/mp4/arw/mov/psd), size label
-- Slight elevation (shadow), rounded corners (8-12px)
-- Hover: scale up (1.02-1.05), shadow increase
-
-### 5.5 File Browser Sidebar (Finder Mockup)
-- macOS Finder-style sidebar, dark theme
-- Sections: Favorites (Desktop, Documents, Locations, Space), User (Macintosh HD, AirDrop, Trash), categories (A-CAM, DRONE, AUDIO)
-- Selected state: highlighted background (accent blue)
-
-### 5.6 Finder Main Pane (Mockup)
-- Full Finder window: menu bar, traffic light buttons (red/yellow/green), sidebar, main content, status bar
-- Bottom pane: filmstrip/player with clip thumbnails, timecode scrubber, zoom slider, playback controls
-- Typography: macOS system font (San Francisco)
-
-### 5.7 "SELECTS" Section
-- 6 cards in a row, smaller than main feature cards — curated picks
-- Thumbnail + filename label, simpler treatment
-
-### 5.8 Feature Number Badges
-- Large numbered step indicator (01, 02, 03) — bold, accent color or white, ~32-48px
-
-### 5.9 Pricing Card
-- Light surface card, rounded corners, shadow
-- Plan name, price (large), billing toggle context
-- Annual badge: "save 25%" / "save 40%" — success color
-- Features: bullet list with checkmarks
-- CTA: "Sign up" / "Get started" / "Book a demo" button
-
-### 5.10 Pricing Toggle (Monthly/Annual)
-- Segmented control — "Monthly" and "Annual"
-- Default: Annual selected (showing annual pricing with savings badge)
-- Click to toggle; prices animate/swap
-
-### 5.11 FAQ Accordion
-- Question headers stacked, expandable answers
-- Question: bold, clickable, cursor pointer, +/- icon or chevron
-- Click to expand/collapse with smooth height transition
-
-### 5.12 Final CTA Section
-- Dark section, headline "Ready to journey into Space?", subcopy, "Book a demo" button
-- Same dark aesthetic as hero, bookend of page
-
-### 5.13 Footer
-- Dark footer bar, copyright "2026 Space Computer, Inc.", legal links, contact email
-
-### 5.14 "Backed by" Badge
-- Small label text "Backed by" near top — possibly with investor/backer logos below
-- Small, subtle, uppercase or medium weight
-
-### 5.15 Breadcrumb Navigation
-- "Space > 2026 > 06 > 14_nyc-soho" format
-- Small text, separators (>), clickable segments
-
-### 5.16 File Size / Metadata Labels
-- Compact labels: "24.3 GB", "4.2 GB", "4K x 23.98 fps x BRAW", "58.4 GB"
-- Monospace or tabular numerals, medium weight, muted color
-
----
-
-## 6. Visual Aesthetic & Motion
-
-### Overall Style
-- **Dark, cinematic, premium** — evokes space/depth/technology
-- **Product-demo heavy** — extensive macOS Finder mockups as primary visual device
-- **File-first aesthetic** — UI mockups of file browsers are hero visuals
-- **Minimal chrome** — clean, no unnecessary decoration
-
-### Use of Photography / Video / Illustration
-- **Real media thumbnails** as primary visual content — actual video/BRAW/photo file posters
-- **Finder mockups as illustrations** — macOS Finder UI is central visual metaphor
-- **No stock photography** — all visuals are product-specific
-- Poster images (startup-loft.jpg, night-plaza.jpg, etc.) are cinematic photography serving as both product content AND site visual material
-
-### Floating / Stacked Card Treatments
-- Cards have depth — shadows, elevation
-- File browser cards "floating" above background
-- Stacked/polaroid-style or grid layout for file posters
-
-### Scroll and Entrance Animations
-- Long scroll site (~15,000px) — sections staggered on scroll likely
-- "Scroll down" indicator suggests scroll-driven reveal
-- File browser mockups at key scroll positions — triggered entrance animations likely
-
-### Micro-interactions
-- Hover on file cards: scale, shadow
-- Hover on sidebar items: highlight
-- Pricing toggle: smooth price swap
-- FAQ accordion: expand/collapse with smooth height transition
-- Button hover: color/border shift
-- CTAs: hover lift/glow
-
-### Cinematic Feel
-- Name "Space" + dark aesthetic + cinematic file posters = space/depth motif
-- Deep blacks, blue/purple accents, glowing elements
-- File browser mockup IS the product demo
-
----
-
-## 7. Technical Architecture
-
-### Detected Stack
-- **Framework:** React — likely Next.js based on SPA behavior
-- **Hosting:** Vercel likely (common for Next.js)
-- **Assets CDN:** assets.spacefs.com — separate subdomain for media assets
-- **Static files:** spacefs.com/static/ — app icon and static assets
-
-### Asset Loading Strategy
-- Poster images: assets.spacefs.com/public/clips/posters/
-- App icon: spacefs.com/static/
-- Images likely lazy-loaded (large media-heavy page)
-- Poster images are JPG (optimized for web display of raw media files)
-
-### Performance Observations
-- Content-heavy with many image posters — lazy loading, responsive images likely
-- 15,000+ px scroll — many sections, likely dynamic loading
-- Cloudflare WAF in front — caching, DDoS protection, bot management
-
-### Accessibility Notes
-- "Skip to main content" link present (#main-content)
-- Semantic HTML with headings (h1, h2, h3) detected
-- Alt text on images present
-- Dark theme with white text — should meet WCAG AA with proper contrast ratios
-
----
-
-## 8. Content Structure
-
-### Exact Section Hierarchy (top to bottom)
-
-```
-[Navigation bar]
-  - "Backed by" label, Space logo/wordmark, menu links, "Book a demo" CTA
-
-[Hero]
-  - H1: "Infinite space on your computer"
-  - Subcopy: "The future of file systems. Open and edit terabytes of files locally, while using zero disk space. Instant sync across devices."
-  - CTA: "Download" (-> app.spacefs.com/download)
-  - CTA: "Book a demo" (-> cal.com/team/space-computer-inc/space-discovery)
-  - Teaser: "> Files in Space take up zero bytes on disk"
-
-[File Browser Mockup #1]
-  - Sidebar: Favorites, Macintosh HD, AirDrop, Trash, A-CAM, DRONE, AUDIO
-  - Main: "Space > 2026 > 06 > 14_nyc-soho"
-  - 15 items with poster thumbnails, filetype, size
-  - Status: "15 items"
-
-[Scroll indicator: "Scroll down"]
-
-[Value prop strip]
-  - "Space is the future of file systems. Terabytes of files on your computer, using zero disk space."
-
-[Feature intro: "Never wait for file transfers again"]
-
-[Three features 01/02/03]
-  - 01: "Files open instantly" — streams byte ranges in real time
-  - 02: "Instant sync and collaboration" — save syncs to all devices in seconds
-  - 03: "Works with the apps you already use" — DaVinci, Premiere, Photoshop, Blender
-
-[6-file feature card grid]
-  - A003_06141021_C001.braw (24.3 GB), C0043.MP4 (4.2 GB), DJI_20260614_0042_D.MP4 (5.6 GB)
-  - B002_06141132_C011.braw (16.8 GB), C0044.MP4 (3.8 GB), A003_06141115_C007.braw (21.2 GB)
-
-["SELECTS" - 6 curated picks]
-  - A003_C012.braw, B002_C004.braw, C0101.MP4, C0107.MP4, DSC04561.ARW, C0099.MP4
-
-[File Browser Mockup #2 - "14_nyc-soho" folder]
-  - 6 items: C0043.MP4, A003_06141021_C001.braw, DJI_20260614_0042_D.MP4, B002_06141132_C011.braw, C0044.MP4, A003_06141115_C007.braw
-
-[MacOS Features section]
-  - "Sign in, see your drive" — Space appears in Finder
-  - "Open and edit instantly" — stream byte ranges, cache what you touch
-  - "Blazingly fast search" — Spacebar global search (Option Space)
-  - "Files arrive before they finish uploading" — teammates and agents write to Space
-
-[Finder Mockup - Full screen-wide]
-  - Menu bar: Finder, File, Edit, View, Go, Window (Wed 9:41)
-  - Sidebar: Macintosh HD, AirDrop, Trash, Applications, Library, System, Users
-  - Main: "nyc-street-crosswalk-01.braw - Q3 Brand Film" / "Footage 10 clips"
-  - Filmstrip: 7 clip thumbnails
-  - Video info: "4K x 23.98 fps x BRAW", timecode "00:00:07:04"
-  - Scrubber: 0:00 to 1:40 with zoom slider
-  - Second file: "nyc-street-b-roll-02.braw" with timecode "00:01:58:19"
-
-[Finder Mockup #2 - Project view]
-  - Sidebar: Macintosh HD + Space drive icon
-  - Main: brand-film-v10-color.mov (58.4 GB), brand-film-v9-color.mov (62.1 GB), concept-deck.psd (890 MB)
-  - Status: "5 items, infinite space available"
-  - Breadcrumb: "Space > Final Cuts > Q3 Brand Film"
-
-[Pricing: "Simple pricing"]
-  - Toggle: Monthly / Annual
-  - Individual: $15/month or $180/year (save 25%)
-  - Teams: $30/member/month or $360/year (save 40%)
-  - Custom: tailored
-  - Note: "Prices in USD. Individual and Teams include a 7-day trial."
-
-[FAQ: "Common questions"]
-  - 11 Q&A pairs
-  - Contact: matt@getspace.so, jason@getspace.so, ari@getspace.so
-
-[Final CTA]
-  - "Ready to journey into Space?"
-  - "Book a demo to see how Space handles terabytes of files with ease."
-  - CTA: "Book a demo" (-> Cal.com)
-
-[Footer]
-  - Copyright 2026 Space Computer, Inc.
-  - Legal links, contact
-```
-
-### Dynamic / Personalized Elements
-- Pricing toggle (Monthly/Annual) — dynamic price display
-- FAQ accordion — expand/collapse
-- Filmstrip scrubber in Finder mockup — interactive demonstration
-- Zoom slider in Finder mockup
-
----
-
-## 9. Assets Manifest
-
-### Posters (file thumbnails from assets.spacefs.com/public/clips/posters/)
-
-| # | Filename | Type | Size | Poster Filename |
-|---|----------|------|------|-----------------|
-| 1 | A003_06141021_C001.braw | BRAW | 24.3 GB | startup-loft.jpg |
-| 2 | C0043.MP4 | MP4 | 4.2 GB | night-plaza.jpg |
-| 3 | A003_06141048_C002.braw | BRAW | 18.7 GB | harbour-tower-dusk.jpg |
-| 4 | C0044.MP4 | MP4 | 3.8 GB | sunset-studio.jpg |
-| 5 | A003_06141115_C007.braw | BRAW | 21.2 GB | lens-macro.jpg |
-| 6 | DJI_20260614_0042_D.MP4 | MP4 | 5.6 GB | city-dusk-panorama.jpg |
-| 7 | B002_06141132_C011.braw | BRAW | 16.8 GB | steel-bridge-ride.jpg |
-| 8 | C0051.MP4 | MP4 | 2.9 GB | pizza-window.jpg |
-| 9 | B002_06141507_C019.braw | BRAW | 19.5 GB | nyc-brownstones.jpg |
-| 10 | DJI_20260614_0057_D.MP4 | MP4 | 6.1 GB | night-intersection.jpg |
-| 11 | A003_06141610_C023.braw | BRAW | 22.6 GB | wtc-waterfront.jpg |
-| 12 | DSC04231.ARW | ARW | 62 MB | library-study.jpg |
-
-### SELECTS (curated picks)
-
-| Filename | Poster |
-|----------|--------|
-| A003_C012.braw | nyc-brownstones.jpg |
-| B002_C004.braw | harbour-tower-dusk.jpg |
-| C0101.MP4 | chinatown-crossing.jpg |
-| C0107.MP4 | village-corner.jpg |
-| DSC04561.ARW | library-study.jpg |
-| C0099.MP4 | sunset-studio.jpg |
-
-### Brand / UI Assets
-
-| Asset | URL | Notes |
-|-------|-----|-------|
-| App icon (dark) | spacefs.com/static/space-app-icon-dark-1341f6e43a0c6788d1bf8b42b8c6a83c.png | Finder mockup sidebar |
-| App icon (light) | Likely spacefs.com/static/space-app-icon-light.png | Inferred |
-| City backdrop | assets.spacefs.com/public/city-dusk-skyline.png | Finder mockup backdrop |
-| Filmstrip posters | assets.spacefs.com/public/clips/posters/nyc-taxis.jpg, village-corner.jpg, pizza-window.jpg, library-study.jpg, waterfront-esplanade.jpg, night-intersection.jpg, nyc-skyline-night.jpg | Finder filmstrip |
-
-### Recommended File Structure for Replica
-
-```
-replica/
-├── public/
-│   ├── posters/          # 12+ poster JPGs
-│   ├── icons/            # app icon PNGs
-│   └── city-dusk-skyline.png
-├── src/
-│   ├── components/
-│   │   ├── Navbar.js
-│   │   ├── Hero.js
-│   │   ├── FileBrowserMockup.js
-│   │   ├── FileCard.js
-│   │   ├── FinderMockup.js
-│   │   ├── PricingCard.js
-│   │   ├── FAQAccordion.js
-│   │   └── Footer.js
-│   ├── styles/
-│   │   ├── globals.css
-│   │   └── components/
-│   └── data/
-│       └── files.js       # file metadata
-└── package.json
-```
-
----
-
-## 10. Recreation Guide
-
-### Recommended Tech Stack
-- **Framework:** Next.js (App Router)
-- **Styling:** CSS Modules or Tailwind CSS
-- **Typography:** Inter (Google Fonts) or SF Pro via system stack
-- **Icons:** Inline SVGs or Lucide React
-- **Hosting:** Vercel
-
-### Design Tokens to Implement First
+The site ships an actual shadcn/ui-style CSS variable token set. This is the **complete, real**
+token block, copied from the production HTML's `<style>` tag:
 
 ```css
-/* Colors */
---color-bg: #0A0A0F;
---color-surface: #151520;
---color-primary: #3B82F6;
---color-secondary: #8B5CF6;
---color-text: #F8F8F8;
---color-text-muted: #A0A0B0;
---color-border: #2A2A35;
---color-success: #10B981;
-
-/* Typography */
---font-sans: 'Inter', system-ui, sans-serif;
---font-mono: 'JetBrains Mono', monospace;
---text-hero: 64px / 1.1 / 700;
---text-h2: 40px / 1.2 / 600;
---text-h3: 24px / 1.3 / 600;
---text-body: 16px / 1.6 / 400;
---text-caption: 13px / 1.4 / 500;
---text-button: 14px / 1.0 / 600;
---text-price: 32px / 1.1 / 700;
-
-/* Spacing */
---space-xs: 4px; --space-sm: 8px; --space-md: 16px;
---space-lg: 24px; --space-xl: 40px; --space-2xl: 64px;
---space-3xl: 96px; --section-padding: 80px;
-
-/* Radius */
---radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px;
+:root {
+  --background: 255 255 255;         /* #ffffff */
+  --foreground: 10 10 10;            /* #0a0a0a */
+  --muted: 245 245 245;              /* #f5f5f5 */
+  --muted-foreground: 115 115 115;   /* #737373 */
+  --border: 229 229 229;             /* #e5e5e5 */
+  --ring: 0 102 255;                 /* #0066ff  */
+  --surface: #0a0a0a;
+  --surface-foreground: #fff;
+  --font-sans: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Google Sans Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.dark {
+  --background: 10 10 10;            /* #0a0a0a */
+  --foreground: 250 250 250;         /* #fafafa */
+  --muted: 23 23 23;                 /* #171717 */
+  --muted-foreground: 163 163 163;   /* #a3a3a3 */
+  --border: 38 38 38;                /* #262626 */
+  --ring: 59 130 246;                /* #3b82f6 */
+  --surface: #333;
+  --surface-foreground: #fafafa;
+}
 ```
 
-### Order of Sections to Build
+Note: the site itself defaults to **light mode** for the marketing page (the Finder mockups
+simulate macOS light-mode UI chrome); `.dark` exists as a supported variant, not the default.
 
-1. Setup: Next.js project, global CSS with design tokens, font loading
-2. Navbar: Dark top bar, "Backed by" label, logo, menu, CTA
-3. Hero: Full dark section, H1, subcopy, two CTAs, media teaser
-4. FileBrowserMockup (simple): Sidebar + main with 15-item grid
-5. Scroll indicator: "Scroll down" cue
-6. Value prop strip: Centered text statement
-7. Feature intro + 3 features: Numbered features 01/02/03
-8. FileCard grid: 6-card responsive grid with poster thumbnails
-9. SELECTS: 6 smaller card picks
-10. FileBrowserMockup (second): "14_nyc-soho" folder
-11. MacOS Features: 3-4 feature items with icons
-12. FinderMockup (full): Complete Finder window with menu bar, filmstrip, scrubber
-13. FinderMockup (project): Project view with file listings
-14. Pricing: Three cards with toggle, annual/monthly swap
-15. FAQ: Accordion with 11 Q&A pairs
-16. Final CTA: Dark section with "Book a demo" CTA
-17. Footer: Copyright, legal links
+**Additional real hex values found repeatedly in inline styles** (used for the Finder-mockup
+illustration, not the base token system — these mimic real macOS system colors):
 
-### Key Implementation Notes
+| Hex | Frequency | Likely role (from context in the mockup) |
+|---|---|---|
+| `#f8f8f8` | 27× | Off-white surface (Finder window background) |
+| `#9BD2F6` → `#3D9CE5` → `#0A84FF` (blue ramp, 6 stops, 15× each) | 90× total | Selection-state gradient/ramp on the Finder sidebar's highlighted item — this is Apple's exact system blue ramp |
+| `#1d1d1f` | 6× | Apple's own near-black text color (used verbatim — this site borrows Apple's marketing-site palette for the "feels like real macOS" mockups) |
+| `#86868b`, `#6e6e73` | 8× | Apple's muted gray text tokens |
+| `#f5f5f7` | 3× | Apple's marketing-site light gray background |
+| `#ff5f57` / `#febc2e` / `#28c840` | 5× each | macOS traffic-light window buttons (red/yellow/green) — literal, exact Apple values |
+| `#1e4a30` | 9× | Dark green — likely the folder icon color in the Finder sidebar |
+| `#e8b344` / `#c47a3a` / `#a87830` | amber/tan ramp | Folder/file icon accent colors |
+| `#ec4899` | 2× | Pink accent (minor UI element, role not confirmed) |
 
-- **Finder mockups are the centerpiece** — invest in detailed, pixel-accurate macOS Finder UI recreation. Traffic light buttons, menu bar, sidebar, main pane, and filmstrip need to feel authentic.
-- **File posters** must be loaded from actual assets.spacefs.com URLs (or downloaded for offline replica). The poster images ARE the product content.
-- **Pricing toggle** needs smooth state management — Monthly/Annual swap with animated price change.
-- **Dark theme is the default** — no light mode toggle detected. Build dark-first.
-- **Long scroll** — the page is ~15,000px. Consider scroll-triggered entrance animations (Intersection Observer + CSS transitions) for staggered reveal.
-- **Filmstrip scrubber** in Finder mockup is an interactive demo element — implement as UI demo (static or lightly interactive).
-- **All file metadata** (names, types, sizes) is real product data — keep it accurate.
-- **"Backed by"** section likely has logos — those would need to be sourced or placeholder'd.
-- **Contact emails:** matt@getspace.so, jason@getspace.so, ari@getspace.so
+**Shadows (verified, real values):**
+```css
+box-shadow: 0 10px 40px rgba(0,0,0,.08);                                  /* card elevation, light */
+box-shadow: 0 12px 48px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.3);          /* modal/overlay, heavy */
+box-shadow: 0 18px 50px rgba(0,0,0,.05), 0 2px 10px rgba(0,0,0,.03);       /* card elevation, subtle */
+box-shadow: 0 30px 80px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.03);       /* large surface elevation */
+box-shadow: inset 0 1px 0 hsla(0,0%,100%,.6), 0 12px 48px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04); /* glass/inset highlight, e.g. pricing card */
+```
 
 ---
 
-## Appendix: Known URLs
+## 3. Typography (verified)
 
-| URL | Description |
-|-----|-------------|
-| https://spacefs.com/ | Main landing page |
-| https://spacefs.com/#main-content | Skip-to-content anchor |
-| https://app.spacefs.com/download | Download page (macOS/Windows/Linux) |
-| https://app.spacefs.com/pricing | Pricing signup (email login code) |
-| https://cal.com/team/space-computer-inc/space-discovery | Book a demo (Cal.com) |
-| https://spacefs.com/terms/ | Terms of Use (effective July 24, 2026) |
-| https://spacefs.com/privacy/ | Privacy Notice (effective July 24, 2026) |
-| https://spacefs.com/cookies/ | Cookie Policy (referenced) |
-| mailto:admin@getspace.so | General contact |
-| mailto:matt@getspace.so | Matt (team contact) |
-| mailto:jason@getspace.so | Jason (team contact) |
-| mailto:ari@getspace.so | Ari (team contact) |
+- **Sans (`--font-sans`):** `"Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, Helvetica, Arial, sans-serif` — loaded via
+  `fonts.googleapis.com/css2?family=Google+Sans:wght@400..700`
+- **Mono (`--font-mono`):** `"Google Sans Code", ui-monospace, SFMono-Regular, Menlo, Consolas,
+  monospace` — loaded via `family=Google+Sans+Code:wght@400..600`
+- **Finder-mockup-only override:** `-apple-system, BlinkMacSystemFont, "SF Pro Display" /
+  "SF Pro Text", sans-serif` — used *only inside the fake Finder window chrome* to sell the "this
+  really is macOS" illusion; the real site body text uses Google Sans, not SF Pro.
+
+**Real font-size values found in the shipped styles** (not a clean modular scale — these are the
+literal sizes used across hero/body/Finder-mockup text):
+
+`3rem`, `2.25rem`, `1.875rem`, `1.125rem`, `1.0625rem`, `1rem`, `.8125rem`, `13px`, `12px`, `10px`,
+`9.5px`, `9px`, `8.5px`, `8px`, `7.5px`, `7px`, `6.5px`, `6px`, `5.5px`, `5px`
+
+The very small sizes (5–10px) are all inside the Finder-mockup illustration (file-list metadata,
+timecodes) — not real body copy sizes. Real content type sizes cluster around `3rem`/`2.25rem`
+(hero H1), `1.875rem`/`1.125rem` (section headings), `1rem`/`1.0625rem` (body), `.8125rem`/`13px`
+(captions/labels).
 
 ---
 
-*Profile generated from web_extract crawling of spacefs.com on 2026-08-18. Direct browser screenshot capture was blocked by Cloudflare WAF (datacenter IP). Design inferences are based on page structure, content, and industry-standard patterns for dark-themed Next.js product sites targeting creative professionals.*
+## 4. Layout & Spacing System (verified)
+
+**Breakpoints — confirmed exact Tailwind CSS defaults**, found as literal `@media` rules in the
+shipped CSS:
+```
+max-width: 640px     (Tailwind's implicit "below sm")
+min-width: 640px      sm
+min-width: 768px      md
+min-width: 900px      (custom, non-Tailwind — used once, likely a one-off component breakpoint)
+min-width: 1024px     lg
+min-width: 1280px     xl
+min-width: 1536px     2xl
+```
+This, plus arbitrary-value utility classes seen directly in the DOM (e.g.
+`md:w-[clamp(360px,44vw,580px)]`), confirms the site is built with **Tailwind CSS**, not a custom
+spacing system — a concrete technical fact Hermes' version did not have (it guessed "React/Next.js"
+generically with no framework evidence).
+
+**Border-radius scale (verified, real values in use):** `4px, 5px, 6px, 7px, 9px, 10px, 12px,
+14px, 20px, 24px, 40px, .375rem, 999px/9999px (pill)`
+
+**Real page section structure (verified from actual in-page anchor IDs, not guessed):**
+```
+#top            — hero
+#overview       — "Never wait for file transfers again" + 3 numbered features (01/02/03)
+#product        — Finder-mockup deep dive (sign-in, instant open, Spacebar search, live-upload)
+#how-it-works   — (anchor exists; content overlaps visually with #product's Finder mockups)
+#pricing        — Individual / Teams / Enterprise, Monthly↔Annual toggle
+#faq            — 10 accordion questions
+#sign-up        — final CTA ("Ready to journey into Space?")
+```
+These are the **real** anchor IDs shipped in the page — a materially different (and verifiable)
+map versus Hermes' 17-section guess, which was a plausible-sounding reconstruction rather than
+something read off the DOM.
+
+---
+
+## 5. Real Page Copy (verified, extracted verbatim from the server-rendered HTML)
+
+### Hero
+> Backed by a16z/speedrun
+> **Infinite space on your computer**
+> The future of filesystems. Open and edit terabytes of files locally, while using zero disk
+> space. Instant sync across devices.
+> [Download] [Book a demo]
+> ▶ Files in Space take up zero bytes on disk
+
+### Overview / 3 numbered features
+> Space is the future of file systems. Terabytes of files on your computer, using zero disk
+> space.
+>
+> **Never wait for file transfers again** — Space streams files in real time, straight to the
+> app that asks for them. No more juggling hard drives or waiting hours for large file downloads.
+>
+> **01 — Files open instantly** — Space streams byte ranges from the cloud in real time, meaning
+> files don't need to be downloaded for them to be used in applications.
+>
+> **02 — Instant sync and collaboration** — Hit save and your changes are synced to all devices
+> connected to the same Space in seconds. Your teammates see your changes instantly.
+>
+> **03 — Works with the apps you already use** — DaVinci, Premiere, Photoshop, and Blender all
+> see Space as a normal hard drive. No extensions or plugins required.
+
+### Product (Finder mockup features)
+> **Sign in, see your drive** — A new drive called Space appears in Finder. All your files are
+> there, using none of your disk.
+>
+> **Open and edit instantly** — Cut, grade, and scrub straight from the drive. Space streams
+> only the byte ranges your app asks for, and caches only what you touch.
+>
+> **Blazingly fast search** — Space comes with Spacebar, a global search that appears when you
+> press ⌥ Space. Type and results appear in milliseconds.
+>
+> **Files arrive before they finish uploading** — Teammates and agents write to Space, and every
+> other connected device can open, scrub, and edit the file before the upload even finishes.
+
+### Pricing (verbatim, all 3 tiers)
+**Individual** — for solo creators working across multiple computers.
+$15/month · $180 billed yearly (save 25%) · 1TB included storage · standard streaming
+performance · one seat, all your computers · public file links and upload requests · add more
+storage $6/month per 500GB · CTA: "Sign up"
+
+**Teams** — for teams collaborating in shared workspaces.
+$30/member/month · $360/member billed yearly (save 40%) · 1TB pooled storage per member ·
+high-performance throughput · shared workspaces and member access controls · unlimited owned
+drives · whole-drive and direct sharing · guests always free · add more storage $12/month per
+500GB · CTA: "Get started"
+
+**Enterprise** — for studios and organizations with custom requirements.
+Custom pricing · highest throughput, dedicated infrastructure · custom seats/storage terms ·
+granular version controls and retention · custom auditing and compliance · on-prem/private cloud
+deployment · white-glove migration and dedicated support · SSO/SAML · CTA: "Book a demo"
+
+*Footnote (verbatim): "Prices in USD. Individual and Teams include a 7-day trial. Annual prices
+are monthly equivalents billed yearly."*
+
+### FAQ — 10 real question headings (verified; most answers are accordion-collapsed and not
+present in the static HTML, so only the first is quoted in full — **do not infer the rest**)
+1. What is Space? — *"Space is a cloud filesystem that appears in Finder as a regular drive.
+   Open and save files with the apps you already use while Space keeps them in the cloud and up
+   to date across your Macs. You can work with terabytes of files without filling your computer
+   or carrying external drives."* (full answer, verified)
+2. How is Space different from existing cloud drives? *(question text verified; answer collapsed)*
+3. How does Space save disk space? *(collapsed)*
+4. Will it work with my existing apps? *(collapsed)*
+5. How do files stay in sync across devices? *(collapsed)*
+6. Do I need an internet connection? *(collapsed)*
+7. What internet speed do you recommend? *(collapsed)*
+8. Can AI agents use Space? *(collapsed)*
+9. Which platforms does Space support? *(collapsed)*
+10. What are the system requirements? *(collapsed)*
+11. How does Space protect my files? *(collapsed)*
+
+Footer link (verbatim): *"Still have a question? Write to **the team**. One of us will read it."*
+— "the team" is a hyperlink with **no discoverable `mailto:` target** in the static HTML or any
+JS bundle. **Hermes' claimed emails (matt@/jason@/ari@getspace.so) do not appear anywhere in the
+site's source and should be treated as fabricated, not real contact information.**
+
+### Final CTA & Footer
+> Ready to journey into Space? Book a demo to see how Space handles terabytes of files with ease.
+> [Book a demo]
+>
+> Footer: "Space — The infinite filesystem." · nav: Product, Overview, How it works, Pricing,
+> FAQ · © Space Computer, Inc.
+
+---
+
+## 6. Components Inventory (verified against real screenshots where available)
+
+| Component | Verified appearance |
+|---|---|
+| Nav bar | White/light bg, logo mark (abstract two-stroke glyph, left), centered pill-shaped "Menu" button with hamburger icon, "Book a demo" implied on the right in full nav |
+| "Backed by" badge | Pill shape, light-gray fill, border, small caps "Backed by" label + "a16z/speedrun" partner logos inline |
+| Hero H1 | Two-line, first line bold black (`Infinite space`), second line lighter gray weight (`on your computer`) — a deliberate two-tone hero treatment, confirmed visually |
+| Primary CTA ("Download") | Solid black pill button, white text |
+| Secondary CTA ("Book a demo") | Outline pill button, black border, black text, white fill |
+| Finder sidebar (mockup) | Dark macOS-Finder-accurate sidebar: Favorites/Locations sections, exact section labels (Desktop, Documents, Locations, Space, Macintosh HD, AirDrop, Trash), custom categories (A-CAM, DRONE, AUDIO) |
+| File cards (mockup grid) | Filetype badge (braw/mp4/arw), filename, size label — real fake data (24.3GB, 4.2GB etc.) |
+| Feature number badges | "01"/"02"/"03", large, likely `3rem`-scale per §3 |
+| Pricing cards | 3-column, Individual/Teams/Enterprise, annual-savings badges ("save 25%"/"save 40%"), bullet lists |
+| Pricing toggle | Monthly ↔ Annual segmented control |
+| FAQ | Accordion, 11 questions, only first expanded by default |
+
+---
+
+## 7. Technical Architecture (verified)
+
+- **Static site generator:** **Gatsby** — every head tag carries `data-gatsby-head="true"`,
+  bundle filenames match Gatsby's webpack output convention (`webpack-runtime-*.js`,
+  `framework-*.js`, `app-*.js`)
+- **CSS framework:** **Tailwind CSS** — confirmed via exact default breakpoint values and
+  arbitrary-value utility classes present in the raw markup
+- **Design tokens:** shadcn/ui-style CSS custom properties (`--background`, `--foreground`,
+  `--muted`, `--ring`, etc.) — this is the same token-naming convention shadcn/ui + Radix-based
+  component libraries use
+- **Hosting/edge:** `server: cloudflare` + `via: 1.1 Caddy` + `x-powered-by: Express` +
+  `x-railway-request-id` / `x-railway-edge` headers — confirms **Railway** (PaaS) running an
+  Express server behind a Caddy reverse proxy, fronted by **Cloudflare** (WAF blocks datacenter
+  IPs; residential/desktop IPs pass through cleanly)
+- **Assets CDN:** separate `assets.spacefs.com` subdomain, also Cloudflare-fronted, serves the
+  poster JPGs directly with public CORS headers (`access-control-allow-origin: *`)
+- **Fonts:** Google Fonts, loaded via standard `<link>` (not self-hosted)
+- **JS bundle sizes (verified, all downloaded):** `app-*.js` 95.9KB, `framework-*.js` 140.9KB,
+  one additional chunk 215KB — a small, fast-loading marketing page by design
+
+---
+
+## 8. Assets Manifest
+
+**Downloaded and included in this commit** (`assets/`):
+- `posters/` — 12 real JPGs from `assets.spacefs.com/public/clips/posters/`: startup-loft,
+  night-plaza, harbour-tower-dusk, sunset-studio, lens-macro, city-dusk-panorama,
+  steel-bridge-ride, pizza-window, nyc-brownstones, night-intersection, wtc-waterfront,
+  library-study (18–54KB each, ~370KB total)
+- `icons/` — `favicon.ico`, `favicon-32.png`, `favicon.png` (512×512), `og-image.png` (the real
+  Open Graph share image, 377KB)
+- `screenshots/01-hero-desktop.png` — real, verified render of the hero section at 1440px
+  desktop width
+- `screenshots/02-overview-desktop.png` — real, verified render confirming the hero persists at
+  the `#overview` anchor with the next section's imagery visible at the bottom edge
+
+**Not captured this pass** (see §10 for why, and how to finish this):
+- Full-page scroll captures of `#product`, `#pricing`, `#faq`, `#sign-up` — attempted via
+  automated browser control but this desktop's window compositor did not reliably focus newly
+  spawned browser windows for screenshot capture (multiple attempts landed on the user's own
+  unrelated, already-open windows instead — including personal photo library content, which was
+  immediately discarded unused rather than risk continuing an unreliable, privacy-risking method)
+- Tablet/mobile viewport screenshots
+- Raw SVG extraction (the logo mark appears to be an inline SVG or icon font glyph — not
+  isolated as a standalone asset this pass)
+- Hover/focus/active interaction states
+- The 9 collapsed FAQ answers (require a real click interaction to expand; not present in
+  static HTML)
+
+---
+
+## 9. Recreation Guide
+
+**Priority order to rebuild an accurate replica:**
+1. **Tooling:** Gatsby (or any React SSG) + Tailwind CSS with the exact `:root`/`.dark` token
+   block from §2 dropped in verbatim — this alone gets colors/spacing/radii right immediately,
+   since these are the site's real values, not estimates.
+2. **Fonts:** Load Google Sans + Google Sans Code from Google Fonts exactly as shown in §3.
+3. **Hero:** Two-tone H1 (`Infinite space` bold black / `on your computer` lighter gray), pill
+   badge, two pill CTAs (solid black / outline).
+4. **Finder mockup:** This is the visual centerpiece of the whole page — budget the most build
+   time here. It's a pixel-accurate fake macOS Finder window (traffic-light buttons in the exact
+   macOS reds/yellows/greens `#ff5f57`/`#febc2e`/`#28c840`, real Apple system-gray text colors).
+   Treat it as a dedicated illustrated component, not a generic "screenshot mockup" image.
+5. **Pricing:** 3-column grid, monthly/annual toggle, exact copy from §5 — this is
+   straightforward once tokens are in place.
+6. **FAQ:** Standard accordion; only question text is verified — you'll need to either invent
+   plausible answers (and mark them as such) or click through the live site to capture the real
+   ones, which this pass didn't do.
+
+**What NOT to guess, now that it's verified:** colors, fonts, breakpoints, radii, and shadows are
+all in §2–4 verbatim from the shipped CSS. There is no need to eyeball these from screenshots —
+use the real values.
+
+---
+
+## 10. Honest Limitations of This Pass
+
+- Real, network-verified data (HTML, CSS tokens, JS bundle sizes, downloaded image assets) is
+  complete and trustworthy.
+- Visual screenshot coverage is **partial** (2 of ~6 real sections) because this desktop's
+  compositor (COSMIC on Wayland) did not reliably hand focus to freshly-spawned browser windows
+  for automated screenshot capture — some attempts silently captured unrelated already-open
+  windows instead. Rather than keep retrying an unreliable method that risked repeatedly
+  capturing the operator's personal, unrelated browser content, capture was stopped once that
+  risk was identified, and no unrelated captures were kept or used.
+- To finish full visual coverage: a human (or an agent with reliable window-focus control, e.g.
+  via `xdotool`/proper Wayland window-management tooling) should manually navigate to
+  `#product`, `#pricing`, `#faq`, `#sign-up` and capture each, plus resize to ~390px and ~820px
+  widths for mobile/tablet.
