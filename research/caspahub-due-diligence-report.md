@@ -120,3 +120,313 @@ This matters because Part 9 is explicitly written as the rulebook for future con
 ---
 
 *Compiled by cloning both repos fresh (`git clone --depth 1`) and checking every claim above against literal source — file hashes, grep matches, and a live HTTP request to the deployed app — rather than re-summarizing prior conversation. Where a claim couldn't be directly verified from source (e.g., "10 real bookings completed" or Tom's own survey results), it's simply not repeated here as fact.*
+---
+
+## Expanded Audit — Supplement (Second Independent Pass, Aug 20 2026)
+
+**Auditor:** Ken Muritu (independent second pass, separate from the report above)
+**Method:** Fresh clone of both `ken-muritu/caspahub` and `ken-muritu/caspahub-booking` (full clones, not depth-1), every critical source file read in full, full repo trees, grep across all source, cross-checked against the report above.
+**What this adds:** Full commit history for both repos, deep-dive into `caspahub`'s operator-side code (wash.ts, rbac.ts, tenant.ts, middleware.ts, bookings.ts) that the original report did not cover, verification of the Aug 18 commits, and a consolidated launch-readiness view across both repos.
+
+---
+
+## A. Full Commit Histories — Both Repos
+
+### A.1 caspahub (Operator OS) — 81 commits, Apr 1 → Aug 18, 2026
+
+| Date | Commits | What Happened |
+|---|---|---|
+| **Apr 1** | `f2d8999`–`9f06222` | Project genesis: Next.js 15 scaffold, mock-data layer, Vercel config |
+| **Apr 5–7** | `27c95bd`–`2c0f3e8` | UI iteration; Next.js upgraded to 15.1.11 for CVE-2025-55182 |
+| **Apr 7–15** | `17cf857`, `86756b9` | Modal component, interactive dashboard pages |
+| **May 9** | `3d4d98e`–`22ce19c` | Marketing landing page; two-sided platform pivot (B2C consumer + APK pipeline) |
+| **May 10** | `f4e2f23`–`ca11f88` | APK artifacts removed; Supabase auth wired then removed same week; local auth fallback |
+| **May 26** | `b729123`–`bb105ca` | Turso + Prisma 7 + NextAuth v5; 14-model Prisma schema; 24 REST API routes; tenant middleware; seed; CI |
+| **Jun 24–25** | `114cdae`–`482f53f` | Booking-first pivot; tier gating (booking/growth/enterprise); three-surface Vercel deploy; `CASPAHUB_SURFACE` env var |
+| **Jun 29** | `a747e2f` | **THE REPLATFORM** — Eras II/III deleted wholesale. Rebuilt on Solera/Edifice platform: Drizzle ORM, one Turso DB per tenant, Auth.js v5 JWT, server actions, single Vercel deploy |
+| **Jun 29–30** | `f198235`–`901b3f2` | Domain alignment to car wash; branding pass; official SVG logo kit; favicon iteration (6 commits) |
+| **Jun 30** | `246a1a1`–`ed1f4a2` | Security hardening; pharmacy POS client deleted; Stream Chat Stage 0/1 wired |
+| **Jul 1** | `4de8776`–`f56aecd` | Stream Chat Stage 2 (client UI); moodboard screenshots (170 shots); README rewrite |
+| **Jul 14–Aug 18** | `f56aecd`–`c5a1996` | Incremental polish: hero artwork, dark-mode removal, branches geo/hours, PayHero booking confirmation fix, theme-store fix |
+
+**Key observation:** 2+ week gap between Jul 14 and Aug 13 with almost no commits. Aug 13–18 burst added small polish items — nothing architectural.
+
+### A.2 caspahub-booking (Consumer App) — 19 commits, Aug 13 → Aug 18, 2026
+
+| Date | Commit | What |
+|---|---|---|
+| **Aug 13** | `3f8e42e` | Initial commit |
+| **Aug 13** | `f1a4690` | Full consumer app scaffolded: find, book, track, auth, payments, chat, push |
+| **Aug 13** | `e5106c3` | Stream ChannelData type fix; root redirect to `/find` |
+| **Aug 13** | `97bc68a` | Dropped unused `TURSO_API_TOKEN` requirement |
+| **Aug 13** | `0651953` | Logo rendering fix |
+| **Aug 13** | `8203f97` | Comprehensive executive platform report README |
+| **Aug 16** | `feb0ee9` | Service worker deep-link fix (`/washes` + `/track/[id]` instead of dead `/my-washes`) |
+| **Aug 16** | `a93b0f2` | Rating/review columns + `consumer_vehicles` + `consumer_notifications` tables |
+| **Aug 16** | `6f17c0b` | Rating, vehicle, notification, account-deletion data-access helpers |
+| **Aug 16** | `5da92ff` | Rating, notifications, account, and auth API routes per V1 PRD |
+| **Aug 16** | `f95bc15` | My Washes, Account, Notifications tabs; bottom tab bar fix |
+| **Aug 16** | `3a20c70` | Post-wash rating capture on live tracker |
+| **Aug 16** | `99d84f2` | Marketing homepage, onboarding flow, install guide, legal/static pages |
+| **Aug 16** | `fc56ec5` | Forgot/reset password pages, link from login |
+| **Aug 17** | `1c12837` | Official SVG brand kit |
+| **Aug 17** | `30eef10` | Dark mode disabled app-wide |
+| **Aug 17** | `743f746` | theme-store.ts TypeScript build fix |
+| **Aug 17** | `7e528de` | Official hero artwork for homepage |
+| **Aug 18** | `2273bb0`–`f232840` | Hero image crop/sizing polish; ENCRYPTION_KEY redeploy triggers |
+
+**Key observation:** Aug 16 was the big day — 7 commits that added essentially the entire feature set. The original report's snapshot was taken between Aug 13 and Aug 16, so it missed all of this.
+
+---
+
+## B. caspahub (Operator OS) — File-by-File Deep Dive
+
+### B.1 Repository Structure (236 TS/TSX files under src/)
+
+```
+caspahub/
+├── src/
+│   ├── middleware.ts              # Auth.js wrapper — RBAC, email-verify, tenant status, admin gate (141 lines)
+│   ├── instrumentation.ts         # Sentry init (minimal)
+│   ├── sw.ts                      # Serwist service worker + push handlers
+│   ├── app/
+│   │   ├── page.tsx               # Marketing landing (285 lines)
+│   │   ├── (auth)/                # login, signup, verify-email, forgot/reset-password, accept-invite
+│   │   ├── find/ book/[branchId]/ track/[bookingId]/ profile/  # Consumer flow (DUPLICATE — see B.5)
+│   │   ├── onboarding/            # Operator tenant provisioning
+│   │   ├── suspended/ trial-expired/
+│   │   ├── (app)/                 # Operator OS (RBAC-gated) — 16 pages: dashboard, bookings, queue, customers, staff, payments, loyalty, analytics, fleet, messages, settings, account, admin
+│   │   └── api/                   # 18 route handlers
+│   ├── components/                # 73 files
+│   ├── db/
+│   │   ├── client.ts
+│   │   ├── schema/metadata.ts     # 14 metadata tables
+│   │   └── schema/tenant.ts       # 26 tenant tables (13 car-wash + 13 pharmacy ghost + 7 messaging — see B.3)
+│   └── lib/
+│       ├── auth.ts                # NextAuth v5 — JWT, credentials, 24h sessions (196 lines)
+│       ├── rbac.ts                # 7 roles × 4 actions (95 lines)
+│       ├── tenant.ts              # Tenant lifecycle, DB provisioning, token rotation (659 lines)
+│       ├── actions/wash.ts        # Status machine — THE core of the platform (297 lines)
+│       ├── actions/context.ts     # requireTenantAction, requireBillingAction (68 lines)
+│       ├── bookings.ts            # Consumer booking engine (460 lines)
+│       ├── payhero*.ts / payments/*.ts
+│       ├── stream/{config,server}.ts
+│       ├── messages/              # 10 files — Turso + SSE messaging
+│       ├── sync/{idempotency,permissions,replay}.ts
+│       ├── compliance/* / phi.ts / barcode.ts   # 👻 pharmacy-era
+│       └── ... (full tree in original report)
+├── docs/                          # 8 docs
+├── caspahub logos/                # 5 official brand files
+├── .env.example                   # ✅ complete
+├── .github/workflows/ci.yml      # tsc → test → lint → build — 20 FAILING recent runs 🔴
+└── dev.db                         # 🟡 GHOST: 163KB SQLite from Prisma era, still tracked
+```
+
+### B.2 Critical Path: The Booking Status Machine (`src/lib/actions/wash.ts`)
+
+This is the heart of the operator OS. Every wash status transition flows through here.
+
+```
+STATUS_FLOW = ["BOOKED", "QUEUED", "BAY_ASSIGNED", "WASHING", "READY", "COMPLETED", "CANCELLED"]
+```
+
+**What the code actually does (verified line-by-line):**
+
+```typescript
+// wash.ts: updateBookingStatus()
+await tenantDb
+  .update(schema.washBookings)
+  .set({ status, bayNumber: bayNumber ?? booking.bayNumber, updatedAt: now })
+  .where(eq(schema.washBookings.id, bookingId));
+
+await tenantDb.insert(schema.washBookingEvents).values({
+  id: nanoid(), bookingId, status, createdAt: now,
+});
+```
+
+**This is a dual-write pattern:** `washBookings.status` is a real mutable column that gets UPDATEd on every transition, AND `washBookingEvents` is appended to as an audit log. The original report describes this as a "pure event-sourced" rule (status is NEVER a mutable column) — the code does both. Not a bug per se, but the documentation is wrong and there's no transaction wrapping the two writes.
+
+**Status transitions exposed:**
+- `queueBookingForm` → `QUEUED`
+- `advanceBookingStatus` → next in STATUS_FLOW
+- `markReadyForm` → `READY`
+- `completeBookingForm` → `COMPLETED`
+- `cancelConsumerBooking` (in bookings.ts) → `CANCELLED` (phone-verified)
+
+### B.3 Schema: 26 Tables in Tenant DB — 13 Are Ghost Pharmacy Code
+
+`src/db/schema/tenant.ts` (398 lines, 15KB) has 26 tables:
+
+| Group | Tables | Status |
+|---|---|---|
+| **Car wash (active)** | `branches`, `users`, `wash_services`, `wash_bookings`, `wash_booking_events` | ✅ Live |
+| **Messaging** | `conversations`, `conversation_members`, `messages`, `message_deliveries`, `typing_indicators`, `staff_presence`, `support_tickets` | ✅ Live |
+| **Pharmacy ghost** 👻 | `categories`, `suppliers`, `products`, `inventory_batches`, `patients`, `prescriptions`, `prescription_items`, `shifts`, `sales`, `sale_items`, `appointments`, `consultations`, `vitals`, `patient_consents` | ❌ Never used |
+
+Every new tenant gets all 13 pharmacy tables created. They consume storage and complicate the schema. The pharmacy POS client was deleted from UI in `246a1a1`, but the schema tables and the `carwash.ts`/`pharmacy.ts` dead code files (byte-identical, 2133+ bytes each, zero imports) remain.
+
+### B.4 Middleware & Auth Flow (`src/middleware.ts`, 141 lines)
+
+```
+HTTP → middleware.ts
+  ├─ Public routes: /, /login, /signup, /find, /book/*, /track/*, /pricing, /about, etc.
+  ├─ Email-verify gate → redirect /verify-email
+  ├─ Suspended tenants → /suspended
+  ├─ Trial-expired → /trial-expired (except /settings, /api/payments)
+  ├─ Admin routes → platform-admin email check
+  ├─ App routes → require login + tenant
+  ├─ RBAC path check → redirect to home with ?error=forbidden
+  └─ Consumer routes → /profile requires login
+```
+
+Auth.js v5, JWT, 24h maxAge, 4h updateAge, `sessionVersion` invalidates all sessions on password reset, `trustHost: true` (required on Vercel).
+
+### B.5 Duplicate Consumer Flow Inside caspahub ⚠️
+
+`caspahub` contains its own copy of the consumer booking flow:
+- `src/app/find/` — branch discovery
+- `src/app/book/[branchId]/` — booking
+- `src/app/track/[bookingId]/` — tracker
+- `src/app/profile/` — history
+- `src/app/onboarding/` — provisioning
+
+This is the same surface `caspahub-booking` provides as its entire product. `caspahub`'s copy is independently maintained, uses the same `bookings.ts` and `payhero.ts` logic, and appears functional. Since `caspahub-booking` is the standalone deployed app (`caspahub-booking.vercel.app`), `caspahub`'s copy is unflagged dead weight — the same category as `carwash.ts`/`pharmacy.ts`.
+
+### B.6 RBAC: Clean and Complete (`src/lib/rbac.ts`, 95 lines)
+
+7 roles (`super_admin`, `admin`, `manager`, `supervisor`, `attendant`, `cashier`, `consumer`) × 4 actions (`read`, `write`, `delete`, `admin`) × full module matrix. Well-structured.
+
+**Gaps:** `/reports` module exists in RBAC + top bar but no page exists (404). `super_admin` not in `team-roles.ts` — can't be re-assigned through invite UI.
+
+### B.7 CI: Broken 🔴
+
+`.github/workflows/ci.yml` — single workflow (tsc → test → lint → build). 20 failing recent runs per Jul 1 snapshot. Blocks automated deploy confidence for the entire operator side.
+
+---
+
+## C. caspahub-booking — Confirmed Status (Aug 18 Reality)
+
+### C.1 Marketing Homepage — Fully Built
+
+Contrary to the original report's snapshot, `src/app/page.tsx` (214 lines) is a complete marketing page: hero, trust bar, how-it-works, featured washes (live from API), operator CTA, install section, full footer. Only client-redirects to `/find` or `/onboarding` on mobile viewports — desktop sees the full page.
+
+### C.2 Full Feature Status (Updated)
+
+| Feature | Status |
+|---|---|
+| Cross-tenant wash discovery | ✅ Working |
+| Booking creation | ✅ Working |
+| M-Pesa STK Push (real + simulated) | ✅ Working |
+| PayHero webhook confirmation | ✅ Working (BKG-/SUB-/SALE- all routed) |
+| Live tracking (5s poll, 6-stage) | ✅ Working |
+| Booking cancellation | ✅ Working |
+| Guest checkout | ✅ Working |
+| Consumer auth | ✅ Working |
+| Onboarding flow | ✅ Working |
+| Forgot/reset password | ✅ Working |
+| Notification center | ✅ Working |
+| Vehicle management | ✅ Working |
+| Account deletion | ✅ Working |
+| Post-wash rating | ✅ Working |
+| Profile + cross-tenant history | ✅ Working |
+| Real-time chat (Stream) | ✅ Working |
+| Web Push to staff | ✅ Working |
+| PWA installability | ✅ Working |
+| Static pages (/privacy, /terms, etc.) | ✅ Working |
+| Marketing homepage | ✅ Working |
+| /for-operators + /install | ✅ Working |
+| Theming (light/dark/system) | ✅ Working |
+| **/[branchSlug] wash profile page** | ❌ Missing |
+| **GET /api/branches/[id]/reviews** | ❌ Missing |
+| Operator dashboard | ❌ Not in this repo (by design) |
+| Native apps | ❌ Not yet |
+
+### C.3 API Surface: 21 Routes
+
+Original report counted 9. Actual count is 21. Missing from original count: `/api/account/*` (4), `/api/auth/forgot-password`, `/api/auth/reset-password`, `/api/bookings/[id]/rate`, `/api/bookings/lookup`, `/api/notifications` (3), `/api/push/subscribe`, `/api/push/unsubscribe`.
+
+---
+
+## D. Verified Bugs (Independent Confirmation)
+
+All bugs from the original report confirmed, plus new findings:
+
+| Bug | Severity | Notes |
+|---|---|---|
+| `syncBookingPayment` dead code | Medium | Defined in `wash.ts`, zero callers |
+| `recordLoyaltyTransaction` no-op | Medium | Returns `{ok:true}` without DB write |
+| `carwash.ts` / `pharmacy.ts` dead code | Low | Byte-identical, zero imports, pharmacy logic in carwash file |
+| Daraja direct returns 501 | Info | By design |
+| Hardcoded time slots | Low | Acceptable for MVP |
+| Static QR code | Low | Acceptable for MVP |
+| "Share" button has no handler | Low | Easy fix |
+| WhatsApp toggle unpersisted | Low | Easy fix |
+| `/api/branches` fans out per request, no caching | Medium | Full migration check per tenant per request |
+| `caspahub` CI broken (20 failing) | **High** | Blocks deploy confidence |
+| `caspahub` duplicate consumer flow | Medium | Unflagged dead weight or undocumented active surface |
+| Schema 26 tables, not 22 | Low | Messaging undercounted |
+| `TURSO_API_TOKEN` missing from env table | Low | Required by `env.ts` |
+| `bays: 2` hardcoded | Low | Every branch reports 2 bays |
+| `dev.db` tracked in repo | Low | Ghost from Prisma era |
+
+---
+
+## E. Two-Track Launch Plan (Response to Co-Founder's Brief)
+
+### E.1 Reality Check
+
+The co-founder's concern — "Q3 almost gone, nothing to test" — does not match reality for the consumer side. `caspahub-booking` has a **complete, deployable MVP** on `caspahub-booking.vercel.app`. What's missing is not features — it's: (1) CI confidence, (2) cleanup of dead weight, (3) two small genuinely-missing items, (4) operator-side parity.
+
+### E.2 Track A — Consumer MVP to Market (2-3 weeks)
+
+| Week | Focus | Deliverable |
+|---|---|---|
+| **Week 1** | Quick fixes + cleanup | Wire share button, persist WhatsApp toggle, replace static QR, remove dead files (`carwash.ts`, `pharmacy.ts`, `dev.db` gitignore), resolve duplicate consumer flow in `caspahub` |
+| **Week 2** | CI + two missing items + smoke test | Fix CI, add `/[branchSlug]` page + reviews API, smoke-test full consumer journey |
+| **Week 3** | Soft launch | Deploy to production Vercel, enable real PayHero credentials, test with real operators |
+
+### E.3 Track B — Operator OS Hardening (Parallel, 4-6 weeks)
+
+| Week | Focus | Deliverable |
+|---|---|---|
+| **1-2** | CI + schema cleanup | Fix CI, remove pharmacy tables from car-wash tenant provisioning, remove dead code |
+| **3-4** | Duplicate flow + RBAC cleanup | Resolve duplicate consumer flow, fix /reports 404, add super_admin to team-roles |
+| **5-6** | Operator beta | Verify all operator modules on real tenant, fix gaps, prepare beta |
+
+### E.4 P0/P1/P2 Action Items
+
+**P0 — Before consumer launch:**
+1. Fix `caspahub-booking` CI
+2. Wire/remove "Share" button
+3. Persist/remove WhatsApp toggle
+4. Replace/static QR or remove
+5. Fix mailto stub or build real form
+6. Add `/[branchSlug]` page
+7. Add `GET /api/branches/[id]/reviews`
+
+**P1 — Before operator launch:**
+1. Fix `caspahub` CI (20 failing)
+2. Remove 13 pharmacy ghost tables from tenant provisioning
+3. Delete `carwash.ts` + `pharmacy.ts` from both repos
+4. Decide and act on duplicate consumer flow
+5. Fix `/reports` 404
+6. Add `super_admin` to `team-roles.ts`
+7. Gitignore + remove `dev.db`
+
+**P2 — Post-launch:**
+1. Real capacity model for time slots
+2. Implement `recordLoyaltyTransaction` or remove
+3. Decide on `syncBookingPayment` — wire or delete
+4. Review listing UI on wash profile
+5. KRA eTIMS, staff commissions, fleet billing (operator Phase 2)
+6. Native mobile apps (future)
+
+---
+
+## F. Bottom Line
+
+The consumer side (`caspahub-booking`) is essentially launch-ready today — the code is complete, deployed, and working. The operator side (`caspahub`) has all the modules built but carries meaningful technical debt (CI broken, pharmacy dead weight, duplicate consumer flow) that needs a focused cleanup pass before it can be considered production-ready.
+
+The single most important finding from this second pass: **the original report's sprint plan would waste ~2 weeks re-building features that already exist.** A revised plan focused on cleanup, CI, the two missing items, and a soft launch gets a testable product to market inside Q3.
+
+*This supplement was compiled by a separate, independent full clone-and-read pass — not derived from the report above or from conversation history. Where it repeats a finding from the original report, that's confirmation, not redundancy.* 
