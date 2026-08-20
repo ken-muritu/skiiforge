@@ -430,3 +430,66 @@ The consumer side (`caspahub-booking`) is essentially launch-ready today — the
 The single most important finding from this second pass: **the original report's sprint plan would waste ~2 weeks re-building features that already exist.** A revised plan focused on cleanup, CI, the two missing items, and a soft launch gets a testable product to market inside Q3.
 
 *This supplement was compiled by a separate, independent full clone-and-read pass — not derived from the report above or from conversation history. Where it repeats a finding from the original report, that's confirmation, not redundancy.* 
+
+---
+
+## G. Third Pass — DRB Verification + Cleanup (2026-08-21)
+
+A Development Review Brief drafted by a separate Claude Chat session (for Thomas Kaingu Mweri, "Tom," Ken's business partner) was checked claim-by-claim against both live repos and their **full commit history** (`caspahub`: 97 commits since 2026-03-31; `caspahub-booking`: 23 commits since 2026-08-13, pulled via `gh api` — no local clone needed). Several of that DRB's specific claims did not hold up. Corrections, plus a same-day cleanup pass, below.
+
+> **Note for whoever (human or Claude Chat) drafts the next Tom-facing DRB from this document:** do not name the removed dead-code vertical below, or reference where it came from, in anything Tom will read. State only that the operator repo has been cleaned up and its CI is green through Build. This is a firm instruction from Ken, not a suggestion.
+
+### G.1 Corrections to the previous DRB draft
+
+| Claim in the draft DRB | What the code/history actually shows |
+|---|---|
+| "Wire the Share button — no click handler" | False. Already fully wired: `navigator.share` with a clipboard-copy fallback and a "Link copied" confirmation state (`src/app/track/[bookingId]/page.tsx`). Nothing to do. |
+| "Persist WhatsApp notification toggle — resets on refresh" | No WhatsApp toggle exists anywhere in `caspahub-booking` (zero matches, code search + full-tree grep). The real push-notification toggle (`notification-toggle.tsx`) correctly re-syncs its subscribed state from the browser's `PushManager` on every mount — it does not reset. Likely a mix-up with a feature that was never built. |
+| "Reviews endpoint doesn't exist yet" | Overstated. `getBranchReviews()` (`src/lib/bookings.ts`) is a fully implemented function already wired into `GET /api/branches?branchId=X`, returning real `reviewCount`/`avgRating`/`reviews`. The data exists; only a dedicated `/api/branches/[id]/reviews` sub-route is missing, and a `/[branchSlug]` public page to display it. |
+| "Fix CI pipeline" (consumer app, `caspahub-booking`) | Wrong framing. This repo has **no CI workflow and no test files at all**. Nothing is failing — nothing exists yet. It's a "stand one up" task. |
+| "20 failing automated tests" (operator app, `caspahub`) | Wrong. CI was failing at the `npm ci` (install) step on every run since at least 2026-07-02 — `package-lock.json` had drifted from `package.json` (missing `webpack` + ~40 transitive deps), so it never reached the Test step at all. The actual test suite has **25 tests across 5 files**; once install was fixed, **all 25 pass**, confirmed both locally and in real GitHub Actions CI. |
+| Wash-discovery API "will slow down as we add operators" | Understated — it's a live-request cost *today*, not a future risk. `GET /api/branches` (`caspahub-booking`) runs a full tenant-DB schema migration check for every active tenant on every single request, uncached. Confirmed by reading `src/app/api/branches/route.ts` directly. Not yet fixed. |
+| Tracker QR code is "a decorative image, not scannable" | Confirmed true — it's a hand-drawn SVG pattern in `track/[bookingId]/page.tsx`, not an encoded/scannable code. Not yet fixed. |
+
+### G.2 Cleanup completed 2026-08-21 (pushed to `caspahub` `main`, commit `5fc2850`)
+
+Traced full blast radius (every importer, grepped across the whole repo) before deleting anything — nothing below had a single live caller outside the cluster being removed:
+
+- Deleted two byte-for-byte identical 889-line dead action files and everything that only existed to serve them: a dead payment-reconciliation path (webhook branch, status-check branch, reference-builder functions), request-validation schemas, a barcode utility + an unused UI component, a patient-data encryption helper, and a compliance/notifications stub module.
+- Deleted two orphaned integration-test scripts that were never wired into `package.json` or CI (confirmed via the repo's own README, which already documented one of them as "not in CI").
+- Dropped **14 unused tables** from the tenant schema and from `migrateTenantSchema`'s per-tenant provisioning (one more than the "13" cited in the previous pass — a 14th table was confirmed to have zero live callers too, same standard applied). These were being silently created for every new operator signup. **Existing tenant databases still carry their already-provisioned empty copies** — `migrateTenantSchema` only ever runs `CREATE TABLE IF NOT EXISTS`, never drops, so this fix is forward-only by design (deliberately not retroactive, to avoid an unattended DROP running on every API request).
+- Regenerated `package-lock.json` to match `package.json`.
+
+**Verified before pushing:** full local `npm install` + `npx tsc --noEmit` + `npm test` + `npm run build`, all clean. **Verified after pushing, in real CI:** Install → Type-check → Test → Build all pass for the first time since at least July. Only **Lint** still fails, on 5 pre-existing unused-variable warnings from an unrelated 2026-08-17 dark-mode-removal commit, in files this cleanup never touched — small, quick, optional, not yet done.
+
+### G.3 Still open (not part of this pass)
+
+- **Duplicate consumer booking flow inside `caspahub`**: `src/app/book/[branchId]`, `src/app/track/[bookingId]`, and `consumer-shell.tsx` still exist in the operator repo, diverged ~44 lines from the canonical version in `caspahub-booking`. Confirmed real. Safe to delete now that `caspahub-booking` is the canonical consumer app — not yet done.
+- The 5 pre-existing Lint warnings noted above.
+- Everything else in Section E's P0/P1/P2 list that this pass didn't touch (branch slug page, reviews sub-route, Share/QR/WhatsApp-toggle items — see corrections in G.1 above for which of those are already resolved or non-issues).
+
+### G.4 Updated P0/P1/P2 (supersedes Section E for the items below)
+
+**P0 — before consumer launch** (unchanged from Section E except items marked): 
+1. Add `/[branchSlug]` wash profile page
+2. Add `GET /api/branches/[id]/reviews` (or build the profile page directly off the existing embedded review data in `GET /api/branches?branchId=X`)
+3. Replace the fake QR code (or remove it)
+4. Add caching to the wash discovery API
+5. ~~Fix `caspahub-booking` CI~~ → **Stand up a CI pipeline for `caspahub-booking`** (none exists)
+6. ~~Wire "Share" button~~ → **done, no action needed**
+7. ~~Persist WhatsApp toggle~~ → **not a real item, no action needed**
+
+**P1 — before operator launch:**
+1. ~~Fix `caspahub` CI (20 failing)~~ → **done** (Install/Type-check/Test/Build all green; only Lint red, see below)
+2. ~~Remove pharmacy ghost tables from tenant provisioning~~ → **done** (14 tables dropped)
+3. ~~Delete dead duplicate action files~~ → **done**
+4. Delete the duplicate consumer booking flow from `caspahub` (still open, see G.3)
+5. Fix the 5 pre-existing Lint warnings (optional, quick)
+6. Decide and act on the `/reports` 404 and `super_admin`/`team-roles.ts` gap noted in Section E (not re-verified this pass)
+7. Gitignore + remove `dev.db` (not re-verified this pass)
+
+**P2 — post-launch:** unchanged from Section E.
+
+### G.5 Bottom line after this pass
+
+The consumer app's real gap list is now shorter than any previous pass found: one real feature (`/[branchSlug]` page, built on data that already exists) and two real rough edges (fake QR, uncached discovery API) — the CI and UI-wiring items from earlier passes turned out to be either already done or not real. The operator repo went from "carries meaningful technical debt" to "clean, tested, CI green through Build" in this pass. What's left (duplicate consumer flow, 5 lint warnings) is small and well-scoped.
