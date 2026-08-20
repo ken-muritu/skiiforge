@@ -1,19 +1,24 @@
-# Audio Series → Split → Transcribe → Compile Skill
+# Audio Series → Split → Transcribe → Compile → Verify Skill
 
 ## Purpose
 
 Turn a folder of long raw audio/video recordings (a multi-part sermon/lecture/talk series,
-meeting recordings, etc.) into one polished, chronologically-correct, voice-preserving
-markdown document — reproducibly, end to end: **split** into manageable chunks, **transcribe**
-each chunk via a speech-to-text API, **consolidate** chunks back into one transcript per
-source recording, then **compile** all of it into a single publication-quality document using
-an LLM with a specific, load-bearing prompt.
+meeting recordings, etc.) into one polished, chronologically-correct, voice-preserving,
+fact-verified markdown document — reproducibly, end to end: **split** into manageable chunks,
+**transcribe** each chunk via a speech-to-text API, **consolidate** chunks back into one
+transcript per source recording, **compile** all of it into a single publication-quality
+document using an LLM with a specific, load-bearing prompt, then **verify** every
+scripture/source citation the compiled document contains against a real source before calling
+it done.
 
 Built and verified on a real 5-part "Faith" sermon series (Pastor Charles Muchemi): 5 source
 `.mp4` files (53–99 minutes each) → 17 stream-copy-split parts → 17 real transcriptions via
 the Modulate STT API → 5 consolidated per-session transcripts → 1 compiled 6-session teaching
 document with correct chronological reordering (the numbered parts were **not** taught in
-1-2-3-4-5 order — the compile step had to figure that out from internal evidence).
+1-2-3-4-5 order — the compile step had to figure that out from internal evidence). Extended
+after a follow-up 3-part "Emotional Intelligence" series (same speaker) surfaced a real
+citation error the compiling model was confident about and wrong on — see the Scripture
+Citation Rule under Decision Rules and Method §5.
 
 ---
 
@@ -58,6 +63,7 @@ Do NOT use for:
 | `python3` + `requests` | `python3 -c "import requests"` to check; `pip install requests` (or your distro's equivalent) if missing. |
 | (For the compile step) An LLM with file-attachment or Write-tool access | Either paste the filled-in prompt from `prompts/compile-teaching.md` into a chat with the transcripts attached, or hand an agent the transcripts + that file and ask it to follow the Structural Rulebook directly. |
 | (Optional but valuable) Broader-context recordings | Full session/meeting recordings that cover the same material more broadly than the curated numbered parts — these help the compile step recover true chronological order. Not required, but noticeably improves the result if available. |
+| (For the verify step) Web access — WebFetch or equivalent | Required to check every scripture/source citation against a real source (e.g. biblegateway.com) instead of trusting the compiling model's memory. An agent without this can't complete Method §5; a chat-route user should verify citations themselves before treating the document as final. |
 
 ---
 
@@ -144,6 +150,28 @@ Use `prompts/compile-teaching.md` — either:
 
 Either way, the output must satisfy the Validation Checklist below before considering it done.
 
+### 5. Verify every scripture/source citation (required, not optional polish)
+Nothing upstream of this step fact-checks anything — split/transcribe/consolidate are purely
+mechanical, and an LLM's recall of exact verse wording (or even the right chapter/verse
+number) from memory is good but not guaranteed correct. Before the compiled document is
+considered done, go back through every citation it contains and, for each one:
+
+1. **Look it up against a real source** (an agent with WebFetch: fetch the passage from an
+   authoritative site, e.g. `https://www.biblegateway.com/passage/?search=<ref>&version=<translation>`,
+   in the translation the brief specified; a chat-route user without tool access should paste
+   the reference into a search themselves) — don't trust the compiling model's memory alone,
+   including for very well-known verses. Confident recall of a wrong reference is exactly how
+   the reference-run's "Romans 12:4" (members of one body) slipped in for what was clearly
+   meant to be Romans 2:4 ("the goodness of God leads you to repentance") — the compiling
+   model was sure it was right, and wasn't.
+2. **Confirm the reference number actually matches the content being quoted or paraphrased.**
+   Speakers misspeak chapter/verse numbers under the pressure of live teaching far more often
+   than they misquote the substance — verify the number independently of how confident the
+   speaker sounded saying it.
+3. **Apply the Scripture Citation Rule below** to render the result — this is where "verified"
+   and "voice-preserving" meet: the fix must never come at the cost of erasing what the
+   speaker actually said.
+
 ---
 
 ## Decision Rules
@@ -154,11 +182,19 @@ THEN verify against internal evidence first (explicit dates, "last time we...", 
      Nth session" references) — numbered-part order and true chronological order are NOT the
      same thing until proven so. This was true in the reference run (order was NOT 1-2-3-4-5).
 
-IF a scripture/quote is spoken as a paraphrase in the transcript
-THEN the compiled document should quote the REAL reference text (e.g. actual NKJV wording),
-     not transcribe the speaker's spoken paraphrase as if it were the literal citation —
-     put the paraphrase in the surrounding prose instead, attributed as the speaker's own
-     words.
+IF a scripture/quote is spoken as a paraphrase, OR the speaker's stated chapter/verse number
+   does not match the content they are quoting (a misspoken or mistranscribed citation)
+THEN apply the Scripture Citation Rule: verify the correct reference against a real source
+     (see Method §5), then render BOTH the speaker's own words and the verified citation —
+     never one in place of the other, and never silently. Keep the speaker's paraphrase (and
+     their spoken reference, if they gave one — even if it was wrong) in the surrounding prose,
+     attributed as their own words exactly as said. Immediately follow it with the corrected
+     citation supplying the real verse text in a blockquote, so the compiler's correction is
+     visibly a correction, not something ventriloquized as the speaker's own statement. Do not
+     quietly drop or swap out a wrong reference number as if the speaker had gotten it right —
+     that erases real information (it shows what the speaker actually said, uncertainty and
+     all) in the name of tidiness. See `prompts/compile-teaching.md` for the exact rendering
+     pattern and a worked example.
 
 IF new source recordings land in the folder after earlier ones were already processed
 THEN just re-run split → transcribe → consolidate on the whole folder again — all three
@@ -198,9 +234,13 @@ THEN that's a hard failure of the compile step, not a stylistic nitpick — the 
    was not taught first.
 2. **Iterating filenames-with-spaces via an unquoted bash variable.** Silently mangles paths
    and can hang a stray command reading stdin. Always use arrays or a properly quoted glob.
-3. **Letting the compile step transcribe the speaker's spoken paraphrase as the literal
-   scripture/source citation.** Look up and quote the real reference text; keep the
-   paraphrase as the speaker's own commentary in the prose.
+3. **Letting the compile step transcribe the speaker's spoken paraphrase — or a misspoken
+   chapter/verse number — as the literal scripture/source citation, without verifying it.**
+   Confident recall from memory is not verification; look the reference up against a real
+   source. And the fix is not "quietly swap in the correct citation" — that deletes what the
+   speaker actually said. Keep the paraphrase (and any spoken reference, right or wrong) in
+   the prose as their own words, and follow it with the verified citation. See the Scripture
+   Citation Rule under Decision Rules.
 4. **Summarizing instead of compiling.** The brief explicitly wants completeness ("do not
    leave out a thing") and voice preservation ("as if [speaker] is speaking directly") — a
    third-person condensed summary fails the brief even if it's well-written.
@@ -262,8 +302,11 @@ actual_parts=$(ls "$out_dir/$prefix $n - Part "*.* | wc -l)
       file numbering.
 - [ ] Every prayer/declaration/punchline/named-illustration from the source transcripts is
       present in the compiled document.
-- [ ] Scripture/source citations in the compiled doc are the real reference text (correct
-      translation), not the speaker's spoken paraphrase.
+- [ ] Every scripture/source citation was verified against a real source (not taken on the
+      compiling model's memory alone) — both the reference number and the wording.
+- [ ] Every corrected citation still shows the speaker's own words/reference as they actually
+      said them (right or wrong), immediately followed by the verified citation — never one
+      silently swapped for the other.
 - [ ] Document reads in first/second person, addressed to the reader — not third-person
       summary.
 - [ ] Structural Rulebook sections all present: title block, epigraph, framing note, PART
