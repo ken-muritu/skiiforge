@@ -34,10 +34,17 @@ some context. If [TEACHER NAME] made any prayers/declarations/punchlines/
 statements be sure to include them in the file, still in a chronological manner.
 Also all scripture [or: quotes/citations from your authoritative source] to be
 referenced in [NKJV, or your default translation/edition] unless of course
-otherwise stated. Format well — headings, titles, bold, italic, etc.
+otherwise stated. Verify every citation against a real source rather than
+relying on memory — including the chapter/verse number itself, not just the
+wording. If [TEACHER NAME]'s spoken reference doesn't match what they're
+quoting, don't just silently fix it: keep what they actually said as their own
+words, and give the correct citation right alongside it. Format well —
+headings, titles, bold, italic, etc.
 
-This is a professional [TOPIC] document. Do not leave out a thing. Let it be
-such that it is as if [TEACHER NAME] is speaking directly to whoever reads it.
+This is a professional [TOPIC] document. Do not leave out a thing — that
+includes not leaving out what was actually said, even a wrong reference number,
+in favor of a silently "corrected" version. Let it be such that it is as if
+[TEACHER NAME] is speaking directly to whoever reads it.
 ```
 
 The load-bearing phrases, and why each one matters (don't drop these when adapting):
@@ -53,8 +60,18 @@ The load-bearing phrases, and why each one matters (don't drop these when adapti
   is what keeps them in.
 - **"unless of course otherwise stated"** — the one correctly-scoped escape hatch: don't
   force the standard translation over a quote the speaker explicitly attributed elsewhere.
+- **"Verify every citation against a real source rather than relying on memory"** — added
+  after a real failure: a compiling model recalled "Romans 12:4" confidently and was wrong
+  (the content quoted was Romans 2:4). Fluent, confident recall of a Bible reference is not
+  verification. See "The Scripture Citation Rule" below for the exact pattern once you've
+  verified — this phrase only covers *checking*, not *rendering*.
+- **"don't just silently fix it ... keep what they actually said ... give the correct citation
+  right alongside it"** — completeness applies to the speaker's own words too, including their
+  mistakes. A silently "corrected" citation deletes real information: what the speaker
+  actually said, uncertainty and all. See the worked example below.
 - **"Do not leave out a thing"** — sets completeness, not summarization, as the goal. This is
-  a compile, not a digest.
+  a compile, not a digest. This now explicitly includes wrong-but-spoken citations, not just
+  prayers/declarations/punchlines.
 - **"as if [name] is speaking directly to whoever reads it"** — the instruction that produces
   first/second-person voice preservation instead of third-person academic paraphrase.
 
@@ -80,8 +97,9 @@ this structure — it's what the prompt above reliably produces, made explicit:
      dates)
    - H2 thematic subheadings for each major movement of thought
    - H3 subheadings tied to specific source-passages taught, each immediately followed by
-     the passage **quoted from the real reference text** (see Common Pitfalls — not the
-     speaker's paraphrase) in a blockquote with citation
+     the passage **quoted from the real, verified reference text** (not the speaker's
+     paraphrase, and not an unverified citation number — see "The Scripture Citation Rule"
+     below) in a blockquote with citation
    - Body prose that preserves the speaker's actual phrasing, rhetorical repetition, and
      idiom — paraphrase as little as humanly possible; this is a transcript compile, not a
      summary
@@ -107,3 +125,43 @@ this structure — it's what the prompt above reliably produces, made explicit:
 - Keep the speaker's own structuring language ("Now let me ask you something," "I want you
   to see something here") — it's part of what makes the compile feel authentic rather than
   ghostwritten.
+
+---
+
+## The Scripture Citation Rule
+
+Two failure modes, both wrong in opposite directions:
+
+1. **Transcribing the speaker's spoken paraphrase as if it were the literal verse text.**
+   (The original problem this rulebook already covered.)
+2. **Silently "correcting" a misspoken chapter/verse number** — swapping in the right
+   reference without showing that the speaker said something different. This looks tidier,
+   but it deletes real information: what the speaker actually said, mistake and all. A
+   reader (or the speaker themself, checking the document later) has no way to tell a
+   verified correction from an invented one if corrections are invisible.
+
+The fix for both is the same three-part pattern, and it requires the citation to have
+actually been checked against a real source first (Method §5 in `skill.md` — not memory,
+however confident):
+
+1. Keep the speaker's own words — their paraphrase, and their spoken reference if they gave
+   one, right or wrong — in the prose, attributed as what they said.
+2. Immediately follow with the verified citation, in a normal scripture blockquote, supplying
+   the real verse text.
+3. Never present step 2 as if it were part of what the speaker said. It's the compiler
+   supplying the real text, and the phrasing should make that clear (see example).
+
+**Worked example** (a real case, from the "Emotional Intelligence" series, verified against
+biblegateway.com/NKJV after the compiling model's first pass got the reference wrong from
+memory):
+
+> Pastor Charles introduced this as "the book of Romans, chapter 12 and verse 4" — the verse
+> whose content he's actually quoting is Romans 2:4:
+>
+> > *"Or do you despise the riches of His goodness, forbearance, and longsuffering, not
+> > knowing that the goodness of God leads you to repentance?"*
+> > — Romans 2:4 (NKJV)
+
+Notice what this does *not* do: it doesn't pretend he said "2:4," and it doesn't present the
+verified text as something he recited verbatim. It shows both — what was actually said, and
+what's actually true — without erasing either one.
