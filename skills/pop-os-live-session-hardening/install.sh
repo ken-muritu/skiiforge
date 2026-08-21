@@ -28,12 +28,20 @@ echo "==> Installing CopyQ autostart entry"
 mkdir -p "$HOME/.config/autostart"
 cp "$SCRIPT_DIR"/autostart/copyq.desktop "$HOME/.config/autostart/"
 
+echo "==> Installing lid-guard's pinnable panel launcher"
+mkdir -p "$HOME/.local/share/applications"
+cp "$SCRIPT_DIR"/desktop/lid-guard-toggle.desktop "$HOME/.local/share/applications/"
+update-desktop-database "$HOME/.local/share/applications" >/dev/null 2>&1 || true
+
 echo "==> Enabling services"
 systemctl --user daemon-reload
 systemctl --user enable --now disk-cleanup.timer
 systemctl --user enable --now battery-guard.service
 systemctl --user enable --now lid-guard.service       # default ON: lid close does nothing
-systemctl --user enable --now lid-guard-tray.service  # panel switch to flip it off when you want
+# lid-guard-tray.service is installed but NOT enabled here: on COSMIC it registers with the
+# status-notifier watcher but the applet doesn't actually paint it (confirmed — see skill.md).
+# Left in the repo for other desktops (GNOME/KDE) where SNI trays are known to work; on COSMIC
+# use the pinned .desktop launcher (just installed) and/or a custom keyboard shortcut instead.
 
 if ! pgrep -x copyq >/dev/null 2>&1; then
   nohup copyq >/dev/null 2>&1 &
@@ -49,15 +57,21 @@ Done.
       ~/bin/battery-guard.sh --test 15
   - CopyQ is running and will autostart on future logins (history capped at 5000 items)
   - lid-guard is ON by default: closing the lid now does nothing (agents/network/session stay
-    up). A panel switch (tray icon, COSMIC status area) lets you flip it off with a click when
-    you actually want the lid to suspend the machine — right-click it for an explicit menu, or
-    use the CLI:
-      ~/bin/lid-guard.sh off     # this lid close suspends normally (wifi/bluetooth drop)
-      ~/bin/lid-guard.sh on      # back to the default (lid close does nothing)
-      ~/bin/lid-guard.sh status  # check which mode is currently active
+    up). To flip it off with a click instead of a terminal:
+      1. Open your app launcher, search "Lid Guard Toggle", right-click (or drag) it onto the
+         panel/dock to pin it — same as pinning any other app.
+      2. Optional: also bind a keyboard shortcut that asks for confirmation before switching —
+         run `cosmic-settings keyboard`, add a custom shortcut with command
+         `~/bin/lid-guard.sh confirm-toggle` and a key combo of your choice (avoid Ctrl+P —
+         that's Print in most apps). It pops a Yes/No dialog either direction before acting.
+    Or from a terminal:
+      ~/bin/lid-guard.sh off             # this lid close suspends normally (wifi/bluetooth drop)
+      ~/bin/lid-guard.sh on              # back to the default (lid close does nothing)
+      ~/bin/lid-guard.sh confirm-toggle  # same toggle, but asks first (zenity Yes/No)
+      ~/bin/lid-guard.sh status          # check which mode is currently active
 
 Check status with:
-  systemctl --user status disk-cleanup.timer battery-guard.service lid-guard.service lid-guard-tray.service
+  systemctl --user status disk-cleanup.timer battery-guard.service lid-guard.service
 
 Optional dev tooling (NOT installed by this script — see skill.md "Dev CLI bootstrap"):
   sudo apt-get install -y gh

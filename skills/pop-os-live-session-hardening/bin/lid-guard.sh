@@ -20,7 +20,7 @@ set -uo pipefail
 
 UNIT="lid-guard.service"
 
-usage() { echo "Usage: $(basename "$0") on|off|toggle|status" >&2; exit 1; }
+usage() { echo "Usage: $(basename "$0") on|off|toggle|confirm-toggle|status" >&2; exit 1; }
 
 is_active() { systemctl --user is-active --quiet "$UNIT"; }
 
@@ -56,10 +56,28 @@ status() {
   fi
 }
 
+# For keybinding use: pop a Yes/No dialog before actually flipping state, so a
+# stray/muscle-memory keypress can't silently change lid behavior.
+confirm_toggle() {
+  command -v zenity >/dev/null 2>&1 || { echo "zenity not installed" >&2; exit 1; }
+  if is_active; then
+    zenity --question --title="Lid guard" --width=360 \
+      --text="Turn lid guard OFF?\n\nClosing the lid will suspend the machine as normal — wifi, bluetooth, and any running agents will stop." \
+      --ok-label="Turn off" --cancel-label="Cancel" 2>/dev/null \
+      && turn_off
+  else
+    zenity --question --title="Lid guard" --width=360 \
+      --text="Turn lid guard ON?\n\nClosing the lid will do nothing — agents, network, and session stay running." \
+      --ok-label="Turn on" --cancel-label="Cancel" 2>/dev/null \
+      && turn_on
+  fi
+}
+
 case "${1:-}" in
-  on)     turn_on ;;
-  off)    turn_off ;;
-  toggle) if is_active; then turn_off; else turn_on; fi ;;
-  status) status ;;
-  *)      usage ;;
+  on)             turn_on ;;
+  off)            turn_off ;;
+  toggle)         if is_active; then turn_off; else turn_on; fi ;;
+  confirm-toggle) confirm_toggle ;;
+  status)         status ;;
+  *)              usage ;;
 esac

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Lid Guard Toggle
+Comment=Toggle whether closing the lid suspends the machine or does nothing
+Exec=/home/pop-os/bin/lid-guard.sh toggle
+Icon=changes-prevent-symbolic
+Terminal=false
+Categories=Utility;
+NoDisplay=false

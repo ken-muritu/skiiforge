@@ -52,7 +52,8 @@ Do NOT use to:
 | **CopyQ's history-size config key is lowercase** | `copyq config maxItems 5000` fails with `Invalid option`; the real key is `maxitems`. | `copyq config maxitems 5000`. |
 | **Lid-close = suspend is a `systemd-logind` action, not a hard OS rule** | Default is `HandleLidSwitch=suspend` (compiled-in; usually commented-out, not present, in `/etc/systemd/logind.conf`). Suspend is what actually kills wifi/bluetooth/agents on lid close — the radios power off as part of suspending, not because of the lid itself. | Don't edit `/etc/systemd/logind.conf` to "fix" this — that's global, permanent, needs root + a `systemd-logind` restart, and removes the choice. Hold a `systemd-inhibit --what=handle-lid-switch --mode=block` lock instead: logind skips its lid action entirely while any such lock is held, and reverts to normal the instant it's released — a true per-use toggle, confirmed via `systemd-inhibit --list`. |
 | **Desktop sessions already use this same inhibitor mechanism** | `systemd-inhibit --list` on this COSMIC session shows `Cosmic Session ... handle-power-key ... block` — the DE itself is built on logind inhibitors, not a competing/independent power daemon. | Trust `--what=handle-lid-switch` to be honored the same way on any systemd-logind desktop (GNOME/KDE/COSMIC) — verify once per DE with `systemd-inhibit --list`, don't assume it needs a DE-specific setting instead. |
-| **A real panel tray icon is achievable without writing a native DE applet** | Building a custom COSMIC quick-settings entry means writing/compiling a Rust `iced`-based applet — heavy. But `cosmic-applet-status-area --status-notifier-watcher` was already running, meaning any app that speaks the standard `org.kde.StatusNotifierItem` D-Bus protocol shows up in the panel automatically. `yad --notification` (a 554KB apt package) registers as one — confirmed empirically via `busctl --user call org.kde.StatusNotifierWatcher ... RegisteredStatusNotifierItems` before writing any real code around it. | Before assuming a "put a switch on the panel" request needs a custom applet, check `busctl --user list \| grep -i statusnotifier` for a running watcher, then prove a lightweight tray tool registers with it (empirically, via `RegisteredStatusNotifierItems`) before committing to a design. |
+| **COSMIC's status-area applet registers a tray icon at the D-Bus level but does not paint it** | `cosmic-applet-status-area --status-notifier-watcher` was already running, and `yad --notification` (554KB) registers correctly as an `org.kde.StatusNotifierItem` — confirmed via `RegisteredStatusNotifierItems` showing the item, and via `GetAll` on the item showing real non-empty `IconPixmap` byte data (not just an empty `IconName`). Despite all of that being correct on the wire, nothing ever appeared on the panel — user-confirmed after swapping to an impossible-to-miss full-color `dialog-warning` icon. This is a real rendering gap in this (young, actively-developed) COSMIC applet, not a config or icon-choice mistake. | Don't trust `RegisteredStatusNotifierItems` alone as proof a tray icon will be *visible* on COSMIC — it only proves the watcher's bookkeeping succeeded. Get explicit user confirmation the icon is actually visible before building anything on top of it. When it fails, COSMIC has a separate, working mechanism for a real panel presence: a normal `.desktop` launcher the user pins via the app launcher's own "pin to panel/dock" action (`com.system76.CosmicPanelAppButton` / `CosmicAppList` — the same mechanism behind every other icon already pinned to their panel) — no SNI protocol involved, so this compatibility gap doesn't apply. |
+| **Don't hand-edit `com.system76.CosmicSettings.Shortcuts`'s live config to add a keybinding** | The shipped `defaults`/`system_actions` files (`/usr/share/cosmic/.../v1/`) are one large RON keymap covering every existing shortcut (workspace switching, lock screen, close window, etc.). There's no confirmed-safe way to verify a hand-written addition's schema without the compositor (`cosmic-comp`) actually reloading it, and a malformed file risks breaking *all* shortcuts, not just the new one — with no visible error to debug from outside the session. | Route custom keybindings through `cosmic-settings keyboard`'s own GUI custom-shortcuts editor instead — it writes this schema correctly by construction. Never write directly to `~/.config/cosmic/com.system76.CosmicSettings.Shortcuts/` from a script. |
 | **`yad`'s running tray icon can't have its image/tooltip updated in place from a separate `--command` invocation** | Each menu/click action runs as its own new process; there's no simple IPC back into the already-running icon process from those. | Supervise yad in a small respawn loop that kills and relaunches it (fresh `--image`/`--text`) whenever the underlying state changes — a sub-second flicker is a non-issue for something toggled a few times a day. |
 
 ---
@@ -80,19 +81,23 @@ skills/pop-os-live-session-hardening/
 ├── bin/
 │   ├── disk-cleanup.sh     (systemd-timer-driven, every 5 min)
 │   ├── battery-guard.sh    (systemd-service-driven, continuous; supports --test <secs>)
-│   ├── lid-guard.sh        (CLI: on|off|toggle|status)
-│   └── lid-guard-tray.sh   (panel switch: tray icon wrapping lid-guard.sh)
+│   ├── lid-guard.sh        (CLI: on|off|toggle|confirm-toggle|status)
+│   └── lid-guard-tray.sh   (tray icon — kept for non-COSMIC desktops; NOT enabled by default,
+│                            see Environment Reality: COSMIC registers it but doesn't render it)
 ├── systemd/
 │   ├── disk-cleanup.service / .timer
 │   ├── battery-guard.service
 │   ├── lid-guard.service       (enabled — ON by default at every login)
-│   └── lid-guard-tray.service  (enabled — tray icon present at every login)
+│   └── lid-guard-tray.service  (installed, NOT enabled — see above)
+├── desktop/
+│   └── lid-guard-toggle.desktop  (pinnable launcher — the panel presence that actually works
+│                                  on COSMIC; installed to ~/.local/share/applications)
 └── autostart/
     └── copyq.desktop
 ```
 Running `install.sh` reproduces: periodic disk cleanup + notification, a battery alarm with
-escalating tiers and snooze, a lid-close guard that's **on by default** (with a panel tray
-switch to flip it off when you actually want the lid to suspend), and a running CopyQ clipboard
+escalating tiers and snooze, a lid-close guard that's **on by default** with a pinnable panel
+launcher to flip it off when you actually want the lid to suspend, and a running CopyQ clipboard
 manager with a 5000-item history. The dev-CLI bootstrap (gh/vercel/turso) is documented but
 deliberately **not** auto-run by `install.sh`, since it ends in per-account interactive logins.
 
@@ -123,22 +128,29 @@ for lid-guard's panel switch) — see `install.sh`.
 - Both run as `systemd --user` units (timer for the periodic one, long-running service with
   `Restart=always` for the continuous one) — never root cron, for the D-Bus/notify-send reason
   in Environment Reality.
-- `lid-guard.sh`: a thin on/off/toggle/status CLI around a `lid-guard.service` unit whose entire
-  job is to run `systemd-inhibit --what=handle-lid-switch --mode=block sleep infinity` and stay
-  alive. Starting the unit acquires the inhibitor (lid close does nothing); stopping it releases
-  the inhibitor (lid close suspends normally). **`lid-guard.service` ships enabled — ON is the
-  default at every login/boot** (the user explicitly wants "nothing shuts unless I choose to
-  sleep," i.e. the inverse of stock logind behavior, not a per-use opt-in).
-- `lid-guard-tray.sh`: the panel switch — a `yad --notification` tray icon that registers with
-  the desktop's `org.kde.StatusNotifierWatcher` (confirmed live via
-  `cosmic-applet-status-area --status-notifier-watcher` on this session; the same protocol GNOME/
-  KDE trays use, so this isn't COSMIC-specific). Left-click toggles; right-click gives an
-  explicit on/off/status menu. yad has no live "update this running icon" handle across separate
-  `--command` invocations, so the script supervises yad and respawns it (sub-second flicker,
-  irrelevant since toggling is rare) whenever `lid-guard.service`'s active state changes, using
-  `changes-prevent-symbolic` / `changes-allow-symbolic` (present in Adwaita/Cosmic/breeze icon
-  themes) so the icon itself shows current state at a glance. Also ships enabled by default —
-  the switch needs to already be on the panel, not launched by hand.
+- `lid-guard.sh`: an on/off/toggle/confirm-toggle/status CLI around a `lid-guard.service` unit
+  whose entire job is to run `systemd-inhibit --what=handle-lid-switch --mode=block sleep
+  infinity` and stay alive. Starting the unit acquires the inhibitor (lid close does nothing);
+  stopping it releases the inhibitor (lid close suspends normally). **`lid-guard.service` ships
+  enabled — ON is the default at every login/boot** (the user explicitly wants "nothing shuts
+  unless I choose to sleep," i.e. the inverse of stock logind behavior, not a per-use opt-in).
+  `confirm-toggle` wraps the same on/off logic in a `zenity --question` Yes/No prompt worded for
+  whichever direction is about to happen — for binding to a keyboard shortcut, so a stray
+  keypress can't silently change lid behavior.
+- **The panel presence that actually works on COSMIC is `desktop/lid-guard-toggle.desktop`**, not
+  a tray icon (see Environment Reality). It's a completely ordinary application launcher
+  (`Exec=lid-guard.sh toggle`); the user pins it via their app launcher's normal
+  pin-to-panel/dock action, the same mechanism behind every other icon already on their panel —
+  no SNI protocol involved, so it can't hit the same rendering gap. Trade-off versus a live tray
+  icon: no dynamic on/off icon swap (pinned launchers show one static icon), compensated by
+  `notify-send` firing on every toggle so the new state is still visible immediately.
+- `lid-guard-tray.sh` (the tray-icon attempt) is kept in the repo, installed but **not enabled**,
+  for desktops with working SNI tray rendering (GNOME/KDE) — see Environment Reality for why it's
+  inert on COSMIC specifically.
+- For a keyboard shortcut, don't hand-write COSMIC's shortcuts config (see Environment Reality) —
+  run `cosmic-settings keyboard`, add a custom shortcut with command `~/bin/lid-guard.sh
+  confirm-toggle` and any key combo that isn't already claimed by something else (e.g. avoid
+  Ctrl+P — that's Print in most apps).
 
 ### 4. Enable and verify
 ```
@@ -147,16 +159,23 @@ systemctl --user enable --now disk-cleanup.timer
 systemctl --user enable --now battery-guard.service
 ~/bin/battery-guard.sh --test 15         # confirm sound + volume ramp + dialog before trusting it unattended
 systemctl --user enable --now lid-guard.service        # default ON
-systemctl --user enable --now lid-guard-tray.service   # panel switch to flip it off on demand
 systemd-inhibit --list | grep lid-guard  # confirm the inhibitor is actually held
-busctl --user call org.kde.StatusNotifierWatcher /StatusNotifierWatcher \
-  org.freedesktop.DBus.Properties Get ss org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems
-  # confirm exactly 1 registered item, not 0 (icon failed) or >1 (a respawn leak)
+
+mkdir -p ~/.local/share/applications
+cp desktop/lid-guard-toggle.desktop ~/.local/share/applications/
+update-desktop-database ~/.local/share/applications
+gio launch ~/.local/share/applications/lid-guard-toggle.desktop   # simulates a real click
+~/bin/lid-guard.sh status                                          # confirm it actually flipped
 ```
 Never verify lid-guard by actually closing the lid or running `systemctl suspend` — confirm the
-inhibitor and tray registration through the commands above, or by simulating a click with
-`~/bin/lid-guard.sh toggle` and re-checking both. Either proves the mechanism works without ever
-risking the live session.
+inhibitor via `systemd-inhibit --list`, and confirm any click-triggered path (pinned launcher,
+`confirm-toggle`) by simulating the click (`gio launch`, or running the same command by hand) and
+re-checking `lid-guard.sh status` afterward. That proves the mechanism works without ever risking
+the live session. If experimenting with a tray icon on a non-COSMIC desktop, additionally check
+`busctl --user call org.kde.StatusNotifierWatcher /StatusNotifierWatcher
+org.freedesktop.DBus.Properties Get ss org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems`
+— but treat that as necessary, not sufficient, proof it's visible (see Environment Reality); get
+explicit human confirmation the icon actually renders before relying on it.
 
 ### 5. (Optional) Dev CLI bootstrap
 Install `gh` (apt), `vercel` (npm global), `turso` (official install script — **read it before
@@ -229,14 +248,24 @@ THEN enable+start `lid-guard.service` (`[Install] WantedBy=default.target`) inst
 
 IF the user wants a literal "switch" (not a CLI command) to flip a toggle like this
 THEN check for a running `org.kde.StatusNotifierWatcher` (`busctl --user list | grep -i
-     statusnotifier`) before assuming a custom DE applet is required — a lightweight tray tool
-     (e.g. `yad --notification`) can usually register with it directly; confirm empirically via
-     `RegisteredStatusNotifierItems` rather than assuming any given tool's build supports it.
+     statusnotifier`) and try a lightweight tray tool (e.g. `yad --notification`) against it —
+     but treat `RegisteredStatusNotifierItems` listing the item as necessary, not sufficient,
+     evidence it's visible. Get explicit human confirmation the icon actually renders before
+     building anything on top of it (on COSMIC specifically, as of this session, it does not —
+     see Environment Reality). If it fails, fall back to a pinnable `.desktop` launcher (the
+     mechanism behind every icon already on the user's panel) instead of a tray icon.
 
 IF lid-guard (or any inhibitor-based toggle) needs verifying
 THEN check `systemd-inhibit --list` for the named entry — never verify by actually closing the
      lid or issuing `systemctl suspend`, since a broken toggle would suspend the live session
      you're trying to protect.
+
+IF a toggle will be bound to a keyboard shortcut
+THEN wrap it in a confirmation prompt (`zenity --question`, worded for whichever direction is
+     about to fire) rather than firing on the bare keypress — a global shortcut has no "are you
+     sure," and a stray/muscle-memory press of a rebound common combo (Ctrl+P, etc.) shouldn't
+     silently change system behavior. Route the actual key binding through the DE's own
+     shortcuts GUI (`cosmic-settings keyboard`), never by hand-writing its config file.
 
 IF any step would touch session data (chat history, credentials, config, code) rather than a
    clearly-named cache/log/tmp path
@@ -364,11 +393,17 @@ wait
 - [ ] `lid-guard.sh on` then `systemd-inhibit --list` shows the `lid-guard` row before trusting
       it; `lid-guard.sh off` then re-running `--list` shows it gone. Never verified by actually
       closing the lid or running `systemctl suspend`.
-- [ ] `lid-guard.service` and `lid-guard-tray.service` are both `enable`d (`WantedBy=
-      default.target`) — the guard must come up ON and the switch must already be on the panel
-      at login, with no command required.
-- [ ] After `lid-guard.sh toggle`, `RegisteredStatusNotifierItems` still reports exactly 1 item
-      (not 0 — icon died; not >1 — the respawn loop leaked a duplicate).
+- [ ] Any click-triggered path (pinned `.desktop` launcher, tray icon) was verified by simulating
+      the click (`gio launch ...`, or the same command by hand) and re-checking `lid-guard.sh
+      status` — and, if a tray icon, by explicit human confirmation it's actually visible, not
+      just registered on D-Bus.
+- [ ] A keyboard-shortcut binding uses `confirm-toggle` (or an equivalent confirmation step), not
+      a bare `toggle` — a global shortcut has no undo if pressed by accident.
+- [ ] `lid-guard.service` is `enable`d (`WantedBy=default.target`) — the guard must come up ON
+      at login, with no command required. `lid-guard-tray.service` stays disabled on COSMIC.
+- [ ] If a tray icon is in use on a non-COSMIC desktop: after `lid-guard.sh toggle`,
+      `RegisteredStatusNotifierItems` still reports exactly 1 item (not 0 — icon died; not >1 —
+      the respawn loop leaked a duplicate).
 
 ---
 
