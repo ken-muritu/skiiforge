@@ -3,7 +3,7 @@
 # Runs every 5 min via the disk-cleanup.timer systemd --user unit.
 set -uo pipefail
 
-THRESHOLD=85
+THRESHOLD=75
 STATE_DIR="$HOME/.local/state/disk-cleanup"
 LOCK_FILE="$STATE_DIR/run.lock"
 LOG_FILE="$STATE_DIR/cleanup.log"
@@ -60,12 +60,67 @@ clean_browsers() {
   done
   return 0
 }
-clean_pip()   { command -v pip  >/dev/null 2>&1 && pip cache purge; }
-clean_npm()   { command -v npm  >/dev/null 2>&1 && npm cache clean --force; }
-clean_yarn()  { command -v yarn >/dev/null 2>&1 && yarn cache clean; }
-clean_go()    { command -v go   >/dev/null 2>&1 && go clean -cache; }
+# Chromium-family browsers (Brave, Chrome, Chromium, Edge) keep their real,
+# regenerable disk caches INSIDE the profile under ~/.config/<vendor>/<product>/,
+# not under ~/.cache — clean_browsers() above only ever hit an empty path for
+# these. Found via audit: Brave-Browser-Beta's Service Worker cache alone was
+# 691M, on a 7.7G disk, silently never touched by any prior cleanup step.
+# ONLY touches known-regenerable cache subdirs, both at the browser-root level
+# and per-profile. Deliberately never touches: Extensions (installed code),
+# IndexedDB/File System/Local Extension Settings (real site & extension data),
+# History/Cookies/Sessions/Preferences/Web Data/Local Storage/Session Storage/
+# Favicons (real browser state — touching these would sign the user out of
+# sites, lose saved logins/autofill, lose open tabs, or reset extensions).
+clean_chromium_profile_caches() {
+  local base profile
+  for base in "$HOME/.config/BraveSoftware/Brave-Browser-Beta" \
+              "$HOME/.config/BraveSoftware/Brave-Browser" \
+              "$HOME/.config/google-chrome" "$HOME/.config/chromium" \
+              "$HOME/.config/microsoft-edge"; do
+    [ -d "$base" ] || continue
+    for d in "$base/GPUPersistentCache" "$base/component_crx_cache" "$base/Safe Browsing"; do
+      [ -d "$d" ] && find "$d" -mindepth 1 -delete 2>/dev/null
+    done
+    for profile in "$base"/Default "$base"/Profile\ *; do
+      [ -d "$profile" ] || continue
+      for d in "Service Worker" "GPUCache" "Code Cache" "DawnWebGPUCache" "DawnGraphiteCache"; do
+        [ -d "$profile/$d" ] && rm -rf "${profile:?}/${d:?}" 2>/dev/null
+      done
+    done
+  done
+  return 0
+}
+# The Claude CLI's self-updater (~/.local/share/claude/versions/<ver>) does
+# not clean up its own old versions — found via audit: two full copies
+# (2.1.235 + 2.1.237, ~330M each) sitting side by side, only one in use.
+# This recurs on every auto-update, so it needs to be a permanent step, not
+# a one-off delete. Only ever removes versions OTHER than the one the
+# ~/.local/bin/claude symlink currently resolves to.
+clean_stale_claude_versions() {
+  local versions_dir="$HOME/.local/share/claude/versions"
+  local claude_bin
+  claude_bin=$(command -v claude 2>/dev/null) || return 0
+  [ -d "$versions_dir" ] || return 0
+  local active
+  active=$(readlink -f "$claude_bin" 2>/dev/null) || return 0
+  local f base
+  for f in "$versions_dir"/*; do
+    [ -f "$f" ] || continue
+    [ "$f" = "$active" ] && continue
+    base=$(basename "$f")
+    rm -f "$f" "$HOME/.local/state/claude/locks/$base.lock" 2>/dev/null
+  done
+  return 0
+}
+# NOTE: guards use `|| return 0` (not `&&`) so a merely-absent optional tool
+# is not indistinguishable from a real failure in the log — see step().
+clean_pip()   { command -v pip  >/dev/null 2>&1 || return 0; pip cache purge; }
+clean_npm()   { command -v npm  >/dev/null 2>&1 || return 0; npm cache clean --force; }
+clean_yarn()  { command -v yarn >/dev/null 2>&1 || return 0; yarn cache clean; }
+clean_go()    { command -v go   >/dev/null 2>&1 || return 0; go clean -cache; }
 clean_cargo() { [ -d "$HOME/.cargo/registry/cache" ] && rm -rf "$HOME"/.cargo/registry/cache/*; return 0; }
 clean_uv()    { [ -x "$HOME/.hermes/bin/uv" ] && "$HOME/.hermes/bin/uv" cache clean; }
+clean_electron_cache() { [ -d "$HOME/.cache/electron" ] && rm -rf "$HOME"/.cache/electron/*; return 0; }
 
 # ---- Hermes agent (~/.hermes): only its own regenerable caches/logs.
 # sessions/, memories/, cron/, config.yaml, .env, SOUL.md, and the
@@ -117,6 +172,7 @@ clean_snap_old() {
     while read -r name rev; do sudo snap remove "$name" --revision="$rev" >/dev/null 2>&1; done
   return 0
 }
+clean_apt_index_cache() { sudo rm -f /var/cache/apt/pkgcache.bin /var/cache/apt/srcpkgcache.bin; return 0; }
 clean_docker() { sudo docker system prune -f; }
 clean_podman() { podman system prune -f; }
 deep_journal_vacuum() { sudo journalctl --vacuum-time=6h; }
@@ -129,18 +185,22 @@ deep_tmp_sweep() {
 }
 top_consumers() {
   du -sh "$HOME/.hermes" "$HOME/.cache" "$HOME/.npm" "$HOME/.cargo" \
-    /var/cache/apt/archives 2>/dev/null | sort -rh | head -5
+    "$HOME/.config/BraveSoftware" "$HOME/Downloads" \
+    /var/cache/apt/archives 2>/dev/null | sort -rh | head -6
 }
 
 step "Trash"           clean_trash
 step "Thumbnail cache"  clean_thumbs
 step "Browser caches"   clean_browsers
+step "Chromium profile caches (Service Worker/GPUCache/etc.)" clean_chromium_profile_caches
+step "Stale Claude CLI versions" clean_stale_claude_versions
 step "pip cache"        clean_pip
 step "npm cache"        clean_npm
 step "yarn cache"       clean_yarn
 step "Go build cache"   clean_go
 step "Cargo registry cache" clean_cargo
 step "uv package cache" clean_uv
+step "Electron download cache" clean_electron_cache
 step "Hermes audio/image cache (>2d)" clean_hermes_caches
 step "Hermes __pycache__"      clean_hermes_pycache
 step "Hermes log rotation (>5MB)" rotate_hermes_logs
@@ -156,6 +216,7 @@ fi
 if [ "$HAVE_SUDO" -eq 1 ]; then
   step "APT package cache"        sudo apt-get clean
   step "APT autoclean"            sudo apt-get autoclean -y
+  step "APT index cache"          clean_apt_index_cache
   step "systemd journal (>2d)"    sudo journalctl --vacuum-time=2d
   step "Old core dumps"           clean_coredumps
   step "Orphaned /tmp files (>1d)" clean_tmp

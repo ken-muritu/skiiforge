@@ -3,4 +3,9 @@ Description=Safe disk cleanup + usage notification
 
 [Service]
 Type=oneshot
+# systemd --user's default PATH omits ~/.local/bin, where claude/npm live.
+# Without this, command -v checks for those tools silently fail here and
+# their cleanup steps (incl. removing stale Claude CLI versions) never run,
+# even though they work fine when the script is run interactively.
+Environment=PATH=%h/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ExecStart=%h/bin/disk-cleanup.sh
