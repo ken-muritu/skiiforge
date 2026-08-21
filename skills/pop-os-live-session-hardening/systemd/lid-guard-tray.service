@@ -1,0 +1,13 @@
+[Unit]
+Description=Panel switch (tray icon) for toggling lid-guard without a terminal
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/bin/lid-guard-tray.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

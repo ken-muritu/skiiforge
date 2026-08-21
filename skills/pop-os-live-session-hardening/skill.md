@@ -52,6 +52,8 @@ Do NOT use to:
 | **CopyQ's history-size config key is lowercase** | `copyq config maxItems 5000` fails with `Invalid option`; the real key is `maxitems`. | `copyq config maxitems 5000`. |
 | **Lid-close = suspend is a `systemd-logind` action, not a hard OS rule** | Default is `HandleLidSwitch=suspend` (compiled-in; usually commented-out, not present, in `/etc/systemd/logind.conf`). Suspend is what actually kills wifi/bluetooth/agents on lid close — the radios power off as part of suspending, not because of the lid itself. | Don't edit `/etc/systemd/logind.conf` to "fix" this — that's global, permanent, needs root + a `systemd-logind` restart, and removes the choice. Hold a `systemd-inhibit --what=handle-lid-switch --mode=block` lock instead: logind skips its lid action entirely while any such lock is held, and reverts to normal the instant it's released — a true per-use toggle, confirmed via `systemd-inhibit --list`. |
 | **Desktop sessions already use this same inhibitor mechanism** | `systemd-inhibit --list` on this COSMIC session shows `Cosmic Session ... handle-power-key ... block` — the DE itself is built on logind inhibitors, not a competing/independent power daemon. | Trust `--what=handle-lid-switch` to be honored the same way on any systemd-logind desktop (GNOME/KDE/COSMIC) — verify once per DE with `systemd-inhibit --list`, don't assume it needs a DE-specific setting instead. |
+| **A real panel tray icon is achievable without writing a native DE applet** | Building a custom COSMIC quick-settings entry means writing/compiling a Rust `iced`-based applet — heavy. But `cosmic-applet-status-area --status-notifier-watcher` was already running, meaning any app that speaks the standard `org.kde.StatusNotifierItem` D-Bus protocol shows up in the panel automatically. `yad --notification` (a 554KB apt package) registers as one — confirmed empirically via `busctl --user call org.kde.StatusNotifierWatcher ... RegisteredStatusNotifierItems` before writing any real code around it. | Before assuming a "put a switch on the panel" request needs a custom applet, check `busctl --user list \| grep -i statusnotifier` for a running watcher, then prove a lightweight tray tool registers with it (empirically, via `RegisteredStatusNotifierItems`) before committing to a design. |
+| **`yad`'s running tray icon can't have its image/tooltip updated in place from a separate `--command` invocation** | Each menu/click action runs as its own new process; there's no simple IPC back into the already-running icon process from those. | Supervise yad in a small respawn loop that kills and relaunches it (fresh `--image`/`--text`) whenever the underlying state changes — a sub-second flicker is a non-issue for something toggled a few times a day. |
 
 ---
 
@@ -76,21 +78,23 @@ skills/pop-os-live-session-hardening/
 ├── skill.md              (this file)
 ├── install.sh            (idempotent bootstrap — packages, scripts, systemd units, CopyQ)
 ├── bin/
-│   ├── disk-cleanup.sh    (systemd-timer-driven, every 5 min)
-│   ├── battery-guard.sh   (systemd-service-driven, continuous; supports --test <secs>)
-│   └── lid-guard.sh       (on-demand toggle: on|off|toggle|status)
+│   ├── disk-cleanup.sh     (systemd-timer-driven, every 5 min)
+│   ├── battery-guard.sh    (systemd-service-driven, continuous; supports --test <secs>)
+│   ├── lid-guard.sh        (CLI: on|off|toggle|status)
+│   └── lid-guard-tray.sh   (panel switch: tray icon wrapping lid-guard.sh)
 ├── systemd/
 │   ├── disk-cleanup.service / .timer
 │   ├── battery-guard.service
-│   └── lid-guard.service  (no [Install] section — deliberately not auto-started/enabled)
+│   ├── lid-guard.service       (enabled — ON by default at every login)
+│   └── lid-guard-tray.service  (enabled — tray icon present at every login)
 └── autostart/
     └── copyq.desktop
 ```
 Running `install.sh` reproduces: periodic disk cleanup + notification, a battery alarm with
-escalating tiers and snooze, a lid-close toggle (installed but left off), and a running CopyQ
-clipboard manager with a 5000-item history. The dev-CLI bootstrap (gh/vercel/turso) is
-documented but deliberately **not** auto-run by `install.sh`, since it ends in per-account
-interactive logins.
+escalating tiers and snooze, a lid-close guard that's **on by default** (with a panel tray
+switch to flip it off when you actually want the lid to suspend), and a running CopyQ clipboard
+manager with a 5000-item history. The dev-CLI bootstrap (gh/vercel/turso) is documented but
+deliberately **not** auto-run by `install.sh`, since it ends in per-account interactive logins.
 
 ---
 
@@ -103,7 +107,8 @@ interactive logins.
 - `ls /sys/class/power_supply/` — confirm a battery exists before installing battery-guard.
 
 ### 2. Install baseline packages
-`libnotify-bin` (notify-send), `zenity` (dialogs), `copyq` (clipboard manager) — see `install.sh`.
+`libnotify-bin` (notify-send), `zenity` (dialogs), `copyq` (clipboard manager), `yad` (tray icon
+for lid-guard's panel switch) — see `install.sh`.
 
 ### 3. Ship the two hardening scripts + systemd units
 - `disk-cleanup.sh`: `flock`-guarded, before/after `df` accounting per cleanup step, tiered
@@ -118,25 +123,40 @@ interactive logins.
 - Both run as `systemd --user` units (timer for the periodic one, long-running service with
   `Restart=always` for the continuous one) — never root cron, for the D-Bus/notify-send reason
   in Environment Reality.
-- `lid-guard.sh`: a thin on/off/toggle/status wrapper around a `lid-guard.service` unit whose
-  entire job is to run `systemd-inhibit --what=handle-lid-switch --mode=block sleep infinity`
-  and stay alive. Starting the unit acquires the inhibitor (lid close does nothing); stopping
-  it releases the inhibitor (lid close goes back to normal suspend). No `[Install]` section —
-  it must never auto-start at boot/login, since the entire point is that it's a conscious
-  choice made before closing the lid, not a standing default.
+- `lid-guard.sh`: a thin on/off/toggle/status CLI around a `lid-guard.service` unit whose entire
+  job is to run `systemd-inhibit --what=handle-lid-switch --mode=block sleep infinity` and stay
+  alive. Starting the unit acquires the inhibitor (lid close does nothing); stopping it releases
+  the inhibitor (lid close suspends normally). **`lid-guard.service` ships enabled — ON is the
+  default at every login/boot** (the user explicitly wants "nothing shuts unless I choose to
+  sleep," i.e. the inverse of stock logind behavior, not a per-use opt-in).
+- `lid-guard-tray.sh`: the panel switch — a `yad --notification` tray icon that registers with
+  the desktop's `org.kde.StatusNotifierWatcher` (confirmed live via
+  `cosmic-applet-status-area --status-notifier-watcher` on this session; the same protocol GNOME/
+  KDE trays use, so this isn't COSMIC-specific). Left-click toggles; right-click gives an
+  explicit on/off/status menu. yad has no live "update this running icon" handle across separate
+  `--command` invocations, so the script supervises yad and respawns it (sub-second flicker,
+  irrelevant since toggling is rare) whenever `lid-guard.service`'s active state changes, using
+  `changes-prevent-symbolic` / `changes-allow-symbolic` (present in Adwaita/Cosmic/breeze icon
+  themes) so the icon itself shows current state at a glance. Also ships enabled by default —
+  the switch needs to already be on the panel, not launched by hand.
 
 ### 4. Enable and verify
 ```
 systemctl --user daemon-reload
 systemctl --user enable --now disk-cleanup.timer
 systemctl --user enable --now battery-guard.service
-~/bin/battery-guard.sh --test 15   # confirm sound + volume ramp + dialog before trusting it unattended
-~/bin/lid-guard.sh on              # verify: systemd-inhibit --list | grep lid-guard
-~/bin/lid-guard.sh off             # leave it off — opt in again next time before closing the lid
+~/bin/battery-guard.sh --test 15         # confirm sound + volume ramp + dialog before trusting it unattended
+systemctl --user enable --now lid-guard.service        # default ON
+systemctl --user enable --now lid-guard-tray.service   # panel switch to flip it off on demand
+systemd-inhibit --list | grep lid-guard  # confirm the inhibitor is actually held
+busctl --user call org.kde.StatusNotifierWatcher /StatusNotifierWatcher \
+  org.freedesktop.DBus.Properties Get ss org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems
+  # confirm exactly 1 registered item, not 0 (icon failed) or >1 (a respawn leak)
 ```
-Never test `lid-guard` by actually closing the lid or running `systemctl suspend` — verify the
-inhibitor is held/released via `systemd-inhibit --list`, which proves the mechanism works
-without ever risking the live session.
+Never verify lid-guard by actually closing the lid or running `systemctl suspend` — confirm the
+inhibitor and tray registration through the commands above, or by simulating a click with
+`~/bin/lid-guard.sh toggle` and re-checking both. Either proves the mechanism works without ever
+risking the live session.
 
 ### 5. (Optional) Dev CLI bootstrap
 Install `gh` (apt), `vercel` (npm global), `turso` (official install script — **read it before
@@ -201,6 +221,17 @@ THEN hold a `systemd-inhibit --what=handle-lid-switch --mode=block` lock via `li
      rather than editing `/etc/systemd/logind.conf` — the inhibitor is reversible per-use and
      needs no root, while a config edit is global, needs a `systemd-logind` restart, and
      removes the choice instead of preserving it.
+
+IF the user wants that to be the *default*, not something they invoke each time
+THEN enable+start `lid-guard.service` (`[Install] WantedBy=default.target`) instead of leaving
+     it as a plain start/stop the user has to remember — "no command needed" means the unit
+     itself must come up active at login, not just be capable of it.
+
+IF the user wants a literal "switch" (not a CLI command) to flip a toggle like this
+THEN check for a running `org.kde.StatusNotifierWatcher` (`busctl --user list | grep -i
+     statusnotifier`) before assuming a custom DE applet is required — a lightweight tray tool
+     (e.g. `yad --notification`) can usually register with it directly; confirm empirically via
+     `RegisteredStatusNotifierItems` rather than assuming any given tool's build supports it.
 
 IF lid-guard (or any inhibitor-based toggle) needs verifying
 THEN check `systemd-inhibit --list` for the named entry — never verify by actually closing the
@@ -333,8 +364,11 @@ wait
 - [ ] `lid-guard.sh on` then `systemd-inhibit --list` shows the `lid-guard` row before trusting
       it; `lid-guard.sh off` then re-running `--list` shows it gone. Never verified by actually
       closing the lid or running `systemctl suspend`.
-- [ ] `lid-guard.service` has no `[Install]` section and is not `enable`d — confirms it can
-      never silently activate at boot/login, only via an explicit `on`/`toggle` call.
+- [ ] `lid-guard.service` and `lid-guard-tray.service` are both `enable`d (`WantedBy=
+      default.target`) — the guard must come up ON and the switch must already be on the panel
+      at login, with no command required.
+- [ ] After `lid-guard.sh toggle`, `RegisteredStatusNotifierItems` still reports exactly 1 item
+      (not 0 — icon died; not >1 — the respawn loop leaked a duplicate).
 
 ---
 

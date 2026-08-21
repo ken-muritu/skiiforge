@@ -1,6 +1,9 @@
 [Unit]
-Description=Hold a lid-switch inhibitor so closing the lid does nothing (toggled on demand via lid-guard.sh)
+Description=Hold a lid-switch inhibitor so closing the lid does nothing by default (toggle off via lid-guard.sh / panel switch when you actually want to sleep)
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/systemd-inhibit --what=handle-lid-switch --who=lid-guard --why="Keep agents, network, and session running with the lid closed" --mode=block sleep infinity
+
+[Install]
+WantedBy=default.target
