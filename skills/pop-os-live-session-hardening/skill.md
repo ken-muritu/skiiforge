@@ -3,9 +3,10 @@
 ## Purpose
 
 Turn a fresh Pop!_OS session (live/USB or installed) into a session that won't quietly run
-itself out of disk, won't let the battery die unnoticed, gives you a real clipboard manager,
-and has GitHub/Vercel/Turso CLIs installed and authenticated — reproducibly, from one folder,
-without re-deriving the gotchas below each time.
+itself out of disk, won't let the battery die unnoticed, won't suspend and drop network/agents
+the instant the lid closes unless you choose that, gives you a real clipboard manager, and has
+GitHub/Vercel/Turso CLIs installed and authenticated — reproducibly, from one folder, without
+re-deriving the gotchas below each time.
 
 This skill encodes the *method and the hard-won pitfalls* from a real session that: hardened a
 7.7G live-session overlay against filling up, installed a large third-party agent (Hermes,
@@ -19,6 +20,8 @@ device-code/OAuth login flows through a live browser non-interactively.
 Invoke when a request combines any of:
 - "set up a script that watches disk usage / cleans cache automatically."
 - "alert me before the battery dies" / "battery guard" / "low battery alarm."
+- "closing the lid shouldn't suspend / disconnect wifi / kill my agents" / "keep running with
+  the lid closed" / "lid switch behavior."
 - "clipboard manager with history" on a fresh Linux desktop.
 - "install and log into gh/vercel/turso (or similar) CLIs, open the browser for me."
 - Preparing a **new** Pop!_OS (or similar apt/systemd) session to match one already configured.
@@ -47,6 +50,8 @@ Do NOT use to:
 | **Vercel CLI auto-detects non-interactive/agent shells** | `vercel login --help` documents `--non-interactive`, "default when an agent is detected." | Just run `vercel login` — it skips the arrow-key provider menu and prints a device-code URL directly (`vercel.com/oauth/device?user_code=...`). |
 | **Turso's `--headless` flag does NOT poll** | `turso auth login --headless` prints a URL and **exits immediately**; it expects a manually-copied token pasted elsewhere. | If a real browser is available in-session, use plain `turso auth login` instead — it opens the browser itself and blocks on a local callback (`localhost:<port>`) until you approve, no code to copy. |
 | **CopyQ's history-size config key is lowercase** | `copyq config maxItems 5000` fails with `Invalid option`; the real key is `maxitems`. | `copyq config maxitems 5000`. |
+| **Lid-close = suspend is a `systemd-logind` action, not a hard OS rule** | Default is `HandleLidSwitch=suspend` (compiled-in; usually commented-out, not present, in `/etc/systemd/logind.conf`). Suspend is what actually kills wifi/bluetooth/agents on lid close — the radios power off as part of suspending, not because of the lid itself. | Don't edit `/etc/systemd/logind.conf` to "fix" this — that's global, permanent, needs root + a `systemd-logind` restart, and removes the choice. Hold a `systemd-inhibit --what=handle-lid-switch --mode=block` lock instead: logind skips its lid action entirely while any such lock is held, and reverts to normal the instant it's released — a true per-use toggle, confirmed via `systemd-inhibit --list`. |
+| **Desktop sessions already use this same inhibitor mechanism** | `systemd-inhibit --list` on this COSMIC session shows `Cosmic Session ... handle-power-key ... block` — the DE itself is built on logind inhibitors, not a competing/independent power daemon. | Trust `--what=handle-lid-switch` to be honored the same way on any systemd-logind desktop (GNOME/KDE/COSMIC) — verify once per DE with `systemd-inhibit --list`, don't assume it needs a DE-specific setting instead. |
 
 ---
 
@@ -72,17 +77,20 @@ skills/pop-os-live-session-hardening/
 ├── install.sh            (idempotent bootstrap — packages, scripts, systemd units, CopyQ)
 ├── bin/
 │   ├── disk-cleanup.sh    (systemd-timer-driven, every 5 min)
-│   └── battery-guard.sh   (systemd-service-driven, continuous; supports --test <secs>)
+│   ├── battery-guard.sh   (systemd-service-driven, continuous; supports --test <secs>)
+│   └── lid-guard.sh       (on-demand toggle: on|off|toggle|status)
 ├── systemd/
 │   ├── disk-cleanup.service / .timer
-│   └── battery-guard.service
+│   ├── battery-guard.service
+│   └── lid-guard.service  (no [Install] section — deliberately not auto-started/enabled)
 └── autostart/
     └── copyq.desktop
 ```
 Running `install.sh` reproduces: periodic disk cleanup + notification, a battery alarm with
-escalating tiers and snooze, and a running CopyQ clipboard manager with a 5000-item history.
-The dev-CLI bootstrap (gh/vercel/turso) is documented but deliberately **not** auto-run by
-`install.sh`, since it ends in per-account interactive logins.
+escalating tiers and snooze, a lid-close toggle (installed but left off), and a running CopyQ
+clipboard manager with a 5000-item history. The dev-CLI bootstrap (gh/vercel/turso) is
+documented but deliberately **not** auto-run by `install.sh`, since it ends in per-account
+interactive logins.
 
 ---
 
@@ -110,6 +118,12 @@ The dev-CLI bootstrap (gh/vercel/turso) is documented but deliberately **not** a
 - Both run as `systemd --user` units (timer for the periodic one, long-running service with
   `Restart=always` for the continuous one) — never root cron, for the D-Bus/notify-send reason
   in Environment Reality.
+- `lid-guard.sh`: a thin on/off/toggle/status wrapper around a `lid-guard.service` unit whose
+  entire job is to run `systemd-inhibit --what=handle-lid-switch --mode=block sleep infinity`
+  and stay alive. Starting the unit acquires the inhibitor (lid close does nothing); stopping
+  it releases the inhibitor (lid close goes back to normal suspend). No `[Install]` section —
+  it must never auto-start at boot/login, since the entire point is that it's a conscious
+  choice made before closing the lid, not a standing default.
 
 ### 4. Enable and verify
 ```
@@ -117,7 +131,12 @@ systemctl --user daemon-reload
 systemctl --user enable --now disk-cleanup.timer
 systemctl --user enable --now battery-guard.service
 ~/bin/battery-guard.sh --test 15   # confirm sound + volume ramp + dialog before trusting it unattended
+~/bin/lid-guard.sh on              # verify: systemd-inhibit --list | grep lid-guard
+~/bin/lid-guard.sh off             # leave it off — opt in again next time before closing the lid
 ```
+Never test `lid-guard` by actually closing the lid or running `systemctl suspend` — verify the
+inhibitor is held/released via `systemd-inhibit --list`, which proves the mechanism works
+without ever risking the live session.
 
 ### 5. (Optional) Dev CLI bootstrap
 Install `gh` (apt), `vercel` (npm global), `turso` (official install script — **read it before
@@ -176,6 +195,17 @@ THEN check for a browser-capable variant (no flag, or --web) before assuming the
 IF two or more device-code login flows would run concurrently
 THEN serialize them — one clipboard can hold one code at a time, and interleaved codes will
      silently paste the wrong one.
+
+IF the user wants the lid to "do nothing" when closed (keep agents/network running)
+THEN hold a `systemd-inhibit --what=handle-lid-switch --mode=block` lock via `lid-guard.sh on`
+     rather than editing `/etc/systemd/logind.conf` — the inhibitor is reversible per-use and
+     needs no root, while a config edit is global, needs a `systemd-logind` restart, and
+     removes the choice instead of preserving it.
+
+IF lid-guard (or any inhibitor-based toggle) needs verifying
+THEN check `systemd-inhibit --list` for the named entry — never verify by actually closing the
+     lid or issuing `systemctl suspend`, since a broken toggle would suspend the live session
+     you're trying to protect.
 
 IF any step would touch session data (chat history, credentials, config, code) rather than a
    clearly-named cache/log/tmp path
@@ -300,6 +330,11 @@ wait
 - [ ] No secrets (`.env`, `auth.json`, tokens, clipboard history, `*.bak`) are included in
       anything committed from this skill — only the automation scripts themselves.
 - [ ] Disk-usage threshold re-checked (and raised if needed) after any large software install.
+- [ ] `lid-guard.sh on` then `systemd-inhibit --list` shows the `lid-guard` row before trusting
+      it; `lid-guard.sh off` then re-running `--list` shows it gone. Never verified by actually
+      closing the lid or running `systemctl suspend`.
+- [ ] `lid-guard.service` has no `[Install]` section and is not `enable`d — confirms it can
+      never silently activate at boot/login, only via an explicit `on`/`toggle` call.
 
 ---
 
