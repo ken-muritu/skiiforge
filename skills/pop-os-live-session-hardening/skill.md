@@ -46,6 +46,8 @@ Do NOT use to:
 | **`cmd &` inside a backgrounded tool call double-detaches** | Launching `nohup long_running_cmd & ; echo done` as a single "run in background" call reports "completed" the instant the wrapper's `echo` runs — not when `long_running_cmd` actually finishes. | For anything you truly need to block on, capture the real child PID and poll/wait on *that*, or avoid the extra trailing `&` inside an already-backgrounded call. |
 | **A big install on a small overlay can crash the session** | Installing a Python/Node-based agent (venv + node_modules + a bundled Node runtime) pushed usage from 58% to 84% in about 7 minutes. | Attach a disk-space watchdog *during* any large install: poll free space, hard-kill the installer if it drops under a floor (we used 400MB) — before the OS itself starts failing writes. |
 | **A large install changes your "normal" baseline permanently** | After installing Hermes, resting usage sat at 79–85% even fully cleaned — most of it was legitimate installed software, not garbage. | Re-tune the alert threshold *after* a big install (we moved 65% → 85%) instead of leaving a threshold that now fires on every single cycle. |
+| **`/tmp` is a SEPARATE RAM-backed tmpfs, not part of the `/` overlay `df -h /` measures** | Confirmed via `findmnt /tmp` (`tmpfs`, own device) vs `findmnt /` (`overlay` on `/cow`). A single agent-session scratchpad grew to 2.6G in `/tmp/claude-1000` — completely invisible to the disk-usage%-based threshold — while system swap climbed to 9.2G/15G used. | Never assume "disk usage is fine" means "no memory pressure." Track `free`'s available-RAM and swap-used% as a *separate* signal from `df -h /`, with its own alert path — a dead session's scratch data can sit unnoticed in RAM for up to 24h under the standard age-based `/tmp` sweep. |
+| **An "installed dependency tree" (`node_modules`) is not the same risk class as a "cache" (`npm`/`pip`/`go` cache)** | `hermes-agent/node_modules` + `apps/desktop/node_modules` = ~1.4G, confirmed regenerable via `npm ci` (lockfile present, clean `git status`, no live node process holding it open). But unlike a registry cache, deleting it does NOT transparently self-heal on next use — the app just fails to start until someone explicitly reinstalls. | Reclaim `node_modules` as a deliberate one-time action (verify no live process depends on it first), not as an unattended periodic step in the same bucket as cache-clearing — the failure mode if reclaimed at the wrong moment is "app broken until manual reinstall," not "next command re-downloads transparently." |
 | **`gh auth login --web` needs a stdin newline when driven non-interactively** | It prints a one-time code + the fixed URL `https://github.com/login/device`, then waits on a "Press Enter" prompt before polling. | `printf '\n' | gh auth login --hostname github.com --git-protocol https --web` unblocks it; then open the printed URL yourself and copy the printed code to the clipboard. |
 | **Vercel CLI auto-detects non-interactive/agent shells** | `vercel login --help` documents `--non-interactive`, "default when an agent is detected." | Just run `vercel login` — it skips the arrow-key provider menu and prints a device-code URL directly (`vercel.com/oauth/device?user_code=...`). |
 | **Turso's `--headless` flag does NOT poll** | `turso auth login --headless` prints a URL and **exits immediately**; it expects a manually-copied token pasted elsewhere. | If a real browser is available in-session, use plain `turso auth login` instead — it opens the browser itself and blocks on a local callback (`localhost:<port>`) until you approve, no code to copy. |
@@ -222,6 +224,17 @@ IF a resting disk baseline creeps above the alert threshold because of legitimat
 THEN raise the threshold and add visibility (e.g. "Hermes: ~2.1GB, excluded by design") to the
      notification, rather than let cache-clearing run pointlessly every cycle and cry wolf.
 
+IF a periodic cleanup script only ever checks `df -h /`
+THEN it is blind to a RAM-backed `/tmp` tmpfs and to swap pressure — add an independent
+     available-RAM-floor and swap-used%-ceiling check that triggers the same deep-sweep path
+     the disk-space floor triggers (we reused the existing 3h-old `/tmp` sweep, just gave it a
+     second trigger condition instead of writing new deletion logic).
+
+IF an unattended "deep" sweep uses a short age cutoff (e.g. 3h) to react fast to memory pressure
+THEN accept that it can delete an *active* long-running session's own older scratch files, not
+     just dead sessions' — it can only see file mtime, not whether a session is still alive.
+     Surface this tradeoff explicitly rather than presenting the deep sweep as purely safe.
+
 IF driving `gh auth login` non-interactively
 THEN pipe a newline and pass --web to force the device-code flow instead of the default
      credential-store prompt sequence.
@@ -390,6 +403,12 @@ wait
 - [ ] No secrets (`.env`, `auth.json`, tokens, clipboard history, `*.bak`) are included in
       anything committed from this skill — only the automation scripts themselves.
 - [ ] Disk-usage threshold re-checked (and raised if needed) after any large software install.
+- [ ] `free -h` (available RAM + swap-used%) checked as a signal independent of `df -h /` —
+      confirmed the memory-pressure emergency path actually fires under real swap pressure
+      (verified live: swap 9.2G→5.2G and `/tmp` 2.6G→32K after the deep sweep triggered).
+- [ ] Before deleting any `node_modules`: confirmed no live process has it open (`pgrep`), a
+      lockfile exists for regeneration, and `git status` is clean — then reclaimed it as a
+      one-time action, not wired into the unattended timer.
 - [ ] `lid-guard.sh on` then `systemd-inhibit --list` shows the `lid-guard` row before trusting
       it; `lid-guard.sh off` then re-running `--list` shows it gone. Never verified by actually
       closing the lid or running `systemctl suspend`.

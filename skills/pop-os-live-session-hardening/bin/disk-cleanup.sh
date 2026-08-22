@@ -24,6 +24,20 @@ fi
 
 usage_pct() { df --output=pcent / | tail -1 | tr -dc '0-9'; }
 avail_kb()  { df --output=avail / | tail -1 | tr -dc '0-9'; }
+# /tmp is a SEPARATE tmpfs (RAM-backed), not part of the / overlay df above
+# measures — a session scratchpad can balloon there and never move the /
+# usage%, while quietly eating real RAM via swap. Tracked independently.
+tmp_used_kb()   { df --output=used /tmp | tail -1 | tr -dc '0-9'; }
+mem_avail_kb()  { free -k | awk '/^Mem:/{print $7}'; }
+swap_used_pct() {
+  local total used
+  read -r total used < <(free -k | awk '/^Swap:/{print $2, $3}')
+  [ "${total:-0}" -gt 0 ] || { echo 0; return; }
+  echo $(( used * 100 / total ))
+}
+
+MEM_AVAIL_FLOOR_KB=1500000   # <1.5G available RAM
+SWAP_USED_PCT_THRESHOLD=40   # >=40% of swap in use
 
 HAVE_SUDO=0
 sudo -n true 2>/dev/null && HAVE_SUDO=1
@@ -157,6 +171,15 @@ rotate_hermes_backups() {
   ls -t "$HOME"/.hermes/config.yaml.bak.* 2>/dev/null | tail -n +4 | xargs -r rm -f
   return 0
 }
+# `git gc --auto` only ever compacts .git's own internal object store (loose
+# objects -> packs); it never touches tracked/untracked working-tree files,
+# so it's safe to run against the live hermes-agent checkout unconditionally.
+# git decides internally whether there's actually enough garbage to bother
+# repacking, so this is a cheap no-op most runs.
+clean_hermes_git_gc() {
+  [ -d "$HOME/.hermes/hermes-agent/.git" ] || return 0
+  git -C "$HOME/.hermes/hermes-agent" gc --auto --quiet
+}
 
 # ---- root-owned system caches ----
 clean_tmp() {
@@ -206,6 +229,7 @@ step "Hermes __pycache__"      clean_hermes_pycache
 step "Hermes log rotation (>5MB)" rotate_hermes_logs
 step "Hermes misc cache (>1d)" clean_hermes_misc_cache
 step "Hermes config backups (keep 3)" rotate_hermes_backups
+step "Hermes-agent git gc (safe, working tree untouched)" clean_hermes_git_gc
 
 if systemctl --user is-active --quiet hermes-gateway.service 2>/dev/null; then
   :
@@ -231,8 +255,18 @@ else
 fi
 
 EMERGENCY_FLOOR_KB=400000
-if [ "$HAVE_SUDO" -eq 1 ] && [ "$(avail_kb)" -lt "$EMERGENCY_FLOOR_KB" ]; then
-  log "EMERGENCY: free space under 400MB after standard cleanup — running deeper pass"
+disk_emergency=0
+[ "$(avail_kb)" -lt "$EMERGENCY_FLOOR_KB" ] && disk_emergency=1
+
+mem_emergency=0
+mem_avail_now=$(mem_avail_kb)
+swap_pct_now=$(swap_used_pct)
+{ [ "${mem_avail_now:-999999999}" -lt "$MEM_AVAIL_FLOOR_KB" ] || [ "${swap_pct_now:-0}" -ge "$SWAP_USED_PCT_THRESHOLD" ]; } && mem_emergency=1
+
+if [ "$HAVE_SUDO" -eq 1 ] && { [ "$disk_emergency" -eq 1 ] || [ "$mem_emergency" -eq 1 ]; }; then
+  [ "$disk_emergency" -eq 1 ] && log "EMERGENCY: free disk space under 400MB after standard cleanup"
+  [ "$mem_emergency" -eq 1 ]  && log "EMERGENCY: RAM/swap pressure (avail ${mem_avail_now}KB, swap ${swap_pct_now}% used) — /tmp is a separate RAM-backed tmpfs the standard 1-day sweep misses for hours"
+  log "running deeper pass"
   step "Deep journal vacuum (>6h)" deep_journal_vacuum
   step "Deep /tmp sweep (>3h)"     deep_tmp_sweep
 fi
@@ -259,6 +293,16 @@ Top space users:
 $(top_consumers)"
 fi
 
+# / usage% never reflects /tmp (separate RAM-backed tmpfs) or RAM/swap
+# pressure — surface both every run so a Hermes-scratch or swap blowup is
+# visible before it needs the emergency path above.
+tmp_note="
+/tmp: $(du -sh /tmp 2>/dev/null | cut -f1) used, RAM avail: $(( $(mem_avail_kb) / 1024 ))MB, swap: ${swap_pct_now}% used"
+if [ "$mem_emergency" -eq 1 ]; then
+  urgency="critical"
+  title="⚠ RAM/swap pressure (swap ${swap_pct_now}%) — ${title#⚠ }"
+fi
+
 # Hermes (~/.hermes and its code checkout) is never touched by any step
 # above — surface its footprint so a high-usage alert isn't mistaken for
 # a leak when it's actually just Hermes' legitimate size.
@@ -270,4 +314,4 @@ Hermes agent: ~${hermes_mb}MB (not cleaned, excluded by design)"
 fi
 
 notify-send -u "$urgency" -i drive-harddisk "$title" "${summary}
-Freed ~${freed_total_mb}MB this run${hermes_note}${top_note}"
+Freed ~${freed_total_mb}MB this run${hermes_note}${tmp_note}${top_note}"
