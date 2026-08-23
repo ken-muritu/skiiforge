@@ -1,0 +1,6 @@
+[Unit]
+Description=Per-boot health check of all custom guards (storage/battery/lid/CLIs/SSD)
+
+[Service]
+Type=oneshot
+ExecStart=%h/bin/guards-doctor.sh --notify

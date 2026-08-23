@@ -13,15 +13,21 @@ sudo apt-get install -y libnotify-bin zenity copyq yad
 echo "==> Installing scripts to ~/bin"
 mkdir -p "$HOME/bin"
 cp "$SCRIPT_DIR"/bin/disk-cleanup.sh "$SCRIPT_DIR"/bin/battery-guard.sh \
-   "$SCRIPT_DIR"/bin/lid-guard.sh "$SCRIPT_DIR"/bin/lid-guard-tray.sh "$HOME/bin/"
+   "$SCRIPT_DIR"/bin/lid-guard.sh "$SCRIPT_DIR"/bin/lid-guard-tray.sh \
+   "$SCRIPT_DIR"/bin/guards-doctor.sh "$SCRIPT_DIR"/bin/dirty-work-nudge.sh \
+   "$SCRIPT_DIR"/bin/guarded-install "$HOME/bin/"
 chmod +x "$HOME/bin/disk-cleanup.sh" "$HOME/bin/battery-guard.sh" \
-         "$HOME/bin/lid-guard.sh" "$HOME/bin/lid-guard-tray.sh"
+         "$HOME/bin/lid-guard.sh" "$HOME/bin/lid-guard-tray.sh" \
+         "$HOME/bin/guards-doctor.sh" "$HOME/bin/dirty-work-nudge.sh" \
+         "$HOME/bin/guarded-install"
 
 echo "==> Installing systemd --user units"
 mkdir -p "$HOME/.config/systemd/user"
 cp "$SCRIPT_DIR"/systemd/disk-cleanup.service "$SCRIPT_DIR"/systemd/disk-cleanup.timer \
    "$SCRIPT_DIR"/systemd/battery-guard.service "$SCRIPT_DIR"/systemd/lid-guard.service \
    "$SCRIPT_DIR"/systemd/lid-guard-tray.service \
+   "$SCRIPT_DIR"/systemd/guards-doctor.service "$SCRIPT_DIR"/systemd/guards-doctor.timer \
+   "$SCRIPT_DIR"/systemd/dirty-work-nudge.service "$SCRIPT_DIR"/systemd/dirty-work-nudge.timer \
    "$HOME/.config/systemd/user/"
 
 echo "==> Installing CopyQ autostart entry"
@@ -38,6 +44,8 @@ systemctl --user daemon-reload
 systemctl --user enable --now disk-cleanup.timer
 systemctl --user enable --now battery-guard.service
 systemctl --user enable --now lid-guard.service       # default ON: lid close does nothing
+systemctl --user enable --now guards-doctor.timer     # once-per-boot health check of all guards
+systemctl --user enable --now dirty-work-nudge.timer  # hourly uncommitted-work reminder (never commits)
 # lid-guard-tray.service is installed but NOT enabled here: on COSMIC it registers with the
 # status-notifier watcher but the applet doesn't actually paint it (confirmed — see skill.md).
 # Left in the repo for other desktops (GNOME/KDE) where SNI trays are known to work; on COSMIC
@@ -55,6 +63,17 @@ Done.
   - disk-cleanup.timer runs every 5 minutes (see skill.md for the 65%/85% threshold note)
   - battery-guard.service runs continuously; test it anytime with:
       ~/bin/battery-guard.sh --test 15
+  - guards-doctor.timer fires ~2 min after login: one notification confirming every guard
+    is armed, resources are sane, and gh/vercel/turso are still authed. Run by hand anytime:
+      ~/bin/guards-doctor.sh
+  - dirty-work-nudge.timer pings hourly about repos with uncommitted changes older than
+    45 min (max once per 2 h per repo). Reminder ONLY — it never commits or pushes.
+    Add extra scan roots, one path per line, in: ~/.config/guards/project-dirs
+  - Wrap big installs to pre-flight them against free space (the #1 live-session killer):
+      guarded-install --need-mb 4000 pip install torch
+      guarded-install --need-mb 1500 npm install
+  - disk-cleanup.sh --digest prints this session's cumulative top space-eaters,
+    so chronic offenders get fixed at the source instead of mopped forever.
   - CopyQ is running and will autostart on future logins (history capped at 5000 items)
   - lid-guard is ON by default: closing the lid now does nothing (agents/network/session stay
     up). To flip it off with a click instead of a terminal:

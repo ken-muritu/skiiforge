@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Pre-flight wrapper for big installs on this live session.
+#
+# The overlay filesystem (/cow, RAM-backed, ~7.7G) dying mid-extract is THE
+# historical failure mode here — pip/torch and npm installs have filled it
+# before. This wrapper:
+#   1. refuses to start unless projected need fits current free space,
+#   2. runs one immediate disk-cleanup pass first to maximize headroom,
+#   3. runs your command, reports the space delta, and cleans up after.
+#
+# Usage:
+#   guarded-install [--need-mb N] [--force] <command> [args...]
+#     --need-mb N   projected peak footprint in MB (default 1000)
+#     --force       run even if the pre-flight check fails (own risk)
+#
+# Example: guarded-install --need-mb 4000 pip install torch
+set -uo pipefail
+
+NEED_MB=1000
+FORCE=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --need-mb) NEED_MB="$2"; shift 2 ;;
+    --force)   FORCE=1; shift ;;
+    *) break ;;
+  esac
+done
+[ $# -gt 0 ] || { echo "usage: guarded-install [--need-mb N] [--force] <command> [args...]" >&2; exit 64; }
+
+pct()      { df --output=pcent / | tail -1 | tr -dc '0-9'; }
+avail_mb() { echo $(( $(df --output=avail / | tail -1 | tr -dc '0-9') / 1024 )); }
+
+MIN_FREE_MB=$(( NEED_MB + 400 ))   # + margin for the installer's own scratch
+
+before=$(avail_mb)
+echo "guarded-install: disk at $(pct)% used, ${before}MB free, need ~${NEED_MB}MB (+400 margin)"
+
+if [ "$before" -lt "$MIN_FREE_MB" ]; then
+  if [ "$FORCE" -eq 1 ]; then
+    echo "WARNING: proceeding despite tight space (--force)" >&2
+  else
+    echo "REFUSING: only ${before}MB free but this install may need ~${NEED_MB}MB." >&2
+    echo "Free space first, lower --need-mb if you know better, or retry with --force." >&2
+    exit 1
+  fi
+fi
+
+# One immediate cleanup pass before starting — synchronous (oneshot unit).
+echo "guarded-install: running a cleanup pass to maximize headroom..."
+systemctl --user start disk-cleanup.service 2>/dev/null || true
+before=$(avail_mb)
+echo "guarded-install: ${before}MB free now — starting: $*"
+
+"$@"
+rc=$?
+
+after=$(avail_mb)
+delta=$(( after - before ))
+if [ "$rc" -eq 0 ]; then
+  echo "guarded-install: done (exit 0). Space: ${after}MB free (Δ ${delta}MB)."
+else
+  echo "guarded-install: command FAILED (exit $rc). Space: ${after}MB free (Δ ${delta}MB)." >&2
+fi
+
+# Post-pass too — installers leave caches behind that the next 5-min run
+# would catch anyway; doing it now returns the space immediately.
+systemctl --user start disk-cleanup.service 2>/dev/null || true
+
+exit "$rc"

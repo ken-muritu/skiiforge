@@ -20,6 +20,11 @@ device-code/OAuth login flows through a live browser non-interactively.
 Invoke when a request combines any of:
 - "set up a script that watches disk usage / cleans cache automatically."
 - "alert me before the battery dies" / "battery guard" / "low battery alarm."
+- "check that everything I set up is actually running after a fresh boot" / "session health
+  check" / "guards doctor."
+- "remind me about uncommitted work" / "don't let me lose work when this session dies"
+  (reminder-only by design).
+- "install X but don't let it fill my disk" / pre-flight a big install.
 - "closing the lid shouldn't suspend / disconnect wifi / kill my agents" / "keep running with
   the lid closed" / "lid switch behavior."
 - "clipboard manager with history" on a fresh Linux desktop.
@@ -83,15 +88,24 @@ skills/pop-os-live-session-hardening/
 ├── skill.md              (this file)
 ├── install.sh            (idempotent bootstrap — packages, scripts, systemd units, CopyQ)
 ├── bin/
-│   ├── disk-cleanup.sh     (systemd-timer-driven, every 5 min)
+│   ├── disk-cleanup.sh     (systemd-timer-driven, every 5 min; --digest prints cumulative
+│                            top space-eaters of the session)
 │   ├── battery-guard.sh    (systemd-service-driven, continuous; supports --test <secs>)
 │   ├── lid-guard.sh        (CLI: on|off|toggle|confirm-toggle|status)
+│   ├── guards-doctor.sh    (one-shot per-boot health check: guard units, disk/RAM/battery,
+│                            gh/vercel/turso auth, internal-SSD link errors)
+│   ├── dirty-work-nudge.sh (hourly scan for repos with uncommitted changes >45 min old;
+│                            reminder ONLY — never commits or pushes)
+│   ├── guarded-install     (pre-flight wrapper: refuse/warn when an install may outgrow
+│                            free space; runs a cleanup pass before and after)
 │   └── lid-guard-tray.sh   (tray icon — kept for non-COSMIC desktops; NOT enabled by default,
 │                            see Environment Reality: COSMIC registers it but doesn't render it)
 ├── systemd/
 │   ├── disk-cleanup.service / .timer
 │   ├── battery-guard.service
 │   ├── lid-guard.service       (enabled — ON by default at every login)
+│   ├── guards-doctor.service / .timer   (enabled — fires ~2 min after login, once per boot)
+│   ├── dirty-work-nudge.service / .timer (enabled — hourly, offset from boot by 25 min)
 │   └── lid-guard-tray.service  (installed, NOT enabled — see above)
 ├── desktop/
 │   └── lid-guard-toggle.desktop  (pinnable launcher — the panel presence that actually works
@@ -156,6 +170,38 @@ for lid-guard's panel switch) — see `install.sh`.
   confirm-toggle` and any key combo that isn't already claimed by something else (e.g. avoid
   Ctrl+P — that's Print in most apps).
 
+- **`guards-doctor.sh`** answers one question ~2 min after every login: "did all of yesterday's
+  setup actually come up?" — because on an ephemeral live session every boot is a fresh boot,
+  and a crashed COSMIC shell (happened 2026-08-23) can leave user units in surprising states.
+  It checks each guard unit, disk/RAM/battery, gh/vercel/turso auth, and (informationally)
+  whether the internal SSD is present and logging SATA link errors this boot. Design points:
+  every external call is `timeout`-wrapped so nothing hangs; a connectivity probe runs first
+  so a DNS hiccup reads as "auth checks skipped (offline)" instead of "logged out" — vercel
+  alone needs ~9s cold (slow Node CLI start), so timeouts are generous; exit code reflects
+  only real failures.
+- **`dirty-work-nudge.sh`** covers the one loss that cleanup guards can't prevent: uncommitted
+  work dying with the session (it has happened). Hourly, it scans for repos with changes older
+  than 45 min (fresh edits are ignored — don't interrupt work-in-flight) and notifies at most
+  once per 2 h per repo. It NEVER commits, pushes, or touches anything. Extra scan roots go in
+  `~/.config/guards/project-dirs`, one path per line; heavy trees (`node_modules`, `.cache`,
+  `.hermes`, …) are pruned from the walk.
+- **`guarded-install`** attacks the historical #1 failure mode directly: big installs
+  (pip/torch, npm) outgrowing the overlay mid-extract. It refuses to run when projected need
+  (`--need-mb N`, default 1000, +400 margin) doesn't fit current free space, runs one
+  synchronous cleanup pass first to maximize headroom, then reports the space delta after.
+  Not a watchdog replacement for huge installs (see Method §6) — a pre-flight gate for the
+  common case.
+- **`disk-cleanup.sh` additions**: package-manager download caches (pip/npm/yarn/go/cargo/uv/
+  electron) are now *gated* — purged only when usage closes within 10% of the threshold, and
+  never while a package manager process is running (purging a cache under a live install risks
+  corrupting it). Unconditional purging meant every install re-downloaded everything. When
+  usage hits that same "elevated" band, the 3-hour /tmp sweep fires *before* full emergency —
+  predictive rather than reactive. Every step's measured frees accumulate into a per-session
+  tally (`~/.local/state/disk-cleanup/offender-tally.tsv`); the top eaters are surfaced once
+  per boot as a digest notification, and anytime via `disk-cleanup.sh --digest` — this is how
+  chronic offenders (stale Claude CLI versions, Brave's Service Worker cache) were originally
+  discovered, minus the manual log-grepping.
+
 ### 4. Enable and verify
 ```
 systemctl --user daemon-reload
@@ -164,7 +210,9 @@ systemctl --user enable --now battery-guard.service
 ~/bin/battery-guard.sh --test 15         # confirm sound + volume ramp + dialog before trusting it unattended
 systemctl --user enable --now lid-guard.service        # default ON
 systemd-inhibit --list | grep lid-guard  # confirm the inhibitor is actually held
-
+systemctl --user enable --now guards-doctor.timer      # per-boot health check
+systemctl --user enable --now dirty-work-nudge.timer   # hourly uncommitted-work reminder
+~/bin/guards-doctor.sh                   # run the doctor once by hand to confirm all green
 mkdir -p ~/.local/share/applications
 cp desktop/lid-guard-toggle.desktop ~/.local/share/applications/
 update-desktop-database ~/.local/share/applications
@@ -286,6 +334,24 @@ IF any step would touch session data (chat history, credentials, config, code) r
    clearly-named cache/log/tmp path
 THEN don't automate it — name it as permanently excluded in both the script comments and the
      notification, so a high-usage alert doesn't get mistaken for something broken.
+
+IF a cache purge has a re-download cost (pip/npm/uv/go/cargo registries)
+THEN gate it on proximity to the space threshold instead of running it unconditionally every
+     cycle, and skip while that package manager is mid-install — unconditional purging turns
+     "cleanup" into "make every future install slower and more download-heavy."
+
+IF a health check shells out to network CLIs
+THEN probe connectivity first and report "skipped (offline)" rather than "not authenticated,"
+     and time each CLI generously against its real cold-start cost (vercel: ~9s) before
+     calling it a failure — otherwise every DNS hiccup produces a false alarm.
+
+IF work-loss protection is wanted on an ephemeral session
+THEN remind about uncommitted changes on a cadence; never auto-commit/auto-push. Pushes happen
+     only after the human validates. A reminder preserves choice; automating the push removes it.
+
+IF a cleanup script measures freed space per step anyway
+THEN accumulate it into a per-session tally and surface the top eaters periodically — root
+     causes (a specific tool's cache) are fixed once; mopping repeats forever.
 ```
 
 ---
@@ -425,6 +491,17 @@ wait
 - [ ] If a tray icon is in use on a non-COSMIC desktop: after `lid-guard.sh toggle`,
       `RegisteredStatusNotifierItems` still reports exactly 1 item (not 0 — icon died; not >1 —
       the respawn loop leaked a duplicate).
+- [ ] `guards-doctor.sh` run once by hand: all guard units ✓, CLI auths ✓ (or "skipped
+      (offline)" — never a false "not authenticated"), exit code 0 when nothing failed.
+- [ ] `dirty-work-nudge.sh` verified end-to-end with a synthetic dirty repo (old-mtime edit):
+      detects once, notifies, and does NOT re-nudge on an immediate second run; synthetic repo
+      removed afterward.
+- [ ] `guarded-install` verified both ways: a trivial command passes (with the pre/post cleanup
+      passes visible in output), and an oversized `--need-mb` is REFUSED with exit 1.
+- [ ] `disk-cleanup.sh --digest` prints an aggregated tally (and the once-per-boot digest
+      notification fired exactly once — `digest-boot-id` marker present).
+- [ ] New timers appear in `systemctl --user list-timers` (guards-doctor: no NEXT until reboot
+      is correct for a once-per-boot timer; dirty-work-nudge: NEXT ≈ last + 1h).
 
 ---
 
@@ -434,10 +511,10 @@ wait
   with a 7.7G overlay root and passwordless sudo. On GNOME-based sessions, notifications
   usually work without installing anything extra; COSMIC currently does not ship
   `libnotify-bin`/`zenity` by default — adjust `install.sh`'s package list per DE if it drifts.
-- **The default `THRESHOLD=85` in `disk-cleanup.sh` is tuned for a session with a large agent
-  framework installed.** On a lean session without something Hermes-sized, `THRESHOLD=65` is a
-  more useful "something's actually wrong" signal — set it back down if you're not installing
-  anything comparably large.
+- **The `THRESHOLD` in `disk-cleanup.sh` is per-session tuning, not a constant.** It has moved
+  65 → 85 → 75 across sessions as installed software changed the legitimate resting baseline
+  (see Decision Rules). Re-tune it to the session, and remember the gated cache-eviction band
+  (`THRESHOLD - 10`) moves with it.
 - **The dev-CLI bootstrap is documented, not automated**, because every login step ends in a
   human clicking "Authorize" with their own credentials/2FA — that boundary is intentional, not
   a gap to close.

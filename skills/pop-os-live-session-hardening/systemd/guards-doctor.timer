@@ -1,0 +1,9 @@
+[Unit]
+Description=Run guards-doctor once per boot, ~2 min after login
+
+[Timer]
+OnBootSec=2min
+AccuracySec=15s
+
+[Install]
+WantedBy=timers.target

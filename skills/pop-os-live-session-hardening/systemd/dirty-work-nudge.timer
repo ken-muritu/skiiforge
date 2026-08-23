@@ -1,0 +1,10 @@
+[Unit]
+Description=Nudge about uncommitted work hourly (reminder only)
+
+[Timer]
+OnBootSec=25min
+OnUnitActiveSec=1h
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

@@ -7,7 +7,21 @@ THRESHOLD=75
 STATE_DIR="$HOME/.local/state/disk-cleanup"
 LOCK_FILE="$STATE_DIR/run.lock"
 LOG_FILE="$STATE_DIR/cleanup.log"
+TALLY_FILE="$STATE_DIR/offender-tally.tsv"   # per-run "step<TAB>KB freed" rows
+BOOT_MARKER="$STATE_DIR/digest-boot-id"      # boot_id already digest-notified
 mkdir -p "$STATE_DIR"
+
+# --digest: print cumulative top space-eaters this session (aggregated from
+# every step's measured frees) without running any cleanup. Root-cause view:
+# shows which tools chronically leak so they can be fixed at the source.
+if [ "${1:-}" = "--digest" ]; then
+  if [ ! -f "$TALLY_FILE" ]; then
+    echo "no offender tally yet (nothing freed since session start)"
+    exit 0
+  fi
+  awk -F'\t' '{s[$1]+=$2} END{for(d in s) printf "%8.0fMB  %s\n", s[d]/1024, d}' "$TALLY_FILE" | sort -rn
+  exit 0
+fi
 
 log() { echo "$(date -Iseconds) $*" >> "$LOG_FILE"; }
 
@@ -57,10 +71,42 @@ step() {
     freed=$(( a - b ))
     if [ "$freed" -gt 1024 ]; then
       CLEARED+=("$desc (~$(( freed / 1024 ))MB)")
+      # cumulative per-step tally -> root-cause digest (see --digest / end of run)
+      printf '%s\t%s\n' "$desc" "$freed" >> "$TALLY_FILE"
     fi
   else
     log "step failed (non-fatal): $desc"
   fi
+}
+
+# Package-manager download caches are pure re-download cost when purged
+# preemptively: an unconditional every-5-min purge means every install
+# re-fetches everything (slower, more bandwidth, more disk churn from the
+# partial downloads themselves). Evict them only when usage is within
+# EVICT_MARGIN_PCT of the threshold — i.e. when the space will actually be
+# needed soon — and never while a package manager is mid-install, since
+# purging its cache under it risks corrupting an in-flight install.
+EVICT_MARGIN_PCT=10
+
+pkg_manager_busy() {
+  local p
+  for p in npm pnpm yarn pip pip3 uv cargo go; do
+    pgrep -x "$p" >/dev/null 2>&1 && return 0
+  done
+  return 1
+}
+
+step_gated() {
+  local desc="$1"; shift
+  if pkg_manager_busy; then
+    log "skip: $desc (package manager running)"
+    return 0
+  fi
+  if [ "$(usage_pct)" -lt $(( THRESHOLD - EVICT_MARGIN_PCT )) ]; then
+    log "skip: $desc (usage below ${THRESHOLD}-${EVICT_MARGIN_PCT}% evict line)"
+    return 0
+  fi
+  step "$desc" "$@"
 }
 
 # ---- user-space caches (no root needed) ----
@@ -217,13 +263,13 @@ step "Thumbnail cache"  clean_thumbs
 step "Browser caches"   clean_browsers
 step "Chromium profile caches (Service Worker/GPUCache/etc.)" clean_chromium_profile_caches
 step "Stale Claude CLI versions" clean_stale_claude_versions
-step "pip cache"        clean_pip
-step "npm cache"        clean_npm
-step "yarn cache"       clean_yarn
-step "Go build cache"   clean_go
-step "Cargo registry cache" clean_cargo
-step "uv package cache" clean_uv
-step "Electron download cache" clean_electron_cache
+step_gated "pip cache"        clean_pip
+step_gated "npm cache"        clean_npm
+step_gated "yarn cache"       clean_yarn
+step_gated "Go build cache"   clean_go
+step_gated "Cargo registry cache" clean_cargo
+step_gated "uv package cache" clean_uv
+step_gated "Electron download cache" clean_electron_cache
 step "Hermes audio/image cache (>2d)" clean_hermes_caches
 step "Hermes __pycache__"      clean_hermes_pycache
 step "Hermes log rotation (>5MB)" rotate_hermes_logs
@@ -252,6 +298,15 @@ if [ "$HAVE_SUDO" -eq 1 ]; then
   command -v podman  >/dev/null 2>&1 && step "Unused podman data"       clean_podman
 else
   log "no passwordless sudo: skipped root-owned cleanup steps"
+fi
+
+# Predictive, not just reactive: once usage closes on the threshold, run the
+# 3-hour /tmp sweep NOW instead of waiting for a full emergency. /tmp is a
+# RAM-backed tmpfs the standard 1-day sweep misses for hours; relieving it
+# early keeps the session away from both the disk and RAM emergency paths.
+if [ "$HAVE_SUDO" -eq 1 ] && [ "$(usage_pct)" -ge $(( THRESHOLD - EVICT_MARGIN_PCT )) ]; then
+  log "usage within ${EVICT_MARGIN_PCT}% of threshold — elevated pre-clean"
+  step "Elevated: early /tmp sweep (>3h)" deep_tmp_sweep
 fi
 
 EMERGENCY_FLOOR_KB=400000
@@ -311,6 +366,27 @@ if [ -d "$HOME/.hermes" ]; then
   hermes_mb=$(du -sm "$HOME/.hermes" 2>/dev/null | cut -f1)
   hermes_note="
 Hermes agent: ~${hermes_mb}MB (not cleaned, excluded by design)"
+fi
+
+# Compact the tally (aggregate duplicate step names) so it stays tiny, and
+# once per boot surface the session's top space-eaters as a digest
+# notification — how the next chronic offender gets noticed without grepping
+# logs (this is how the Claude-versions and Brave SW-cache leaks were found).
+if [ -f "$TALLY_FILE" ]; then
+  digest="$(awk -F'\t' '{s[$1]+=$2} END{for(d in s) printf "%d\t%s\n", s[d], d}' "$TALLY_FILE" | sort -rn)"
+  printf '%s\n' "$digest" > "$TALLY_FILE"
+  boot_id="$(cat /proc/sys/kernel/random/boot_id 2>/dev/null)"
+  if [ -n "$boot_id" ] && [ "$(cat "$BOOT_MARKER" 2>/dev/null)" != "$boot_id" ]; then
+    top5="$(printf '%s\n' "$digest" | head -5 | awk -F'\t' '{printf "• %s — ~%dMB total\n", $2, $1/1024}')"
+    if [ -n "$top5" ]; then
+      notify-send -u normal -i drive-harddisk \
+        "Session space digest — top eaters" \
+        "${top5}
+Full list anytime: disk-cleanup.sh --digest"
+    fi
+    echo "$boot_id" > "$BOOT_MARKER"
+    log "digest notified for boot $boot_id"
+  fi
 fi
 
 notify-send -u "$urgency" -i drive-harddisk "$title" "${summary}
