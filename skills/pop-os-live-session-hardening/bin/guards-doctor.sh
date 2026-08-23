@@ -94,14 +94,24 @@ else
 fi
 
 if [ "$online" -eq 1 ]; then
-  if timeout 15 gh auth status >/dev/null 2>&1; then
+  # One retry each: transient DNS blips (observed live) must not read as logout.
+  retry() { # retry <timeout> <cmd...> — runs cmd twice, returns first success
+    local t="$1"; shift
+    timeout "$t" "$@" >/dev/null 2>&1 && return 0
+    sleep 2
+    timeout "$t" "$@" >/dev/null 2>&1
+  }
+
+  if retry 15 gh auth status; then
     ok "gh authenticated ($(timeout 15 gh api user --jq .login 2>/dev/null || echo '?'))"
   else
     bad "gh NOT authenticated — run: gh auth login"
   fi
 
-  # vercel is a slow-starting Node CLI: measured ~9s cold, so 25s ceiling
-  vc_user="$(timeout 25 vercel whoami 2>/dev/null | tail -1)"
+  # vercel is a slow-starting Node CLI: measured 8.6–14s+ depending on network,
+  # so a generous ceiling plus the shared retry
+  vc_user="$(timeout 40 vercel whoami 2>/dev/null | tail -1)"
+  [ -z "$vc_user" ] && { sleep 2; vc_user="$(timeout 40 vercel whoami 2>/dev/null | tail -1)"; }
   if [ -n "$vc_user" ]; then
     ok "vercel authenticated ($vc_user)"
   else
@@ -109,6 +119,7 @@ if [ "$online" -eq 1 ]; then
   fi
 
   ts_user="$(timeout 15 turso auth whoami 2>/dev/null || timeout 15 turso whoami 2>/dev/null | tail -1)"
+  [ -z "$ts_user" ] && { sleep 2; ts_user="$(timeout 15 turso auth whoami 2>/dev/null || timeout 15 turso whoami 2>/dev/null | tail -1)"; }
   if [ -n "$ts_user" ]; then
     ok "turso authenticated ($ts_user)"
   else
