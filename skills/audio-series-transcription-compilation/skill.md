@@ -1,15 +1,23 @@
-# Audio Series → Split → Transcribe → Compile → Verify Skill
+# Audio Series → Compress (Split if Needed) → Transcribe → Compile → Verify Skill
 
 ## Purpose
 
 Turn a folder of long raw audio/video recordings (a multi-part sermon/lecture/talk series,
 meeting recordings, etc.) into one polished, chronologically-correct, voice-preserving,
-fact-verified markdown document — reproducibly, end to end: **split** into manageable chunks,
-**transcribe** each chunk via a speech-to-text API, **consolidate** chunks back into one
-transcript per source recording, **compile** all of it into a single publication-quality
-document using an LLM with a specific, load-bearing prompt, then **verify** every
-scripture/source citation the compiled document contains against a real source before calling
-it done.
+fact-verified markdown document — reproducibly, end to end: get each source recording down to
+**one complete audio file** (compress first; only **split** into the minimum number of chunks
+if compression genuinely can't get it under the API's limits), **transcribe** each file/chunk
+via a speech-to-text API, **consolidate** back into one transcript per source recording (a
+no-op if it was never split), **compile** all of it into a single publication-quality document
+using an LLM with a specific, load-bearing prompt, then **verify** every scripture/source
+citation the compiled document contains against a real source before calling it done.
+
+**Splitting is a fallback, not the default step.** The most common real mistake with this
+skill is reaching for a fixed-size split (e.g. "29-minute parts") on every source regardless
+of whether it's actually needed. Check Method §1 before doing that — most single sermons/
+teachings compress to well under the API's limits as one file, and a single continuous
+transcription pass is both cheaper and cleaner (no part-boundary seams to verify) than
+stitching chunks back together.
 
 Built and verified on a real 5-part "Faith" sermon series (Pastor Charles Muchemi): 5 source
 `.mp4` files (53–99 minutes each) → 17 stream-copy-split parts → 17 real transcriptions via
@@ -18,7 +26,14 @@ document with correct chronological reordering (the numbered parts were **not** 
 1-2-3-4-5 order — the compile step had to figure that out from internal evidence). Extended
 after a follow-up 3-part "Emotional Intelligence" series (same speaker) surfaced a real
 citation error the compiling model was confident about and wrong on — see the Scripture
-Citation Rule under Decision Rules and Method §5.
+Citation Rule under Decision Rules and Method §5. Further extended after a 3-source "Kisumu
+Day 2" run got the split step backwards — it split every source into fixed 29-minute chunks
+unconditionally (matching the *Faith* series' pattern) without first checking whether a
+compressed single file would fit under the API's limits, which for a single ~1.5–2.5 hour
+sermon it almost always does (a same-environment "God Gives Kingdom" run had already
+established this: a 101-minute source compressed to 56MB and was transcribed as one file, no
+split at all). That run also surfaced an undocumented **duration** ceiling on top of the known
+100MB size ceiling — see "Modulate API Reference" and Method §1.
 
 ---
 
@@ -57,7 +72,7 @@ Do NOT use for:
 
 | Input | How to obtain |
 |---|---|
-| Source recordings | Named `<PREFIX> <N>.<ext>` (e.g. `Faith 1.mp4`) — the scripts here rely on this exact naming to auto-discover files and derive output names. Rename first if they don't already follow it. |
+| Source recordings | Any filename works for the common single-file-per-source path (Method §1). Only the fallback split path needs the `<PREFIX> <N>.<ext>` convention (e.g. `Faith 1.mp4`) — `split-audio.sh`/`consolidate-transcripts.sh` rely on it to auto-discover parts and derive output names. |
 | `ffmpeg` | `sudo apt-get install -y ffmpeg` (also installs `ffprobe`, used to sanity-check durations) |
 | A speech-to-text API + key | This skill is written against **Modulate** (`docs.modulate.ai`) — see §"Modulate API Reference" below for the exact contract. Swap `bin/transcribe.py`'s `API_URL`/request shape if using a different provider; the rest of the pipeline (split, consolidate, compile) is provider-agnostic. |
 | `python3` + `requests` | `python3 -c "import requests"` to check; `pip install requests` (or your distro's equivalent) if missing. |
@@ -74,8 +89,24 @@ Do NOT use for:
 - **Endpoint used here:** `POST /velma-2-stt-batch` — multilingual, synchronous, speaker
   diarization available
 - **Submission:** multipart form, field name `upload_file`
-- **Supported formats:** `.aac .aiff .flac .mov .mp3 .mp4 .ogg .opus .wav .webm`
-- **Limits:** 100MB max file size (`413` if exceeded), empty files rejected (`400`)
+- **Supported formats:** `.aac .aiff .flac .mov .mp3 .mp4 .ogg .opus .wav .webm` — note **`.m4a`
+  is NOT supported** despite being a common yt-dlp/ffmpeg output container (see below);
+  convert to `.mp3` before uploading.
+- **Limits:** 100MB max file size (`413` if exceeded), empty files rejected (`400`) — **and a
+  separate, undocumented duration ceiling somewhere between 7,000s (~1h56m, confirmed working)
+  and 8,797s (~2h26m, confirmed failing)**, found empirically 2026-08-26: a mono-64kbps-mp3 file
+  at 7000s/56MB transcribed fine; the same encode settings on an 8797s/70MB file from a
+  different source (well under the 100MB size cap) failed every retry with a `400` "The audio
+  could not be processed. It may be corrupted or in an unsupported format." error, even though
+  `ffmpeg -f null -` confirmed the file decoded cleanly end to end with zero errors. Splitting
+  that one file in half (two ~4400s/35MB parts) transcribed both halves without issue. **Treat
+  ~1h55m (6,900s) as the safe per-call ceiling** until narrowed further, and check duration
+  independently of size — a file well under 100MB can still fail purely for being too long.
+- **Unsupported format is a hard `400`, not a `413`:** uploading `.m4a` (not in the supported-
+  formats list) fails fast before any real processing — cheap/harmless to hit by accident (e.g.
+  leaving both a source `.m4a` and its converted `.mp3` in the same folder when calling
+  `transcribe.py`; the `.m4a` attempt just fails fast and the `.mp3` attempt still succeeds
+  right after), but don't rely on that — just don't hand it `.m4a` files in the first place.
 - **Response:** `{"text": "...", "duration_ms": N, "utterances": [{"utterance_uuid", "text",
   "start_ms", "duration_ms", "speaker", "language", ...}]}` — this skill's script only uses
   the top-level `text` field; `utterances` is there if you want per-speaker/per-timestamp
@@ -96,10 +127,23 @@ Do NOT use for:
 
 ## Outputs
 
+**Common case — source compresses under both API caps, no split needed:**
 ```
 Downloads/
-├── <Prefix> Parts (29min)/                  ← split-audio.sh output
-│   ├── <Prefix> 1 - Part 1.mp4
+├── <Source>.m4a                              ← raw download, kept for reference
+├── <Source>.mp3                              ← compressed complete file (Method §1)
+└── Transcripts/
+    └── <Source>.txt                          ← transcribe.py output, one call, no stitching
+```
+Repeat per source recording; the "compile" step (§4) reads directly from each source's single
+`Transcripts/<Source>.txt`. No `consolidate-transcripts.sh` step needed — there's nothing to
+join.
+
+**Fallback case — a source is too long/large even compressed, so it was split:**
+```
+Downloads/
+├── <Prefix> Parts (29min)/                  ← split-audio.sh output (or manual -ss/-t cuts
+│   ├── <Prefix> 1 - Part 1.mp4                 into the minimum part count, see Method §1)
 │   ├── <Prefix> 1 - Part 2.mp4  ...
 │   └── Transcripts/                          ← transcribe.py output
 │       ├── <Prefix> 1 - Part 1.txt
@@ -110,35 +154,82 @@ Downloads/
 └── <Compiled Document Title>.md              ← the final compile step's output
 ```
 
+Either way, the compile step (§4) produces one `<Compiled Document Title>.md` reading from
+whichever per-source transcripts exist (single-file or consolidated) — the compiled document's
+structure doesn't change based on which path a given source took to get there.
+
 ---
 
 ## Method
 
-### 1. Split
+### 1. Get each source down to one complete file — compress before you split
+
+**Automated:** `bin/prepare-audio.sh <src_dir> <prefix>` does exactly what this section
+describes — compresses each `<prefix> <N>.<ext>` source to mono 64kbps mp3, checks the result
+against both caps, and only falls back to a minimal split (not a fixed segment length) if it
+still doesn't clear them. Prefer this over doing the steps below by hand.
+
+**Default path (works for most single sermons/teachings, up to ~1h55m):** convert straight to
+a compact single mp3, no splitting:
 ```bash
-bin/split-audio.sh ~/Downloads "Faith" 29
+ffmpeg -y -i "Source.m4a" -vn -ac 1 -ar 44100 -c:a libmp3lame -b:a 64k "Source.mp3"
 ```
-Splits every `Faith <N>.<ext>` in `~/Downloads` into 29-minute stream-copy parts. Verify
-part counts/durations before moving on — `ffprobe -v error -show_entries format=duration
--of csv=p=0 <file>` on each output, cross-checked against `total_duration / (segment_minutes
-* 60)` rounded up.
+Downmixing to mono (`-ac 1`) matters — a stereo source at the same bitrate setting roughly
+doubles the resulting file size for no transcription-accuracy benefit; speech content is
+mono-equivalent anyway. 64kbps mono keeps even a ~2 hour recording around 55-70MB, comfortably
+under the 100MB size cap — the *duration* cap (~1h55m safe ceiling, see Modulate API Reference)
+is what actually binds first for anything sermon-length or longer, not size.
+
+Check both constraints on the compressed output before deciding you're done:
+```bash
+ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 "Source.mp3"
+```
+If duration ≤ ~6,900s AND size ≤ 100MB: you're done, transcribe this one file, skip splitting
+entirely. This is the common case — verified on real single-session teachings from 56min to
+~2h03m (Day-2 Kisumu run: three ~1h31m–2h03m sources all compressed to 44-71MB and transcribed
+as one file each, no splitting, after an earlier pass on the same sources had wastefully forced
+them all through fixed 29-minute chunking instead).
+
+**Fallback (only if the compressed file still exceeds either cap — most often because the
+source itself runs longer than ~2 hours):** split into the *minimum* number of roughly-equal
+parts that clears both caps, not a fixed default segment length:
+```bash
+n=$(python3 -c "import math; print(math.ceil(<duration_seconds>/6900))")
+# then split into n parts, e.g. via bin/split-audio.sh's segment-time approach, or manual
+# ffmpeg -ss/-t cuts at duration/n boundaries — whichever is more convenient for n parts.
+bin/split-audio.sh ~/Downloads "Faith" 29   # legacy fixed-minutes form, still fine when a
+                                             # source is long enough that a ~29min segment
+                                             # length happens to divide it into few-enough parts
+```
+`bin/split-audio.sh` still exists and still works exactly as before for a genuinely long
+source (e.g. the original 5-part *Faith* series, or a multi-hour full-service recording).
+Don't reach for it (or any splitting) first — verify the compressed single file doesn't
+already clear both caps. When splitting genuinely is needed, prefer the smallest part count
+that clears both caps (e.g. a source at 2h26m only needs 2 parts, not 5-6) — verify part
+counts/durations before moving on — `ffprobe -v error -show_entries format=duration -of csv=p=0
+<file>` on each output.
 
 ### 2. Transcribe
 ```bash
-python3 bin/transcribe.py "$HOME/Downloads/Faith Parts (29min)"
+python3 bin/transcribe.py "$HOME/Downloads"                    # common case: whole folder,
+                                                                 # single files, one call each
+python3 bin/transcribe.py "$HOME/Downloads/Faith Parts (29min)" # fallback case: a Parts folder
 ```
-Run this as a **background** task (it's slow — budget ~1-2 min per 29-minute part) and check
-back rather than blocking on it. Test on one file first (`transcribe.py <dir> "Part 1"`) to
-confirm the API key and request shape work before committing to the full batch — this is
-cheap insurance against discovering an auth/format problem 15 files in.
+Run this as a **background** task and check back rather than blocking on it — budget ~1-2 min
+per 29-minute part in the fallback case, but a single-file call on a ~1.5-2 hour source takes
+proportionally longer (several minutes), not less just because it's one call. Test on one
+file first (`transcribe.py <dir> "<name filter>"`) to confirm the API key and request shape
+work before committing to a full batch of several sources — cheap insurance against
+discovering an auth/format problem partway through.
 
-### 3. Consolidate
+### 3. Consolidate — only if a source was split
 ```bash
 bin/consolidate-transcripts.sh "$HOME/Downloads/Faith Parts (29min)/Transcripts" "Faith"
 ```
 Joins parts back into one transcript per original recording. Spot-check a join boundary
 (the point where two parts meet) to confirm it reads as a natural mid-sentence cut, not
-mangled or duplicated text.
+mangled or duplicated text. **Skip this step entirely for any source that stayed a single
+file** — its `Transcripts/<Source>.txt` from step 2 already is the complete transcript.
 
 ### 4. Compile
 Gather the N consolidated transcripts (from step 3) plus any broader-context recordings.
@@ -196,6 +287,13 @@ THEN apply the Scripture Citation Rule: verify the correct reference against a r
      all) in the name of tidiness. See `prompts/compile-teaching.md` for the exact rendering
      pattern and a worked example.
 
+IF you're about to split a source into fixed-size chunks (e.g. "29-minute parts") without
+   first checking whether a compressed single file clears both API caps
+THEN stop — that's the exact mistake a real run made (Method §1's "Kisumu Day 2" note). Convert
+     to mono + a moderate bitrate first, check duration AND size against the caps, and only
+     split if that single file still doesn't clear both. Most single sermons/teachings don't
+     need splitting at all.
+
 IF new source recordings land in the folder after earlier ones were already processed
 THEN just re-run split → transcribe → consolidate on the whole folder again — all three
      scripts are idempotent/incremental by design and will only touch the new files.
@@ -213,14 +311,21 @@ THEN that's a hard failure of the compile step, not a stylistic nitpick — the 
 
 ## Best Practices
 
-- **Verify the pipeline on one file end-to-end before batching.** Split one recording,
-  transcribe one part, confirm the transcript reads correctly, *then* run the full batch.
+- **Compress to one file and check both caps before ever splitting.** This is the single
+  highest-value habit this skill teaches — see Method §1. Don't default to splitting just
+  because a previous run (even a previous run *in this same skill's history*) split.
+- **Verify the pipeline on one file end-to-end before batching.** Whichever path Method §1
+  puts you on (single file or split), transcribe one file/part first, confirm the transcript
+  reads correctly, *then* run the full batch.
 - **Store the API key outside any git-tracked directory**, `chmod 600`, referenced by path
   from the script — never inline in code that might get committed or shared.
 - **Run the transcription step as a background/async task** and check back — it's the slow
-  part of the pipeline by a wide margin, and blocking on it wastes a foreground turn.
-- **Keep the numbered-parts naming convention (`<Prefix> <N>.<ext>`) consistent** across a
-  whole series — every script here depends on it for auto-discovery.
+  part of the pipeline by a wide margin, and blocking on it wastes a foreground turn. A
+  single-file call on a ~1.5-2 hour source can itself take several minutes — budget for that,
+  don't assume it's fast just because it's one call instead of several.
+- **When splitting is genuinely needed, keep the numbered-parts naming convention
+  (`<Prefix> <N>.<ext>`) consistent** across a whole series — every script here depends on it
+  for auto-discovery.
 - **Give the compile step the broader-context recordings if you have them**, even though
   they're "just context" — they're what makes correct chronological reordering possible
   when the numbered parts alone don't carry enough evidence.
@@ -229,6 +334,11 @@ THEN that's a hard failure of the compile step, not a stylistic nitpick — the 
 
 ## Common Pitfalls
 
+0. **Splitting into fixed-size chunks by default, without checking if a compressed single
+   file would clear both API caps.** This happened in a real run (three ~1.5-2.5 hour sources
+   all force-split into 29-minute parts unconditionally) even though this exact skill's own
+   history already had the counter-example (a single 101-minute source compressed to 56MB and
+   transcribed whole). Always try Method §1's compress-first path before splitting.
 1. **Trusting numbered file order as chronological order.** The whole reason this skill's
    compile prompt exists is that this assumption was wrong in the reference case — Part 1
    was not taught first.
@@ -290,14 +400,20 @@ actual_parts=$(ls "$out_dir/$prefix $n - Part "*.* | wc -l)
 
 ## Validation Checklist
 
-- [ ] `ffmpeg`/`ffprobe` confirmed installed before splitting.
-- [ ] Split part count per source file matches `ceil(duration / segment_length)`.
+- [ ] Every source was compressed to a single mono file and checked against BOTH the 100MB
+      size cap and the ~1h55m duration cap before deciding whether it needed splitting at all.
+- [ ] `ffmpeg`/`ffprobe` confirmed installed.
+- [ ] If a source did need splitting: part count matches the minimum needed to clear both
+      caps, not a fixed default segment length assumed without checking.
+- [ ] No `.m4a` (or other unsupported-format) file was left for `transcribe.py` to attempt —
+      harmless if it happens, but check for it rather than relying on the fast-fail.
 - [ ] API key stored at `~/.config/modulate/api_key`, `chmod 600`, not present in any script.
 - [ ] One file transcribed and manually read before running the full batch.
 - [ ] Transcription run as background/async, not blocking a short-timeout foreground call.
 - [ ] Every source file has a corresponding non-empty `.txt` transcript (no silent skips due
       to a bug rather than genuine "already done").
-- [ ] Consolidated per-recording transcripts read naturally across part-join boundaries.
+- [ ] If any sources were split: consolidated per-recording transcripts read naturally across
+      part-join boundaries.
 - [ ] Compiled document's session order verified against internal evidence, not assumed from
       file numbering.
 - [ ] Every prayer/declaration/punchline/named-illustration from the source transcripts is
