@@ -13,10 +13,12 @@ sudo apt-get install -y libnotify-bin zenity copyq yad
 echo "==> Installing scripts to ~/bin"
 mkdir -p "$HOME/bin"
 cp "$SCRIPT_DIR"/bin/disk-cleanup.sh "$SCRIPT_DIR"/bin/battery-guard.sh \
+   "$SCRIPT_DIR"/bin/blackout-guard.sh \
    "$SCRIPT_DIR"/bin/lid-guard.sh "$SCRIPT_DIR"/bin/lid-guard-tray.sh \
    "$SCRIPT_DIR"/bin/guards-doctor.sh "$SCRIPT_DIR"/bin/dirty-work-nudge.sh \
    "$SCRIPT_DIR"/bin/guarded-install "$HOME/bin/"
 chmod +x "$HOME/bin/disk-cleanup.sh" "$HOME/bin/battery-guard.sh" \
+         "$HOME/bin/blackout-guard.sh" \
          "$HOME/bin/lid-guard.sh" "$HOME/bin/lid-guard-tray.sh" \
          "$HOME/bin/guards-doctor.sh" "$HOME/bin/dirty-work-nudge.sh" \
          "$HOME/bin/guarded-install"
@@ -25,6 +27,7 @@ echo "==> Installing systemd --user units"
 mkdir -p "$HOME/.config/systemd/user"
 cp "$SCRIPT_DIR"/systemd/disk-cleanup.service "$SCRIPT_DIR"/systemd/disk-cleanup.timer \
    "$SCRIPT_DIR"/systemd/battery-guard.service "$SCRIPT_DIR"/systemd/lid-guard.service \
+   "$SCRIPT_DIR"/systemd/blackout-guard.service "$SCRIPT_DIR"/systemd/blackout-guard.timer \
    "$SCRIPT_DIR"/systemd/lid-guard-tray.service \
    "$SCRIPT_DIR"/systemd/guards-doctor.service "$SCRIPT_DIR"/systemd/guards-doctor.timer \
    "$SCRIPT_DIR"/systemd/dirty-work-nudge.service "$SCRIPT_DIR"/systemd/dirty-work-nudge.timer \
@@ -43,6 +46,7 @@ echo "==> Enabling services"
 systemctl --user daemon-reload
 systemctl --user enable --now disk-cleanup.timer
 systemctl --user enable --now battery-guard.service
+systemctl --user enable --now blackout-guard.timer    # nightly-blackout protection: unplug + low battery + idle -> close apps, suspend
 systemctl --user enable --now lid-guard.service       # default ON: lid close does nothing
 systemctl --user enable --now guards-doctor.timer     # once-per-boot health check of all guards
 systemctl --user enable --now dirty-work-nudge.timer  # hourly uncommitted-work reminder (never commits)
@@ -63,6 +67,14 @@ Done.
   - disk-cleanup.timer runs every 5 minutes (see skill.md for the 65%/85% threshold note)
   - battery-guard.service runs continuously; test it anytime with:
       ~/bin/battery-guard.sh --test 15
+  - blackout-guard.timer checks every 60s: if the charger is unplugged AND battery is
+    <= 60% AND there's been no keyboard/mouse activity for ~10 min, it gracefully closes
+    browsers/media players (they restore their tabs/state on next launch) and suspends to
+    RAM — so an overnight blackout can't drain the battery dead and kill the session
+    (suspend keeps the session alive in RAM). Terminals, claude, and hermes are NEVER
+    killed. Inspect/simulate anytime:
+      ~/bin/blackout-guard.sh --status   # current power/idle state and trigger thresholds
+      ~/bin/blackout-guard.sh --test     # full dry run: shows exactly what WOULD happen
   - guards-doctor.timer fires ~2 min after login: one notification confirming every guard
     is armed, resources are sane, and gh/vercel/turso are still authed. Run by hand anytime:
       ~/bin/guards-doctor.sh
@@ -90,7 +102,7 @@ Done.
       ~/bin/lid-guard.sh status          # check which mode is currently active
 
 Check status with:
-  systemctl --user status disk-cleanup.timer battery-guard.service lid-guard.service
+  systemctl --user status disk-cleanup.timer battery-guard.service blackout-guard.timer lid-guard.service
 
 Optional dev tooling (NOT installed by this script — see skill.md "Dev CLI bootstrap"):
   sudo apt-get install -y gh

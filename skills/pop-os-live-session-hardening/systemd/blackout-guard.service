@@ -1,0 +1,6 @@
+[Unit]
+Description=Blackout guard — one condition check (unplugged + low battery + idle -> close apps, suspend)
+
+[Service]
+Type=oneshot
+ExecStart=%h/bin/blackout-guard.sh

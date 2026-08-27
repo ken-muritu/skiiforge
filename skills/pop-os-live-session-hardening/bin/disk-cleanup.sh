@@ -90,7 +90,7 @@ EVICT_MARGIN_PCT=10
 
 pkg_manager_busy() {
   local p
-  for p in npm pnpm yarn pip pip3 uv cargo go; do
+  for p in npm pnpm yarn pip pip3 uv cargo go apt apt-get dpkg; do
     pgrep -x "$p" >/dev/null 2>&1 && return 0
   done
   return 1
@@ -111,7 +111,7 @@ step_gated() {
 
 # ---- user-space caches (no root needed) ----
 clean_trash()    { rm -rf "$HOME"/.local/share/Trash/files/* "$HOME"/.local/share/Trash/info/* 2>/dev/null; }
-clean_thumbs()   { find "$HOME/.cache/thumbnails" -type f -mtime +7 -delete 2>/dev/null; }
+clean_thumbs()   { [ -d "$HOME/.cache/thumbnails" ] && find "$HOME/.cache/thumbnails" -type f -mtime +7 -delete 2>/dev/null; return 0; }
 clean_browsers() {
   local d
   for d in "$HOME/.cache/google-chrome" "$HOME/.cache/BraveSoftware" "$HOME/.cache/chromium" \
@@ -143,7 +143,7 @@ clean_chromium_profile_caches() {
     done
     for profile in "$base"/Default "$base"/Profile\ *; do
       [ -d "$profile" ] || continue
-      for d in "Service Worker" "GPUCache" "Code Cache" "DawnWebGPUCache" "DawnGraphiteCache"; do
+      for d in "Cache" "Service Worker" "GPUCache" "Code Cache" "DawnCache" "DawnWebGPUCache" "DawnGraphiteCache"; do
         [ -d "$profile/$d" ] && rm -rf "${profile:?}/${d:?}" 2>/dev/null
       done
     done
@@ -242,6 +242,28 @@ clean_snap_old() {
   return 0
 }
 clean_apt_index_cache() { sudo rm -f /var/cache/apt/pkgcache.bin /var/cache/apt/srcpkgcache.bin; return 0; }
+# /var/lib/apt/lists/* (the package index, ~350MB after one `apt update`) is
+# pure re-download cost, exactly like the download caches — so it gets the
+# same gated treatment: purge only near the threshold, never mid-install.
+# `apt install` still works after a purge; `apt update` just re-fetches.
+clean_apt_lists() { sudo find /var/lib/apt/lists -mindepth 1 -not -name lock -not -name partial -delete 2>/dev/null; return 0; }
+# rsyslog files grow UNBOUNDED on live-boot (no logrotate config runs for
+# them): found /var/log/syslog at 154MB + 87MB rotated on a 7.7G disk while
+# journalctl vacuuming happily left them alone. Rotated copies (>7d) are
+# deleted outright; live files >50MB are archived to .1 then truncated in
+# place (truncate keeps the inode, so rsyslog keeps writing without a
+# restart).
+clean_rotated_logs() {
+  sudo find /var/log -maxdepth 1 -type f \( -name "*.gz" -o -name "*.1" -o -name "*.old" \) -mtime +7 -delete 2>/dev/null
+  local f
+  for f in /var/log/syslog /var/log/kern.log /var/log/auth.log; do
+    [ -f "$f" ] || continue
+    if [ "$(sudo stat -c%s "$f" 2>/dev/null || echo 0)" -gt 52428800 ]; then
+      sudo cp "$f" "$f.1" 2>/dev/null && sudo truncate -s 0 "$f" 2>/dev/null
+    fi
+  done
+  return 0
+}
 clean_docker() { sudo docker system prune -f; }
 clean_podman() { podman system prune -f; }
 deep_journal_vacuum() { sudo journalctl --vacuum-time=6h; }
@@ -255,7 +277,7 @@ deep_tmp_sweep() {
 top_consumers() {
   du -sh "$HOME/.hermes" "$HOME/.cache" "$HOME/.npm" "$HOME/.cargo" \
     "$HOME/.config/BraveSoftware" "$HOME/Downloads" \
-    /var/cache/apt/archives 2>/dev/null | sort -rh | head -6
+    /var/cache/apt/archives /var/lib/apt/lists /var/log 2>/dev/null | sort -rh | head -6
 }
 
 step "Trash"           clean_trash
@@ -287,7 +309,10 @@ if [ "$HAVE_SUDO" -eq 1 ]; then
   step "APT package cache"        sudo apt-get clean
   step "APT autoclean"            sudo apt-get autoclean -y
   step "APT index cache"          clean_apt_index_cache
+  step_gated "APT package lists (regenerable)" clean_apt_lists
+  step "rsyslog rotate/truncate"  clean_rotated_logs
   step "systemd journal (>2d)"    sudo journalctl --vacuum-time=2d
+  step "systemd journal (>100MB)" sudo journalctl --vacuum-size=100M
   step "Old core dumps"           clean_coredumps
   step "Orphaned /tmp files (>1d)" clean_tmp
   command -v snap    >/dev/null 2>&1 && step "Old snap revisions"       clean_snap_old

@@ -20,6 +20,8 @@ device-code/OAuth login flows through a live browser non-interactively.
 Invoke when a request combines any of:
 - "set up a script that watches disk usage / cleans cache automatically."
 - "alert me before the battery dies" / "battery guard" / "low battery alarm."
+- "if the power goes out overnight, don't drain the battery" / "blackout guard" / "unplugged +
+  idle → close my apps and put it to sleep" / "protect the session from blackouts."
 - "check that everything I set up is actually running after a fresh boot" / "session health
   check" / "guards doctor."
 - "remind me about uncommitted work" / "don't let me lose work when this session dies"
@@ -64,6 +66,8 @@ Do NOT use to:
 | **A camera device's ACL can already grant access without group membership** | `/dev/video0` was owned `root:video` and the user wasn't in the `video` group — expected to need `usermod -aG video`, but `getfacl` showed an explicit `user:pop-os:rw-` entry (the `+` suffix on `ls -l`'s permission bits is the tell), and a direct Python `open()` succeeded. This is systemd-logind's dynamic per-seat `uaccess` udev tag granting the active session user real-time device ACLs. | Check `getfacl <device>` (look for the `+` suffix first) and actually try opening the device before assuming a group-membership fix is needed — adding the user to a group is a bigger, session-wide change than necessary when the ACL already covers it. |
 | **Don't hand-edit `com.system76.CosmicSettings.Shortcuts`'s live config to add a keybinding** | The shipped `defaults`/`system_actions` files (`/usr/share/cosmic/.../v1/`) are one large RON keymap covering every existing shortcut (workspace switching, lock screen, close window, etc.). There's no confirmed-safe way to verify a hand-written addition's schema without the compositor (`cosmic-comp`) actually reloading it, and a malformed file risks breaking *all* shortcuts, not just the new one — with no visible error to debug from outside the session. | Route custom keybindings through `cosmic-settings keyboard`'s own GUI custom-shortcuts editor instead — it writes this schema correctly by construction. Never write directly to `~/.config/cosmic/com.system76.CosmicSettings.Shortcuts/` from a script. |
 | **`yad`'s running tray icon can't have its image/tooltip updated in place from a separate `--command` invocation** | Each menu/click action runs as its own new process; there's no simple IPC back into the already-running icon process from those. | Supervise yad in a small respawn loop that kills and relaunches it (fresh `--image`/`--text`) whenever the underlying state changes — a sub-second flicker is a non-issue for something toggled a few times a day. |
+| **`tail -f /dev/input/event*` under `timeout` CANNOT detect input activity** | `tail -f` never exits on its own — it keeps following whether or not events arrive — so `timeout 5 tail -f ...` *always* ends via timeout (exit 124), making "idle" and "active" indistinguishable. | To sample input, `timeout N cat /dev/input/event* > probe` and check whether the probe file has any bytes: bytes flowed → input happened; empty → idle. Multiple readers on evdev devices are fine (the compositor still gets every event). logind's `IdleHint` (`busctl get-property org.freedesktop.login1 ... Manager IdleHint`) works on COSMIC and is the cheaper primary check — keep the event sampling as the fallback for DEs that don't report it, and if NEITHER source can confirm idle, fail safe to "not idle" so the guard never acts on a guess. |
+| **Suspend-to-RAM is the blackout answer for a live session, not "kill everything"** | A live-boot session dies only when power reaches zero; suspend keeps RAM powered at ~1-2W for days. On a machine left plugged in overnight, a blackout otherwise leaves browser/music/terminal draining the battery to dead. | An unplug + battery-floor + sustained-idle condition should gracefully close only heavy, state-restoring apps (browsers, media players — whitelisted by process name) and then `systemctl suspend` — the session, terminals, and agents all survive in RAM. Verify permission first with logind's `CanSuspend` method (`busctl call ... Manager CanSuspend` → `s "yes"`), not by actually suspending. |
 
 ---
 
@@ -91,6 +95,9 @@ skills/pop-os-live-session-hardening/
 │   ├── disk-cleanup.sh     (systemd-timer-driven, every 5 min; --digest prints cumulative
 │                            top space-eaters of the session)
 │   ├── battery-guard.sh    (systemd-service-driven, continuous; supports --test <secs>)
+│   ├── blackout-guard.sh   (systemd-timer-driven, every 60s; unplug + battery ≤60% + idle
+│                            ≥10 min → graceful close of browsers/media + suspend to RAM;
+│                            supports --status and --test)
 │   ├── lid-guard.sh        (CLI: on|off|toggle|confirm-toggle|status)
 │   ├── guards-doctor.sh    (one-shot per-boot health check: guard units, disk/RAM/battery,
 │                            gh/vercel/turso auth, internal-SSD link errors)
@@ -103,6 +110,7 @@ skills/pop-os-live-session-hardening/
 ├── systemd/
 │   ├── disk-cleanup.service / .timer
 │   ├── battery-guard.service
+│   ├── blackout-guard.service / .timer (enabled — checks every 60s)
 │   ├── lid-guard.service       (enabled — ON by default at every login)
 │   ├── guards-doctor.service / .timer   (enabled — fires ~2 min after login, once per boot)
 │   ├── dirty-work-nudge.service / .timer (enabled — hourly, offset from boot by 25 min)
@@ -114,9 +122,11 @@ skills/pop-os-live-session-hardening/
     └── copyq.desktop
 ```
 Running `install.sh` reproduces: periodic disk cleanup + notification, a battery alarm with
-escalating tiers and snooze, a lid-close guard that's **on by default** with a pinnable panel
-launcher to flip it off when you actually want the lid to suspend, and a running CopyQ clipboard
-manager with a 5000-item history. The dev-CLI bootstrap (gh/vercel/turso) is documented but
+escalating tiers and snooze, a blackout guard (unplug + low battery + sustained idle → close
+browsers/media gracefully and suspend to RAM so an overnight power cut can't kill the session),
+a lid-close guard that's **on by default** with a pinnable panel launcher to flip it off when
+you actually want the lid to suspend, and a running CopyQ clipboard manager with a 5000-item
+history. The dev-CLI bootstrap (gh/vercel/turso) is documented but
 deliberately **not** auto-run by `install.sh`, since it ends in per-account interactive logins.
 
 ---
@@ -201,6 +211,19 @@ for lid-guard's panel switch) — see `install.sh`.
   per boot as a digest notification, and anytime via `disk-cleanup.sh --digest` — this is how
   chronic offenders (stale Claude CLI versions, Brave's Service Worker cache) were originally
   discovered, minus the manual log-grepping.
+- **`blackout-guard.sh`** covers the failure battery-guard can't: the machine is plugged in
+  overnight, a blackout hits, and browser/music/terminal keep draining the battery to dead —
+  killing the live session. Every 60s it checks: AC unplugged (glob-tolerant over `AC*` and
+  USB-C PD `ucsi-source-psy-*` supplies) AND battery ≤ 60% AND genuinely discharging AND idle
+  for ~10 consecutive minutes (logind `IdleHint` primary, `/dev/input/event*` byte-count
+  sampling fallback; if neither can confirm idle it fails safe to "not idle"). When all hold,
+  it warns with a critical notification, gives a 30s grace window where ANY input or AC
+  return aborts, then SIGTERMs only an explicit whitelist of process names (browsers and
+  media players — all restore their state on next launch; terminals, claude/hermes agents,
+  the guard suite, the audio stack and compositor are untouched by construction) and
+  suspends to RAM — the session survives in RAM at ~1-2W instead of dying at 0%. A 30-min
+  cooldown prevents re-trigger thrash; `--status` shows the live decision inputs and
+  `--test` simulates the full path without signalling anything.
 
 ### 4. Enable and verify
 ```
@@ -212,6 +235,12 @@ systemctl --user enable --now lid-guard.service        # default ON
 systemd-inhibit --list | grep lid-guard  # confirm the inhibitor is actually held
 systemctl --user enable --now guards-doctor.timer      # per-boot health check
 systemctl --user enable --now dirty-work-nudge.timer   # hourly uncommitted-work reminder
+systemctl --user enable --now blackout-guard.timer     # nightly-blackout protection (60s cadence)
+~/bin/blackout-guard.sh --status         # confirm it reads real AC/battery/idle state correctly
+~/bin/blackout-guard.sh --test           # full dry run: what WOULD be closed — nothing is touched
+busctl call org.freedesktop.login1 /org/freedesktop/login1 \
+  org.freedesktop.login1.Manager CanSuspend            # must say 's "yes"' — verify suspend is
+                                                       # permitted WITHOUT actually suspending
 ~/bin/guards-doctor.sh                   # run the doctor once by hand to confirm all green
 mkdir -p ~/.local/share/applications
 cp desktop/lid-guard-toggle.desktop ~/.local/share/applications/
@@ -352,6 +381,25 @@ THEN remind about uncommitted changes on a cadence; never auto-commit/auto-push.
 IF a cleanup script measures freed space per step anyway
 THEN accumulate it into a per-session tally and surface the top eaters periodically — root
      causes (a specific tool's cache) are fixed once; mopping repeats forever.
+
+IF the threat is "power out overnight while plugged in, battery drains to dead with apps
+   still running" (a live session's worst-case)
+THEN don't just alarm (battery-guard already does that) — ACT: unplug + battery floor +
+     sustained-idle together should gracefully close only whitelisted state-restoring apps
+     and suspend to RAM. Require ALL THREE conditions AND a grace window abortable by any
+     input, AND a post-action cooldown — any one condition alone (unplugged while working,
+     low battery while active) must never trigger.
+
+IF an unattended script would close user applications
+THEN signal only an explicit whitelist of process names that are known to restore state on
+     relaunch (browsers, media players) — never kill by resource usage, window count, or
+     "everything except X" logic; the failure mode of an inverted list is killing the session
+     itself.
+
+IF verifying a suspend-based guard
+THEN check logind's `CanSuspend` (`busctl call org.freedesktop.login1 ... Manager CanSuspend`)
+     and simulate the decision path (`--test`) — never verify by actually suspending, since a
+     broken condition check would suspend the live session you're trying to protect.
 ```
 
 ---
@@ -502,6 +550,10 @@ wait
       notification fired exactly once — `digest-boot-id` marker present).
 - [ ] New timers appear in `systemctl --user list-timers` (guards-doctor: no NEXT until reboot
       is correct for a once-per-boot timer; dirty-work-nudge: NEXT ≈ last + 1h).
+- [ ] `blackout-guard.sh --status` matches reality (AC online, battery %, idle state);
+      `--test` lists exactly which whitelisted apps WOULD be closed and touches nothing;
+      logind `CanSuspend` returns `s "yes"`. The timer's NEXT advances ~60s each check.
+      Never verified by actually suspending or unplugging to force a trigger.
 
 ---
 
@@ -518,6 +570,12 @@ wait
 - **The dev-CLI bootstrap is documented, not automated**, because every login step ends in a
   human clicking "Authorize" with their own credentials/2FA — that boundary is intentional, not
   a gap to close.
+- **battery-guard and blackout-guard are complementary, not redundant**: battery-guard is an
+  *alarm* (you're awake, act now); blackout-guard is an *autonomous action* (you're asleep,
+  the machine saves itself). Both watch the same sysfs supplies but trigger on different
+  conditions and never interfere — blackout-guard's whitelist-kill + suspend runs only under
+  the full unplugged + low + idle conjunction, so normal battery use while working never
+  touches it.
 - **A live/USB session is ephemeral by default.** Everything here (scripts, systemd units,
   installed packages) lives only for the current boot unless the session has persistence set
   up or the target is an installed system — say so explicitly rather than letting someone
