@@ -1,0 +1,17 @@
+- [User environment](user_environment.md) — live-boot because internal SSD SATA link fault; git id ken-muritu/kenhopkins.ke@gmail.com; Hermes removed 2026-08-28; guard suite in skiiforge
+- [skiiforge repo](reference_skiiforge.md) — GitHub home for reusable skills, research docs, and `claude/` live-session restore point (memory + all-time session history)
+- [Credential rotation needed](project_credential_rotation_needed.md) — a Google API key + GitHub OAuth token were found in plaintext in old session transcripts 2026-08-25, ask if rotated
+- [TokenRouter setup](project_tokenrouter_setup.md) — claude-ox/ox2/tr/tr2 share a `_claude_relay` retry+error-classifier (08-30, fixes 402/503); interactive mid-session errors still uncatchable
+- [Live-session hardening](project_live_session_hardening.md) — 8 new guards (08-23); 08-31: fixed huggingface cache gap (89%→62%), Femi Lazarus live video download filled disk to 100% and died, unrecoverable
+- [CaspaHub due diligence](project_caspahub.md) — QR/queue pivot plan approved 09-03, extends caspahub-booking; never mention pharmacy history to Tom
+- [The Inner Circle](project_theinnercircle.md) — v2 shipped 4ca33fd 2026-08-23 (story/vision/intentional join); Tally form Xx6ZoV wired; hard-won Tally block schema
+- [Portfolio challenge](project_portfolio.md) — muritukennedy → TIC-standard white/black retheme, KenM.png light + KenM-EDIT-EDIT.jpg dark (SVG, dark = favicon), linktr.ee/muri_tuu, de-genericize, admin dashboard fixes
+- [ADDPlus+ audit](project_addplus.md) — repo at ~/addplus; Solera pharmacy graft is 90% dead code; full-picture audit done 2026-08-25, polish/hardening pending strip-vs-finish call
+- [Fungu app](project_fungu.md) — peer-debt ledger (Flutter APK + fungu-api.vercel.app), fully live 2026-08-24; YouTube transcripts stalled 17/2276 (IP-banned, proxy decision pending); was missing from memory until 2026-08-27
+- [Edifice audit](project_edifice_audit.md) — due diligence done 2026-08-25, report at ~/edifice-inspection.md; offline-sync throws + hardcoded dashboard data are the headline finds; qwen surveyed, ox-alpha verified+wrote
+- [Edifice Django rewrite](project_edifice_django_rewrite.md) — **LIVE at edifice-django.vercel.app** (own Vercel project; edificesite.vercel.app restored to Next.js per owner); all 42 tables ported, 130 tests; Render DB expires 2026-09-24
+- [Destructive instruction coordination](feedback_destructive_instruction_coordination.md) — peer-relayed deletes need verification + protect-then-delete; learned 2026-08-26 the hard way
+- [Audio pipeline: no default split](feedback_audio_pipeline_no_default_split.md) — compress to one file first, split only as fallback; Modulate has an undocumented ~2hr duration cap too
+- [Flutter live-session rollback](project_flutter_live_rollback.md) — attempted 2026-08-27, destabilized the session, fully undone same day; sdb3 is an empty partition again; do not re-attempt without asking
+- [Foveo](project_foveo.md) — gaze-reading extension, Chrome+Firefox ports pushed to private github.com/ken-muritu/foveo 2026-08-28; needs 1 manual Load-Temp-Add-on click to verify; never webcam-tested
+- [Teaching doc voice](feedback_teaching_doc_first_person_voice.md) — compiled teaching docs must be first-person (the pastor's voice), never third-person reporting; check a prior doc's style first
