@@ -37,6 +37,15 @@ private-repo boundary is not a reason to keep live credentials in cleartext.
 **Both of those should be rotated** since they sat in cleartext in local
 session logs; ask Claude to help if that hasn't happened yet.
 
+**2026-09-09 addition:** session `da55f37a-def8-461e-b126-49f3c445c392` (the
+Ardena demo-video / adb screen-capture session — see
+`skills/adb-app-demo-video/`) was added to `sessions/anthropic/`. The same
+YouTube API key surfaced again (re-echoed by a `grep` that went looking for
+it) and a phone unlock PIN the user pasted in-chat were both found and
+**redacted** the same way before this push. The YouTube key still isn't
+rotated as of this addition — it keeps resurfacing across unrelated sessions
+because it's never actually been changed at the source (`Fungu/.env`).
+
 ## Restore after reboot
 
 ```bash
